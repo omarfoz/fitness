@@ -269,6 +269,8 @@
     $('flexViewerNote').hidden = !readonly;
     $('sharingPanel').hidden = readonly;
     $('exportBtn').hidden = readonly;
+    $('bottomShareBtn').hidden = readonly;
+    $('quickLogBtn').firstChild.textContent = readonly ? 'View day ' : 'Log a meal ';
   }
   async function openTracker(id) {
     if (!user || !db || id === currentTrackerId) return;
@@ -420,10 +422,14 @@
     setText('challengeDay', day > CHALLENGE_DAYS ? 'Keep it going!' : 'Day ' + day + ' / ' + CHALLENGE_DAYS);
     $('challengeProgress').style.width = Math.min(100, Math.max(0, day / CHALLENGE_DAYS * 100)) + '%';
     setText('challengeDates', 'Nov 15 – Dec 14, 2026 · Continue afterward');
+    setText('overviewDay', fmtDay(selectedDate, { weekday: 'short', month: 'short', day: 'numeric' }));
     const currentShare = incomingShares.find((share)=>share.id===currentTrackerId);
+    const dayText = fmtDay(selectedDate, { weekday: 'long', month: 'long', day: 'numeric' });
     setText('heroSubtitle', viewingShared()
-      ? 'Viewing '+(currentShare?.display_name || 'shared fitness')+' progress. You have read-only access.'
-      : 'Today is ' + fmtDay(today, { weekday: 'long', month: 'long', day: 'numeric' }) + '. Build a routine you can keep.');
+      ? 'Viewing '+(currentShare?.display_name || 'shared fitness')+' progress. Read-only access.'
+      : selectedDate === today
+        ? 'Today is '+dayText+'. Small steps add up.'
+        : 'Your check-in for '+dayText+'. Progress at your own pace.');
   }
   function renderDay() {
     const entry = entries.get(selectedDate);
@@ -472,11 +478,34 @@
   }
   function renderStats() {
     const entry = entries.get(selectedDate);
+    const flexible = isFlexDay(selectedDate);
+    const calories = entry?.calories_estimate;
+    const hasCalories = calories != null;
+    // These are deliberately broad user-selected reference ranges, not exact
+    // medical or diet targets. Never invent remaining calorie precision.
+    const referenceLow = flexible ? 2300 : 1900;
+    const referenceHigh = flexible ? 2600 : 2200;
+    const ratio = hasCalories ? Math.min(100, Math.max(0, calories / referenceHigh * 100)) : 0;
+    const ring = $('calorieRing');
+    ring.style.setProperty('--ring-degrees', (ratio * 3.6).toFixed(2) + 'deg');
+    ring.setAttribute('aria-valuetext', hasCalories
+      ? 'Roughly ' + shortNum(calories) + ' calories logged, compared with a flexible reference range of ' + shortNum(referenceLow) + ' to ' + shortNum(referenceHigh)
+      : 'No estimated calories logged yet');
+    if (hasCalories) ring.setAttribute('aria-valuenow', String(Math.round(ratio)));
+    else ring.removeAttribute('aria-valuenow');
+    setText('calorieRange', shortNum(referenceLow) + '–' + shortNum(referenceHigh));
+    setText('calValue', hasCalories ? shortNum(calories) : '—');
+    setText('calMeta', flexible
+      ? 'Flexible day. Approximate reference only, not a limit.'
+      : 'Estimate only. Your nutritional needs may differ.');
+    setText('calorieState', hasCalories ? 'Logged' : 'Not logged');
+    $('calorieState').classList.toggle('is-saved', hasCalories);
+    $('calorieRangeFill').style.width = ratio.toFixed(1) + '%';
     setText('stepValue', entry?.steps == null ? '—' : shortNum(entry.steps));
     $('stepProgress').style.width = Math.min(100, Math.max(0, (entry?.steps || 0) / STEP_GOAL * 100)) + '%';
-    setText('stepMeta', entry?.steps == null ? 'Goal: 10,000 steps' : Math.max(0, STEP_GOAL - entry.steps).toLocaleString('en-US') + ' to goal · ' + fmtDay(selectedDate));
-    setText('calValue', entry?.calories_estimate == null ? '—' : shortNum(entry.calories_estimate));
-    setText('calMeta', isFlexDay(selectedDate) ? 'Flexible day · estimates only' : 'Standard day · estimates only');
+    setText('stepMeta', entry?.steps == null ? '10,000 steps is your daily aim' : entry.steps >= STEP_GOAL
+      ? 'Your daily walking goal is complete'
+      : shortNum(STEP_GOAL - entry.steps) + ' steps until your goal');
     setText('fastValue', entry?.fasting_hours == null ? '—' : entry.fasting_hours + 'h');
     $('daysValue').innerHTML = String(entries.size) + '<span class="stat-unit"> days</span>';
   }
@@ -540,6 +569,34 @@
       : '—');
     setText('summaryMeals', shortNum(rows.filter((r) => r.one_meal).length));
   }
+
+  // Navigation intentionally links to real sections rather than introducing
+  // separate pages or duplicate editable forms.
+  function activateBottomTab(target) {
+    document.querySelectorAll('.bottom-tab').forEach((button) => {
+      const isActive = button.dataset.navTarget === target;
+      button.classList.toggle('is-active', isActive);
+      if (isActive) button.setAttribute('aria-current', 'page');
+      else button.removeAttribute('aria-current');
+    });
+  }
+  function jumpToSection(target, focusMeal = false) {
+    const section = $(target);
+    if (!section || section.hidden) return;
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    activateBottomTab(target);
+    if (focusMeal && !viewingShared()) {
+      // Delay focus without scrolling twice; keeps the keyboard out of the way
+      // until the user actually wants to type.
+      $('meals').focus({ preventScroll: true });
+    }
+  }
+  $('appBottomNav').addEventListener('click', (event) => {
+    const target = event.target.closest('[data-nav-target]');
+    if (!target || target.hidden) return;
+    jumpToSection(target.dataset.navTarget);
+  });
+  $('quickLogBtn').addEventListener('click', () => jumpToSection('logSection', false));
 
   $('entryForm').addEventListener('submit', (event) => {
     event.preventDefault();

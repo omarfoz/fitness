@@ -1,0 +1,153 @@
+/*
+ * Mobile polish (loaded after existing themes).
+ * - Collapsible reference cards on phones
+ * - Legible 11/12px text floor
+ * - 44px touch targets
+ * - Food picker uses "Show more", not nested scrolling
+ * - Keep Safari pinch zoom accessible
+ */
+.card-collapse > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  list-style: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.card-collapse > summary::-webkit-details-marker { display: none; }
+.card-collapse > summary::marker { content: ""; }
+.card-collapse > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 10px; }
+.card-collapse-head { display: block; min-width: 0; }
+.card-collapse-head h2 { margin-bottom: 0; }
+.card-collapse-chevron {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  color: var(--muted);
+  transition: transform .2s ease;
+}
+.card-collapse[open] > summary .card-collapse-chevron { transform: rotate(90deg); }
+.card-collapse-body { padding-top: 14px; }
+@media (min-width: 681px) {
+  .card-collapse > summary { cursor: default; pointer-events: none; min-height: 0; }
+  .card-collapse-chevron { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-collapse-chevron { transition: none; }
+}
+.food-show-more {
+  grid-column: 1 / -1;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px dashed var(--field-border);
+  border-radius: 13px;
+  background: transparent;
+  color: var(--accent);
+  font-size: .82rem;
+  font-weight: 700;
+}
+.food-show-more:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 680px) {
+  /* Micro labels 11px, readable supporting text 12px */
+  html body .metric-kicker,
+  html body .eyebrow,
+  html body .energy-label,
+  html body .subtle-tag,
+  html body .food-browser-tag,
+  html body .pill,
+  html body .goal-caption,
+  html body .summary-panel small,
+  html body .week-row span,
+  html body .tracker-switcher label,
+  html body .bottom-tab {
+    font-size: .6875rem;
+  }
+  html body .tracker-heading small,
+  html body .energy-unit,
+  html body .energy-summary small,
+  html body .energy-summary p,
+  html body .energy-bottom > span,
+  html body .today-date-chip,
+  html body .field-help,
+  html body .muted.small,
+  html body small.muted,
+  html body .challenge-strip small,
+  html body .food-result-serve,
+  html body .food-result-ar,
+  html body .food-result-energy,
+  html body .food-results-header span,
+  html body .selected-food-main small,
+  html body .selected-food-edit > label,
+  html body .selected-foods-total,
+  html body .auth-steps span,
+  html body .checkline small,
+  html body .fixed-flex small,
+  html body .push-time-toggle small,
+  html body .push-message,
+  html body .guide-footnote,
+  html body .calendar-weekdays span,
+  html body .calendar-key,
+  html body .calendar-metrics-legend,
+  html body .optional,
+  html body .footer {
+    font-size: .75rem;
+  }
+  html body .food-result-name { font-size: .8125rem; }
+  html body .food-category,
+  html body .energy-action { font-size: .8125rem; }
+  html body .calendar-metric,
+  html body .calendar-day .day-status { font-size: .65625rem; }
+  html body .calendar-metric-icon,
+  html body .calendar-metric-icon svg { width: 10px; height: 10px; flex-basis: 10px; }
+
+  /* Apple-friendly minimum touch target sizes */
+  .tracker-identity { min-height: 44px; }
+  .theme-toggle { width: 44px; height: 44px; }
+  .tracker-actions .button-small { min-height: 44px; }
+  .text-button { min-height: 44px; display: inline-flex; align-items: center; }
+  .energy-action { min-height: 44px; }
+  .food-category { min-height: 44px; min-width: 44px; }
+  .food-remove { width: 44px; height: 44px; }
+  .selected-food-edit input { min-height: 44px; }
+  .advanced summary { min-height: 44px; }
+  .icon-button { width: 44px; height: 44px; }
+  .viewer-list .button { min-height: 44px; }
+
+  /* Results flow with the page; JS handles paging */
+  .food-results { max-height: none; overflow: visible; }
+  .selected-food-edit {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .selected-food-edit > label,
+  .selected-food-edit label:last-child { max-width: none; flex-basis: auto; min-width: 0; }
+  .selected-food-edit input { width: 100%; min-width: 0; }
+
+  .form-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .form-actions .button { width: 100%; white-space: nowrap; }
+
+  html body .food-browser .eyebrow { font-size: .6875rem; }
+  html body .viewer-list .button { font-size: .75rem; }
+  .food-result-bottom { flex-wrap: wrap; gap: 4px 5px; }
+  .food-result-serve { flex: 1 1 100%; overflow-wrap: normal; word-break: normal; }
+  .food-result-energy { margin-inline-start: auto; }
+}
+@media (max-width: 365px) {
+  .logging-card .section-heading { flex-wrap: wrap; }
+  .logging-card .section-heading .date-input { flex: 1 1 100%; width: 100%; max-width: none; min-width: 0; }
+  html body .calendar-metric,
+  html body .calendar-day .day-status { font-size: .625rem; }
+  html body .calendar-metric-icon,
+  html body .calendar-metric-icon svg { width: 8px; height: 8px; flex-basis: 8px; }
+}
+.sidebar > .glass-card { width: 100%; }
+.card-collapse { display: block; width: 100%; }
+
+/* ios-app.css earlier disabled gesture zoom even if the viewport allowed it.
+ * Re-enable standard browser pinch gestures, including the installed PWA. */
+@media (display-mode: standalone) {
+  html, body { touch-action: auto; }
+}

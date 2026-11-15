@@ -9,6 +9,8 @@
   const $ = (id) => document.getElementById(id);
   const config = window.FITNESS_CONFIG || {};
   let db, user = null, authMode = 'signin', recovering = false, entries = new Map(), flex = new Map();
+  let lastObservedDate = localDateKey(new Date());
+  let rolloverTimer = null;
   let selectedDate = localDateKey(new Date());
   let displayedMonth = firstOfMonth(dateFromKey(selectedDate));
   let loadingFor = null;
@@ -201,6 +203,40 @@
     renderCalendar();
     renderSummary();
   }
+  function refreshForNewDay() {
+    const currentDate = localDateKey(new Date());
+    if (currentDate === lastObservedDate) return;
+    const previousDate = lastObservedDate;
+    lastObservedDate = currentDate;
+    // Follow the new day only when the user was viewing the previous today.
+    // Keep a manually selected historical date untouched.
+    if (selectedDate === previousDate) {
+      selectedDate = currentDate < START_DATE ? START_DATE : currentDate;
+      displayedMonth = firstOfMonth(dateFromKey(selectedDate));
+    }
+    renderAll();
+  }
+  function scheduleDailyRollover() {
+    if (rolloverTimer !== null) clearTimeout(rolloverTimer);
+    const now = new Date();
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);
+    rolloverTimer = setTimeout(() => {
+      refreshForNewDay();
+      scheduleDailyRollover();
+    }, Math.max(1000, midnight.getTime() - now.getTime()));
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      refreshForNewDay();
+      scheduleDailyRollover();
+    }
+  });
+  window.addEventListener('pageshow', () => {
+    refreshForNewDay();
+    scheduleDailyRollover();
+  });
+  scheduleDailyRollover();
+
   function renderHero() {
     const today = localDateKey(new Date());
     const elapsed = Math.floor((dateFromKey(today) - dateFromKey(START_DATE)) / 86400000);
@@ -208,7 +244,7 @@
     setText('challengeDay', day > CHALLENGE_DAYS ? 'Keep it going!' : 'Day ' + day + ' / ' + CHALLENGE_DAYS);
     $('challengeProgress').style.width = Math.min(100, Math.max(0, day / CHALLENGE_DAYS * 100)) + '%';
     setText('challengeDates', 'Nov 15 – Dec 14, 2026 · Continue afterward');
-    setText('heroSubtitle', 'Your ' + fmtDay(today, { weekday: 'long', month: 'long', day: 'numeric' }) + ' check-in. Build a routine you can keep.');
+    setText('heroSubtitle', 'Today is ' + fmtDay(today, { weekday: 'long', month: 'long', day: 'numeric' }) + '. Build a routine you can keep.');
   }
   function renderDay() {
     const entry = entries.get(selectedDate);

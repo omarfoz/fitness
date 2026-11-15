@@ -41,9 +41,18 @@
     element.textContent=message;
     element.className='inline-message'+(kind?' '+kind:'');
   }
+  function updateSelectionBar() {
+    const bar=$('foodSelectionBar');
+    bar.hidden=items.length===0;
+    if (!bar.hidden) {
+      const count=items.length;
+      $('foodSelectionSummary').textContent=count+' '+(count===1?'food':'foods')+' · '+fmt(total())+' kcal';
+    }
+  }
   function syncTotal() {
     const sum=total();
     $('foodSum').textContent=fmt(sum);
+    updateSelectionBar();
     if (items.length && !manualTotal) $('calories').value=String(sum);
     if (items.length===0 && !manualTotal) $('calories').value='';
     renderHint();
@@ -53,12 +62,12 @@
     const note=$('calorieModeHint');
     if (manualTotal) {
       note.textContent=items.length
-        ? 'Manual daily total. Use food total to recalculate.'
-        : 'Manual daily estimate. Add foods if you like.';
+        ? 'Manual total · edit or use food sum.'
+        : 'Manual total · add foods if useful.';
     } else {
       note.textContent=items.length
-        ? 'Calculated from your food list. You can override it.'
-        : 'Add foods to calculate an estimated total.';
+        ? 'From selected foods · editable.'
+        : 'Add foods or enter a total manually.';
     }
   }
   function restoreItem(raw) {
@@ -167,6 +176,7 @@
     for(let i=0;i<items.length;i++) list.append(selectedRow(items[i],i));
     $('selectedFoodEmpty').hidden=items.length>0;
     $('foodSum').textContent=fmt(total());
+    updateSelectionBar();
     renderHint();
   }
   function categories() {
@@ -278,6 +288,9 @@
       }
     });
   }
+  $('jumpToSelectedFoods').addEventListener('click',()=>{
+    $('selectedFoodsHeading').scrollIntoView({ behavior:'smooth', block:'start' });
+  });
   $('selectedFoodList').addEventListener('click',event=>{
     const btn=event.target.closest('[data-food-remove]');
     if(!btn) return;

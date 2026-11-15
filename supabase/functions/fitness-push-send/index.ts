@@ -6,9 +6,9 @@ const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const VAPID_PUBLIC = "BA5IlLyKxRM9-CJHMAx-jSWTNLr8ODrOx1dKW8xVS9MKNdqGBNydIvO_iKL6n5-rcgdvfMyvxJaDRTLw9cbdg_s";
 const ORIGIN = "https://fitness.oalfawzan.sa";
 const SLOTS: Record<string, string> = {
-  "09:00": "Good morning! Start your day with a small step toward your goals.",
-  "14:00": "Afternoon check-in: how many steps have you taken so far?",
-  "20:00": "Your evening reminder: log today's food, calories and steps."
+  "10:00": "Good morning! Start your day with a small step toward your goals.",
+  "16:00": "Afternoon check-in: how many steps have you taken so far?",
+  "21:00": "Your evening reminder: log today's food, calories and steps."
 };
 const json = (body: Record<string, unknown>, code = 200) =>
   new Response(JSON.stringify(body), { status: code, headers: { "Content-Type": "application/json", "Cache-Control": "no-store", "Access-Control-Allow-Origin": ORIGIN, "Vary": "Origin" } });

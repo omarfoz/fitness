@@ -1,0 +1,249 @@
+/*
+ * Fitness Tracker · Accessible text palette
+ * Type-only color layer, placed AFTER previous theme sheets.
+ * Goals: maintain strong hierarchy over translucent glass, retain colorful
+ * section identities, and avoid faint captions on small iPhone displays.
+ * Does not change sizes, spacing, illustrations, or saved data.
+ *
+ * Contrast checks: primary >11:1; secondary >=6.5:1; subdued >=5.3:1
+ * against representative flat backgrounds (real translucent surfaces vary).
+ */
+:root:not([data-theme="light"]) {
+  --text: #F6F8FF;
+  --muted: #B9C8DD;
+  --soft: #A8BAD3;
+  --accent: #91C0FF;
+  --accent2: #D0BCFF;
+  --success: #8DE7C8;
+  --type-primary: #F6F8FF;
+  --type-secondary: #B9C8DD;
+  --type-subtle: #A8BAD3;
+  --type-placeholder: #B2C2D8;
+  --type-blue: #91C0FF;
+  --type-coral: #FFB4A7;
+  --type-mint: #8DE7C8;
+  --type-purple: #D0BCFF;
+  --type-amber: #F8D69B;
+  --type-pink: #FFB3D3;
+  --type-cyan: #98E1ED;
+}
+:root[data-theme="light"] {
+  --text: #17263F;
+  --muted: #40536E;
+  --soft: #4E6179;
+  --accent: #0756B4;
+  --accent2: #6140A5;
+  --success: #126B4D;
+  --type-primary: #17263F;
+  --type-secondary: #40536E;
+  --type-subtle: #4E6179;
+  --type-placeholder: #4E6179;
+  --type-blue: #0756B4;
+  --type-coral: #963D34;
+  --type-mint: #126B4D;
+  --type-purple: #6140A5;
+  --type-amber: #815014;
+  --type-pink: #983C6B;
+  --type-cyan: #116777;
+}
+
+/* 1. Neutral readable type: headings remain neutral, not rainbow-colored. */
+body,
+.tracker-heading strong,
+.today-header h1,
+.card-heading h2,
+.section-heading h2,
+.food-browser h3,
+.selected-foods-header h3,
+.sidebar h2,
+.history-card h2,
+.auth-card h2,
+.shared-metric strong,
+#entryForm .selected-food-main strong,
+#entryForm .food-result-name,
+#entryForm .custom-food-title strong {
+  color: var(--type-primary);
+}
+:root :is(
+  .muted, small.muted, .field-help, .guide-footnote,
+  .quick-entry-caption, .day-label .muted, .tracker-heading small,
+  .energy-unit, .energy-summary small, .energy-summary p,
+  .energy-bottom > span, .steps-total > span, .compact-metric small,
+  .selected-food-main small, .selected-food-edit > label,
+  .food-result-ar, .food-result-serve, .food-empty,
+  .push-message, .push-time-toggle small, .calendar-key,
+  .auth-description, .guide-line span
+) {
+  color: var(--type-secondary);
+}
+:root :is(
+  .optional, .metric-kicker, .energy-label,
+  .stat-card small, .summary-panel small,
+  .shared-metric small, .stat-unit,
+  .challenge-strip small, .footer,
+  .calendar-weekdays span, .calendar-day .day-status,
+  .food-results-header span
+) {
+  color: var(--type-subtle);
+}
+:root :is(.eyebrow, .text-button, .food-show-more, .tracker-switcher label) {
+  color: var(--type-blue);
+}
+:root :is(
+  input:not([type="checkbox"]), select, textarea
+) {
+  color: var(--type-primary);
+}
+:root :is(
+  input:not([type="checkbox"]), select, textarea
+)::placeholder {
+  color: var(--type-placeholder);
+  opacity: 1;
+}
+:root .calorie-mode-row .text-button { color: var(--type-blue); }
+:root :is(.food-result, .calendar-day, .bottom-tab, .button, .food-category, .food-remove):focus-visible {
+  outline-color: var(--type-blue);
+}
+
+/* 2. Color communicates meaning. Inactive labels don't compete with values. */
+:root .energy-card :is(.metric-kicker, .energy-label) {
+  color: var(--type-coral);
+}
+:root .energy-card .subtle-tag {
+  color: var(--type-coral);
+}
+:root .energy-card .subtle-tag.is-saved {
+  color: var(--type-mint);
+}
+:root .energy-card :is(.energy-number, .energy-summary strong) {
+  color: var(--type-primary);
+}
+:root .steps-card :is(.metric-kicker, .goal-caption, .steps-total strong) {
+  color: var(--type-mint);
+}
+:root .compact-metric:first-child :is(.metric-kicker, strong) {
+  color: var(--type-purple);
+}
+:root .compact-metric:last-child :is(.metric-kicker, strong) {
+  color: var(--type-amber);
+}
+:root .compact-metric:last-child .stat-unit,
+:root .compact-metric:first-child .stat-unit {
+  color: var(--type-secondary);
+}
+:root .challenge-strip :is(.metric-kicker, .challenge-strip-top strong) {
+  color: var(--type-blue);
+}
+
+/* 3. Consistent section accents throughout long Log, History and Share pages. */
+:root .logging-card .eyebrow,
+:root #entryForm .food-browser .eyebrow,
+:root #entryForm .food-browser-tag,
+:root #entryForm .food-result-energy,
+:root #entryForm .selected-foods-total {
+  color: var(--type-pink);
+}
+:root .flex-card .eyebrow,
+:root .pill.flexible,
+:root .calendar-day.is-flex .day-status {
+  color: var(--type-amber);
+}
+:root .guide-card .eyebrow,
+:root .history-card .eyebrow,
+:root .auth-card .eyebrow {
+  color: var(--type-purple);
+}
+:root .sharing-card .eyebrow,
+:root .push-card .eyebrow {
+  color: var(--type-cyan);
+}
+:root .food-category.is-active { color: var(--type-pink); }
+:root .food-category:not(.is-active) { color: var(--type-secondary); }
+:root .pill:not(.flexible):not(.neutral),
+:root .calendar-day.is-today,
+:root .today-date-chip svg {
+  color: var(--type-blue);
+}
+:root .pill.neutral,
+:root .calendar-day .day-status,
+:root .food-result-ar,
+:root .food-result-serve {
+  color: var(--type-subtle);
+}
+:root .calendar-day.is-logged:not(.is-flex) .day-status,
+:root .calendar-metric--steps,
+:root .calendar-metrics-legend .legend-step {
+  color: var(--type-mint);
+}
+:root .calendar-metric--calories,
+:root .calendar-metrics-legend .legend-calorie {
+  color: var(--type-coral);
+}
+:root .push-message.success,
+:root .inline-message.success {
+  color: var(--type-mint);
+}
+:root .push-message.error,
+:root .inline-message.error {
+  color: var(--type-coral);
+}
+:root #entryForm .food-selection-bar button { color: var(--type-mint); }
+:root #entryForm .food-selection-bar > span { color: var(--type-primary); }
+
+/* 4. Strong contrast for navigation. Inactive tabs remain legible. */
+:root .app-bottom-nav .bottom-tab:not(.is-active) {
+  color: var(--type-secondary);
+}
+:root .app-bottom-nav .bottom-tab:nth-child(1).is-active {
+  color: var(--type-blue);
+}
+:root .app-bottom-nav .bottom-tab:nth-child(2).is-active {
+  color: var(--type-pink);
+}
+:root .app-bottom-nav .bottom-tab:nth-child(3).is-active {
+  color: var(--type-purple);
+}
+:root .app-bottom-nav .bottom-tab:nth-child(4).is-active {
+  color: var(--type-cyan);
+}
+
+/* 5. Keep the small two-field Log area quiet: labels are readable;
+ * colored card fills and borders already identify the metrics. */
+:root .logging-card #entryForm .quick-entry-field label {
+  color: var(--type-primary);
+}
+:root .logging-card #entryForm .quick-entry-caption,
+:root .logging-card #entryForm .calorie-mode-row .field-help {
+  color: var(--type-secondary);
+}
+
+/* Light-theme chips use soft colored backgrounds; prefer deep ink to
+ * saturated pastel text. The existing fill colors are unchanged. */
+:root[data-theme="light"] .energy-card .energy-summary strong {
+  color: var(--type-coral);
+}
+:root[data-theme="light"] .today-header .gradient-text {
+  color: var(--type-purple);
+  -webkit-text-fill-color: var(--type-purple);
+}
+:root[data-theme="light"] .food-category.is-active,
+:root[data-theme="light"] .quick-food,
+:root[data-theme="light"] .selected-foods-total {
+  color: var(--type-pink);
+}
+:root[data-theme="light"] .pill.flexible {
+  color: var(--type-amber);
+}
+:root[data-theme="light"] .subtle-tag.is-saved {
+  color: var(--type-mint);
+}
+:root[data-theme="light"] .summary-panel small,
+:root[data-theme="light"] .calendar-weekdays span {
+  color: var(--type-subtle);
+}
+
+/* Button text contrast must not be lost by inheriting the new ink color. */
+:root .button.primary,
+:root[data-theme="light"] .button.primary {
+  color: #FFFFFF;
+}

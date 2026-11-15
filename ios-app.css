@@ -81,3 +81,119 @@ body::-webkit-scrollbar,
     touch-action: pan-x pan-y;
   }
 }
+
+
+/* Sticky liquid-glass fitness toolbar.
+ * The toolbar stays in document flow; no content is hidden beneath a fixed bar.
+ * Use transparent glass + live backdrop blur to reveal moving content beneath it.
+ */
+.app-header {
+  position: -webkit-sticky;
+  position: sticky;
+  top: max(9px, env(safe-area-inset-top, 0px));
+  z-index: 180;
+  isolation: isolate;
+  overflow: hidden;
+  margin-bottom: 30px;
+  background:
+    linear-gradient(145deg,
+      rgba(255,255,255,.19) 0%,
+      rgba(255,255,255,.065) 31%,
+      rgba(255,255,255,.022) 70%,
+      rgba(255,255,255,.075) 100%),
+    rgba(21,39,72,.63);
+  border: 1px solid rgba(232,243,255,.38);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255,255,255,.46),
+    inset 1px 0 0 rgba(255,255,255,.11),
+    inset 0 -1px 0 rgba(193,222,255,.14),
+    0 13px 32px rgba(2,9,27,.29),
+    0 3px 9px rgba(2,9,27,.13);
+  -webkit-backdrop-filter: blur(32px) saturate(190%) brightness(1.08);
+  backdrop-filter: blur(32px) saturate(190%) brightness(1.08);
+  transform: translateZ(0);
+}
+/* A specular highlight along the curved glass rim. */
+.app-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 65% 90% at 10% -30%,rgba(255,255,255,.20),transparent 74%),
+    linear-gradient(180deg,rgba(255,255,255,.07) 0%,transparent 52%);
+}
+/* Subtle bottom-edge reflection differentiates the glass from an opaque card. */
+.app-header::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 0;
+  height: 1px;
+  border-radius: 100%;
+  background: linear-gradient(90deg,transparent,rgba(190,226,255,.28),transparent);
+  pointer-events: none;
+}
+.app-header .tracker-mark {
+  border-color: rgba(220,238,255,.28);
+  background: linear-gradient(150deg,rgba(255,255,255,.13),rgba(255,255,255,.035));
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.app-header .tracker-actions .button-small {
+  border-color: rgba(231,242,255,.27);
+  background: linear-gradient(155deg,rgba(255,255,255,.16),rgba(255,255,255,.065));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.19);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+:root[data-theme="light"] .app-header {
+  background:
+    linear-gradient(148deg,
+      rgba(255,255,255,.72) 0%,
+      rgba(255,255,255,.30) 45%,
+      rgba(241,247,255,.18) 100%),
+    rgba(247,250,255,.58);
+  border-color: rgba(255,255,255,.84);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255,255,255,.99),
+    inset 1px 0 0 rgba(255,255,255,.62),
+    inset 0 -1px 0 rgba(101,137,193,.12),
+    0 12px 32px rgba(45,74,124,.16),
+    0 3px 10px rgba(45,74,124,.07);
+  -webkit-backdrop-filter: blur(32px) saturate(165%) brightness(1.04);
+  backdrop-filter: blur(32px) saturate(165%) brightness(1.04);
+}
+:root[data-theme="light"] .app-header::before {
+  background:
+    radial-gradient(ellipse 65% 90% at 10% -30%,rgba(255,255,255,.90),transparent 75%),
+    linear-gradient(180deg,rgba(255,255,255,.35),transparent 62%);
+}
+:root[data-theme="light"] .app-header .tracker-mark {
+  background: linear-gradient(150deg,rgba(255,255,255,.95),rgba(220,236,255,.45));
+  border-color: rgba(126,161,208,.36);
+}
+:root[data-theme="light"] .app-header .tracker-actions .button-small {
+  background: linear-gradient(150deg,rgba(255,255,255,.82),rgba(229,241,255,.52));
+  border-color: rgba(139,165,199,.34);
+  color: #243c5a;
+}
+/* In-page Today / Log / History / Share navigation must leave room for the
+ * sticky header, including the iPhone's dynamic-island safe area. */
+html {
+  scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 105px);
+}
+#todaySection, #logSection, #historySection, #sharingPanel, #main-content,
+#trackerSwitcher {
+  scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 105px);
+}
+@media (max-width: 680px) {
+  .app-header { margin-top: 9px; margin-bottom: 25px; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .app-header { background-color: #1d3251; }
+  :root[data-theme="light"] .app-header { background-color: #edf3fc; }
+}

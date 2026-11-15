@@ -91,3 +91,18 @@ If fasting causes faintness, dizziness, or difficulty meeting nutritional needs,
 ## Costs
 
 GitHub Pages and Supabase both offer free tiers that are appropriate for small personal trackers, subject to usage limits and provider terms. Existing domain renewal fees are separate.
+
+## iPhone push reminders
+
+The tracker supports **Home Screen Web Push** on iOS/iPadOS 16.4+, without a native App Store app or an Apple Developer subscription.
+
+- Three independently selectable Riyadh-time reminder slots: **9:00 AM**, **2:00 PM**, and **8:00 PM**. Notifications are generic and do not contain private nutrition, fasting or measurement data.
+- On iPhone, open the site in Safari, tap **Share → Add to Home Screen**, open the new **Fitness** app icon, and sign in. In **iPhone notifications**, choose the reminders and tap **Enable notifications**. Accept the iOS permission prompt.
+- Tap **Send test notification** to verify your registered device. The test uses your authenticated Supabase account and never exposes the server's VAPID private key.
+- Tap **Turn off reminders** to stop scheduled sends; sign-out unregisters that iPhone (without disabling notifications on your other devices).
+- iOS Focus and notification settings can silence/delay delivery. Notifications cannot be activated from an ordinary iPhone Safari browser tab.
+- The backend is a Supabase Edge Function at **supabase/functions/fitness-push-send/index.ts** plus three UTC-based Supabase Cron jobs. Source schema and schedules are in **supabase/web-push-setup.sql**.
+- The server stores its VAPID private key and cron authentication token in **Supabase Vault** (not GitHub), and the Edge Function reads them only through a service-role-only RPC. Push subscriptions and preferences use owner-only RLS. The public VAPID key is in **config.js**.
+- To set up a **new** Supabase project, create a matching P-256 VAPID keypair, store the private key and cron token in Vault, update the public key in both config and the Edge Function, apply the SQL setup after replacing PROJECT_REF, and deploy the Edge Function. The current connected project is already configured.
+
+**Testing status:** The scheduled backend was invoked successfully and returned HTTP 200 with no registered subscriptions. Actual notification delivery must be tested from an iPhone after the user grants permission.

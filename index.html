@@ -233,6 +233,10 @@
                 <button id="clearFoodSearchBtn" type="button" aria-label="Clear food search" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6 18 18M18 6 6 18"/></svg></button>
               </div>
               <div id="foodCategories" class="food-categories" role="group" aria-label="Filter food categories"></div>
+              <div id="foodSelectionBar" class="food-selection-bar" hidden>
+                <span id="foodSelectionSummary" aria-live="polite">No foods selected</span>
+                <button id="jumpToSelectedFoods" type="button">Review foods <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+              </div>
               <div class="food-results-header"><span id="foodResultsMeta" class="muted small">Popular foods</span><span class="muted small">kcal per serving</span></div>
               <div id="foodResults" class="food-results" role="group" aria-label="Choose foods"></div>
               <div id="foodNoResults" class="food-empty" hidden>No matching food. Try another word or add your own below.</div>

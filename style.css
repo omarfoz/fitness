@@ -230,3 +230,122 @@ p { line-height: 1.65; }
 @media (prefers-reduced-motion: reduce) {
   .app-header, .theme-toggle { transition: none; }
 }
+
+
+/* Safari-safe checkbox: the browser's native unchecked control was a black circle. */
+.checkline { position: relative; }
+.checkline .native-checkbox {
+  position: absolute;
+  width: 24px; height: 24px; min-height: 24px;
+  margin: 0; padding: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.checkbox-visual {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 24px;
+  width: 24px; height: 24px;
+  border: 1.5px solid var(--field-border);
+  border-radius: 8px;
+  background: rgba(255,255,255,.055);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.08);
+  transition: border-color .2s,background-color .2s;
+}
+:root[data-theme="light"] .checkbox-visual {
+  background: rgba(255,255,255,.72);
+}
+.checkbox-visual svg { width: 16px; height: 16px; stroke: #fff; opacity: 0; }
+.checkline .native-checkbox:checked + .checkbox-visual {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.checkline .native-checkbox:checked + .checkbox-visual svg { opacity: 1; }
+.checkline .native-checkbox:focus-visible + .checkbox-visual { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+/* Native disclosure triangles differ between iOS browsers. Use our SVG only. */
+.advanced summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  cursor: pointer;
+}
+.advanced summary::-webkit-details-marker { display: none; }
+.advanced summary::marker { content: ""; }
+.details-chevron {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  transition: transform .2s;
+}
+.advanced[open] .details-chevron { transform: rotate(90deg); }
+
+/* Owner-controlled sharing and view-only progress. */
+.tracker-switcher {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 16px;
+  padding: 16px 20px;
+}
+.tracker-switcher > div { flex: 1 1 auto; min-width: 160px; }
+.tracker-switcher label { margin: 0; color: var(--accent); font-size: .7rem; letter-spacing: .09em; }
+.tracker-switcher p { margin: 4px 0 0; }
+.tracker-switcher select { flex: 0 1 290px; width: 100%; }
+.tracker-switcher .pill { flex: 0 0 auto; }
+.sharing-card > p { color: var(--muted); line-height: 1.7; }
+.sharing-card .form-stack { margin-top: 16px; }
+.sharing-card .form-stack .button { margin-top: 12px; }
+.heading-inline-icon { width: 16px; height: 16px; }
+.share-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 25px 0 10px;
+  gap: 10px;
+  font-size: .85rem;
+}
+.viewer-list { display: flex; flex-direction: column; gap: 8px; }
+.viewer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 11px;
+  background: var(--input);
+  overflow-wrap: anywhere;
+}
+.viewer-info { min-width: 0; }
+.viewer-info strong { display: block; font-size: .77rem; font-weight: 600; }
+.viewer-info small { display: block; margin-top: 3px; color: var(--soft); }
+.viewer-row .button { padding: 6px 9px; min-height: 32px; font-size: .72rem; flex-shrink: 0; }
+#copyInviteBtn { margin-top: 14px; }
+.shared-day-summary { padding: 10px 0 5px; }
+.shared-day-summary > p { margin: 14px 0; }
+.shared-day-metrics {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 10px;
+}
+.shared-metric {
+  min-width: 0;
+  padding: 15px 13px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--input);
+}
+.shared-metric small { color: var(--soft); display: block; font-size: .72rem; }
+.shared-metric strong { display: block; margin-top: 6px; font-size: 1.15rem; }
+#flexViewerNote { margin: 14px 0 0; }
+
+/* No native iOS triangle or black circular checkbox should be visible. */
+@media (max-width: 700px) {
+  .tracker-switcher { flex-wrap: wrap; padding: 15px; }
+  .tracker-switcher > div { flex: 1 1 100%; }
+  .tracker-switcher select { flex: 1 1 180px; }
+  .shared-day-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}

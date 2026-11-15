@@ -54,3 +54,26 @@ The original Fitness dashboard looked attractive but made the user scroll throug
 ## Next decisions to revisit after use
 
 Observe whether the calorie-focused card is genuinely helpful and whether the diary fields can be reduced further without losing important detail. Avoid adding goals or analytics that increase pressure without improving adherence.
+
+
+## Mobile UI and UX follow-up: 15 Nov 2026
+
+### UI diagnosis from an iPhone screenshot
+- Two half-width number fields displayed uneven label wrapping and an extra explanation under just the calorie field, creating visibly mismatched heights.
+- Duplicate "daily check-in" introduction above the actual logging card increased scroll cost without adding meaning.
+- A 202-food picker required scrolling to its selected-items section to verify what had been added.
+- Fasting/coffee labels, long explanations, and custom-food fields competed for narrow widths.
+
+### Corrected interface
+- Steps and calories are now equivalent compact metric input cards. At 1000px and below they stack as matching horizontal rows, with the value on the right and a short explanation on the left. On wider screens they align as equal-height tiles.
+- Calorie estimation feedback is now a shared row *below* both metric tiles, so it can never stretch only one side.
+- Removed the duplicate section heading and moved the Log navigation anchor to the actual form card.
+- The food catalog has concise copy, clearer search labeling, accessible 44px controls, and an immediate selected-food count / estimated total beside search results. The Review foods action jumps to the editable list.
+- Fasting/coffee labels and mobile serving/calorie editing have consistent spacing and minimum widths.
+- Maintained Liquid Glass appearance, dark/light modes, collapsible reference cards, food pagination, read-only sharing, calendar data and scroll-aware bottom navigation.
+- Forced native `[hidden]` to remain hidden regardless of decorative display rules.
+
+### UX behavior and test boundaries
+- No backend schema changes; daily entry, editable food totals, and verified-email sharing persist as before.
+- JavaScript syntax, duplicate IDs, DOM selectors, food-list addition and live calorie recalculation were checked through static checks and a simulated browser DOM.
+- iPhone visual QA, large system-font settings, landscape rotation, keyboard focus and real Supabase save/reload still require device testing; do not treat simulated checks as an iOS browser test.

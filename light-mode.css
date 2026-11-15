@@ -143,7 +143,7 @@
 :root[data-theme="light"] :is(
   input:not([type="checkbox"]), select, textarea
 )::placeholder {
-  color: #72829a;
+  color: #64768f;
   opacity: 1;
 }
 :root[data-theme="light"] :is(input, select, textarea):focus {
@@ -250,6 +250,12 @@
 :root[data-theme="light"] .calendar-day:hover {
   background: #eef5ff;
 }
+:root[data-theme="light"] .calendar-day.empty {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
 :root[data-theme="light"] .calendar-day.is-flex {
   background: #fff8ee;
   border-color: #f0e0c6;

@@ -14,6 +14,11 @@
   let selectedDate = localDateKey(new Date());
   let displayedMonth = firstOfMonth(dateFromKey(selectedDate));
   let loadingFor = null;
+  let currentTrackerId = 'mine';
+  let ownedShares = [];
+  let incomingShares = [];
+  let lastInvitedEmail = '';
+  const viewingShared = () => currentTrackerId !== 'mine';
 
   function localDateKey(date) {
     return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
@@ -140,6 +145,7 @@
     const { error } = await db.auth.signOut();
     if (error) return showMessage('globalAlert', errorText(error), 'error');
     user = null; entries.clear(); flex.clear();
+    currentTrackerId='mine'; ownedShares=[]; incomingShares=[]; lastInvitedEmail='';
     $('appView').hidden = true; $('authView').hidden = false; $('logoutBtn').hidden = true;
     $('authPassword').value = '';
     showMessage('authMessage', 'Signed out successfully.', 'success');
@@ -151,6 +157,7 @@
     user = session.user;
     $('authView').hidden = true; $('appView').hidden = false; $('logoutBtn').hidden = false;
     showMessage('globalAlert', '');
+    await loadShares();
     await loadData();
   }
 
@@ -170,7 +177,7 @@
       ]);
       if (dayResult.error) throw dayResult.error;
       if (flexResult.error) throw flexResult.error;
-      if (!user || user.id !== uid) return;
+      if (!user || user.id !== uid || viewingShared()) return;
       entries = new Map((dayResult.data || []).map((row) => [row.entry_date, row]));
       flex = new Map((flexResult.data || []).map((row) => [row.week_start, row.flex_date]));
       renderAll();
@@ -178,6 +185,174 @@
       showMessage('globalAlert', 'Could not load your private data: ' + errorText(e), 'error');
     } finally { loadingFor = null; }
   }
+
+
+  async function loadShares() {
+    if (!user || !db) return;
+    const uid = user.id;
+    try {
+      // Claim pending invitations only for the currently authenticated, verified email.
+      const claimed = await db.rpc('claim_fitness_invitations');
+      if (claimed.error) throw claimed.error;
+      const [owned, incoming] = await Promise.all([
+        db.from('progress_shares').select('id,viewer_email,viewer_id,created_at').eq('owner_id',uid).order('created_at',{ascending:false}),
+        db.from('progress_shares').select('id,owner_id,display_name').eq('viewer_id',uid).order('created_at',{ascending:false})
+      ]);
+      if (owned.error) throw owned.error;
+      if (incoming.error) throw incoming.error;
+      if (!user || user.id !== uid) return;
+      ownedShares = owned.data || [];
+      incomingShares = incoming.data || [];
+      if (viewingShared() && !incomingShares.some((share)=>share.id === currentTrackerId)) {
+        currentTrackerId = 'mine';
+      }
+      renderShareControls();
+    } catch (e) {
+      showMessage('sharingMessage', 'Sharing could not be loaded: ' + errorText(e), 'error');
+    }
+  }
+  function renderShareControls() {
+    const select = $('trackerSelect');
+    const previous = currentTrackerId;
+    select.replaceChildren();
+    const mine = document.createElement('option');
+    mine.value = 'mine';
+    mine.textContent = 'My progress';
+    select.append(mine);
+    for (const share of incomingShares) {
+      const option = document.createElement('option');
+      option.value = share.id;
+      option.textContent = share.display_name || 'Shared fitness progress';
+      select.append(option);
+    }
+    if (previous !== 'mine' && !incomingShares.some((share)=>share.id===previous)) {
+      currentTrackerId = 'mine';
+    }
+    select.value = currentTrackerId;
+    $('trackerSwitcher').hidden = incomingShares.length === 0;
+    const rows = $('viewerList');
+    rows.replaceChildren();
+    $('viewerCount').textContent = String(ownedShares.length);
+    if (ownedShares.length === 0) {
+      const message = document.createElement('p');
+      message.className = 'muted small';
+      message.textContent = 'No one has access yet.';
+      rows.append(message);
+    }
+    for (const share of ownedShares) {
+      const row = document.createElement('div');
+      row.className = 'viewer-row';
+      const info = document.createElement('div');
+      info.className = 'viewer-info';
+      const email = document.createElement('strong');
+      email.textContent = share.viewer_email;
+      const state = document.createElement('small');
+      state.textContent = share.viewer_id ? 'Access active' : 'Pending: the viewer must sign in with this verified email';
+      info.append(email,state);
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'button subtle';
+      remove.textContent = 'Remove';
+      remove.dataset.removeShareId = share.id;
+      remove.setAttribute('aria-label','Remove access for '+share.viewer_email);
+      row.append(info,remove);
+      rows.append(row);
+    }
+    $('copyInviteBtn').hidden = !lastInvitedEmail;
+  }
+  function renderSharingState() {
+    const readonly = viewingShared();
+    $('viewOnlyBadge').hidden = !readonly;
+    $('entryForm').hidden = readonly;
+    $('sharedDaySummary').hidden = !readonly;
+    $('flexEditor').hidden = readonly;
+    $('flexViewerNote').hidden = !readonly;
+    $('sharingPanel').hidden = readonly;
+    $('exportBtn').hidden = readonly;
+  }
+  async function openTracker(id) {
+    if (!user || !db || id === currentTrackerId) return;
+    if (id !== 'mine' && !incomingShares.some((share)=>share.id===id)) return;
+    currentTrackerId = id;
+    entries.clear();
+    flex.clear();
+    renderShareControls();
+    renderSharingState();
+    if (id === 'mine') {
+      await loadData();
+      return;
+    }
+    const share = incomingShares.find((item)=>item.id===id);
+    if (!share) return;
+    const selectedId = id;
+    showMessage('globalAlert', '');
+    const [days,weeks] = await Promise.all([
+      db.rpc('shared_fitness_entries',{p_owner_id:share.owner_id}),
+      db.rpc('shared_fitness_weeks',{p_owner_id:share.owner_id})
+    ]);
+    if (currentTrackerId !== selectedId) return;
+    if (days.error || weeks.error) {
+      showMessage('globalAlert', 'Could not read shared progress: '+errorText(days.error||weeks.error),'error');
+      renderAll();
+      return;
+    }
+    entries = new Map((days.data || []).map((day)=>[day.entry_date,day]));
+    flex = new Map((weeks.data || []).map((week)=>[week.week_start,week.flex_date]));
+    renderAll();
+  }
+  $('trackerSelect').addEventListener('change',(event)=>{
+    openTracker(event.target.value).catch((e)=>showMessage('globalAlert',errorText(e),'error'));
+  });
+  $('shareForm').addEventListener('submit',(event)=>{
+    event.preventDefault();
+    if (!user || viewingShared() || !db) return;
+    callWithButton($('inviteBtn'),async()=>{
+      const email=$('viewerEmail').value.trim().toLowerCase();
+      if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+        showMessage('sharingMessage','Enter a valid email address.','error'); return;
+      }
+      if (email === String(user.email||'').toLowerCase()) {
+        showMessage('sharingMessage','You already have access to your own progress.','error'); return;
+      }
+      if (ownedShares.some((share)=>share.viewer_email===email)) {
+        showMessage('sharingMessage','This person is already on your list.','error'); return;
+      }
+      try {
+        const { error } = await db.from('progress_shares').insert({
+          owner_id: user.id,
+          viewer_email: email,
+          display_name: String(user.email||'Shared fitness progress').slice(0,80)
+        });
+        if (error) throw error;
+        lastInvitedEmail = email;
+        $('viewerEmail').value = '';
+        await loadShares();
+        showMessage('sharingMessage','Access is ready. Share the invitation message with this person. They must sign in using the verified email you entered.','success');
+      } catch(e) { showMessage('sharingMessage',errorText(e),'error'); }
+    });
+  });
+  $('viewerList').addEventListener('click',(event)=>{
+    const button=event.target.closest('[data-remove-share-id]');
+    if (!button || !user || viewingShared()) return;
+    const share=ownedShares.find((item)=>item.id===button.dataset.removeShareId);
+    if (!share || !window.confirm('Remove '+share.viewer_email+' from your viewers?')) return;
+    callWithButton(button,async()=>{
+      const {error}=await db.from('progress_shares').delete().eq('id',share.id).eq('owner_id',user.id);
+      if(error) return showMessage('sharingMessage',errorText(error),'error');
+      await loadShares();
+      showMessage('sharingMessage','Access removed. This person can no longer load your shared progress.','success');
+    });
+  });
+  $('copyInviteBtn').addEventListener('click', async ()=>{
+    if (!lastInvitedEmail) return;
+    const message = 'I have shared my fitness progress with you (view-only). Open https://fitness.oalfawzan.sa/ and sign in or create an account using '+lastInvitedEmail+'. Verify your email if prompted, then select my tracker from the dashboard.';
+    try {
+      await navigator.clipboard.writeText(message);
+      showMessage('sharingMessage','Invitation copied. Send it to your viewer.','success');
+    } catch(e) {
+      showMessage('sharingMessage','Could not copy automatically. Your invitee should open https://fitness.oalfawzan.sa/ and sign in using '+lastInvitedEmail+'.','error');
+    }
+  });
 
   function setDate(key, scroll = false) {
     if (key < START_DATE) return;
@@ -196,6 +371,7 @@
 
   function renderAll() {
     if (!user) return;
+    renderSharingState();
     renderHero();
     renderDay();
     renderStats();
@@ -244,7 +420,10 @@
     setText('challengeDay', day > CHALLENGE_DAYS ? 'Keep it going!' : 'Day ' + day + ' / ' + CHALLENGE_DAYS);
     $('challengeProgress').style.width = Math.min(100, Math.max(0, day / CHALLENGE_DAYS * 100)) + '%';
     setText('challengeDates', 'Nov 15 – Dec 14, 2026 · Continue afterward');
-    setText('heroSubtitle', 'Today is ' + fmtDay(today, { weekday: 'long', month: 'long', day: 'numeric' }) + '. Build a routine you can keep.');
+    const currentShare = incomingShares.find((share)=>share.id===currentTrackerId);
+    setText('heroSubtitle', viewingShared()
+      ? 'Viewing '+(currentShare?.display_name || 'shared fitness')+' progress. You have read-only access.'
+      : 'Today is ' + fmtDay(today, { weekday: 'long', month: 'long', day: 'numeric' }) + '. Build a routine you can keep.');
   }
   function renderDay() {
     const entry = entries.get(selectedDate);
@@ -257,14 +436,39 @@
     $('oneMeal').checked = entry?.one_meal ?? false;
     $('waist').value = entry?.waist_cm ?? '';
     $('notes').value = entry?.notes ?? '';
-    $('deleteEntryBtn').hidden = !entry;
+    $('deleteEntryBtn').hidden = !entry || viewingShared();
+    if (viewingShared()) {
+      const box=$('sharedDayMetrics');
+      box.replaceChildren();
+      $('sharedDayNote').textContent = entry
+        ? 'Progress recorded for '+fmtDay(selectedDate,{month:'long',day:'numeric',year:'numeric'})+'.'
+        : 'No progress has been recorded for this date.';
+      if (entry) {
+        const metrics=[
+          ['Steps',entry.steps == null ? 'Not logged' : shortNum(entry.steps)],
+          ['Estimated calories',entry.calories_estimate == null ? 'Not logged' : shortNum(entry.calories_estimate)],
+          ['Fasting',entry.fasting_hours == null ? 'Not logged' : entry.fasting_hours+' hours'],
+          ['Black coffee',entry.coffee_cups == null ? 'Not logged' : entry.coffee_cups+' cups'],
+          ['One main meal',entry.one_meal ? 'Yes' : 'No']
+        ];
+        for (const [label,value] of metrics) {
+          const item=document.createElement('div');
+          item.className='shared-metric';
+          const caption=document.createElement('small'); caption.textContent=label;
+          const detail=document.createElement('strong'); detail.textContent=value;
+          item.append(caption,detail);box.append(item);
+        }
+      }
+    }
     const flexible = isFlexDay(selectedDate);
     $('dayKind').textContent = flexible ? 'Flexible day' : 'Standard day';
     $('dayKind').classList.toggle('flexible', flexible);
     setText('dayHint', flexible
       ? (isFriday(selectedDate) ? 'Friday · flexible meals' : 'Your selected second flexible day')
       : 'One main meal is your preference; sufficient nutrition comes first');
-    setText('logTitle', selectedDate === localDateKey(new Date()) ? 'Log your day' : 'Log ' + fmtDay(selectedDate, { month: 'short', day: 'numeric' }));
+    setText('logTitle', viewingShared()
+      ? 'Shared day: '+fmtDay(selectedDate,{month:'short',day:'numeric'})
+      : (selectedDate === localDateKey(new Date()) ? 'Log your day' : 'Log ' + fmtDay(selectedDate, { month: 'short', day: 'numeric' })));
   }
   function renderStats() {
     const entry = entries.get(selectedDate);
@@ -295,6 +499,9 @@
       select.append(option);
     }
     select.value = value;
+    setText('flexViewerNote',value
+      ? 'Extra flexible day: '+fmtDay(value,{weekday:'long',month:'short',day:'numeric'})
+      : 'Friday is the only flexible day selected for this week.');
   }
   function renderCalendar() {
     const grid = $('calendarGrid'); grid.replaceChildren();
@@ -336,7 +543,7 @@
 
   $('entryForm').addEventListener('submit', (event) => {
     event.preventDefault();
-    if (!user || !db) return;
+    if (!user || !db || viewingShared()) return;
     callWithButton($('saveEntryBtn'), async () => {
       const steps = numericValue('steps'), cals = numericValue('calories'), fasting = numericValue('fasting');
       const coffee = numericValue('coffee') ?? 0, waist = numericValue('waist');
@@ -368,7 +575,7 @@
     });
   });
   $('deleteEntryBtn').addEventListener('click', async () => {
-    if (!user || !entries.has(selectedDate) || !window.confirm('Delete your entry for ' + fmtDay(selectedDate) + '? This cannot be undone.')) return;
+    if (!user || viewingShared() || !entries.has(selectedDate) || !window.confirm('Delete your entry for ' + fmtDay(selectedDate) + '? This cannot be undone.')) return;
     try {
       const { error } = await db.from('daily_entries').delete()
         .eq('user_id', user.id).eq('entry_date', selectedDate);
@@ -380,7 +587,7 @@
   });
   $('quickFoods').addEventListener('click', (event) => {
     const chip = event.target.closest('[data-meal]');
-    if (!chip) return;
+    if (!chip || viewingShared()) return;
     const existingMeal = $('meals').value.trim();
     $('meals').value = (existingMeal ? existingMeal + '\n' : '') + chip.dataset.meal;
     const oldCal = numericValue('calories') || 0;
@@ -388,7 +595,7 @@
     showMessage('entryMessage', 'Added a rough estimate. Adjust calories based on your actual portion.', 'success');
   });
   $('saveFlexBtn').addEventListener('click', () => {
-    if (!user) return;
+    if (!user || viewingShared()) return;
     callWithButton($('saveFlexBtn'), async () => {
       const week = mondayFreeWeekStart(selectedDate);
       const chosen = $('flexSelect').value;
@@ -423,7 +630,7 @@
     renderCalendar();
   });
   $('exportBtn').addEventListener('click', () => {
-    if (!user || entries.size === 0) return showMessage('globalAlert', 'No saved entries to export yet.');
+    if (!user || viewingShared() || entries.size === 0) return showMessage('globalAlert', 'No saved entries to export yet.');
     const cols = ['entry_date', 'steps', 'calories_estimate', 'meals', 'fasting_hours', 'one_meal', 'coffee_cups', 'waist_cm', 'notes'];
     const quoteCsv = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
     const rows = [...entries.values()].sort((a, b) => a.entry_date.localeCompare(b.entry_date));
@@ -454,6 +661,7 @@
       }
       if (event === 'SIGNED_OUT') {
         user = null; entries.clear(); flex.clear();
+        currentTrackerId='mine'; ownedShares=[]; incomingShares=[]; lastInvitedEmail='';
         $('appView').hidden = true; $('authView').hidden = false; $('logoutBtn').hidden = true;
         return;
       }

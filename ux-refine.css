@@ -341,3 +341,64 @@
 @media (prefers-reduced-motion: reduce) {
   #entryForm .food-result { transition: none; }
 }
+
+/* The hidden attribute must win over decorative display rules on iOS.
+ * Without this, the "Use food total" action can appear when it is disabled. */
+[hidden] { display: none !important; }
+
+/* Instant feedback beside the search results after selecting a food.
+ * Keeps the user oriented without an unexpected scroll to the list bottom. */
+#entryForm .food-selection-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 12px;
+  margin: 2px 0 12px;
+  border: 1px solid rgba(88,200,162,.30);
+  border-radius: 13px;
+  background: rgba(73,198,153,.10);
+}
+#entryForm .food-selection-bar > span {
+  color: var(--text);
+  font-size: .79rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+#entryForm .food-selection-bar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid rgba(104,213,175,.30);
+  border-radius: 10px;
+  background: rgba(105,223,185,.11);
+  color: var(--ux-green);
+  font-size: .78rem;
+  font-weight: 720;
+}
+#entryForm .food-selection-bar button svg {
+  width: 15px;
+  height: 15px;
+}
+:root[data-theme="light"] #entryForm .food-selection-bar {
+  background: #eaf8f2;
+  border-color: #b8e4cf;
+}
+:root[data-theme="light"] #entryForm .food-selection-bar button {
+  background: #fff;
+  border-color: #b5ddca;
+  color: #126f51;
+}
+#selectedFoodsHeading { scroll-margin-top: 24px; }
+@media(max-width:680px) {
+  #entryForm .food-selection-bar {
+    padding: 9px 10px;
+    margin-bottom: 11px;
+  }
+  #entryForm .food-selection-bar > span { font-size: .76rem; }
+  #entryForm .food-selection-bar button { min-height: 44px; font-size: .76rem; }
+}

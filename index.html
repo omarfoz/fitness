@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101827">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="description" content="Private daily wellness tracker for food, steps, fasting and flexible days.">
+  <title>Fitness Tracker | Omar Alfawzan</title>
+  <link rel="icon" type="image/svg+xml" href="/fitness-icon.svg">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/fitness-icon.svg">
+  <link rel="stylesheet" href="/style.css">
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem('fitness-theme')==='light'?'light':'dark'}catch(e){}</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script defer src="/config.js"></script>
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+  <div class="layout">
+    <header class="topbar">
+      <a class="identity" href="/" aria-label="Fitness Tracker home">
+        <span class="brand-icon" aria-hidden="true">✳</span>
+        <span><strong>FITNESS</strong><small>by Omar Alfawzan</small></span>
+      </a>
+      <div class="header-actions">
+        <a class="back-link" href="https://oalfawzan.sa/" target="_blank" rel="noopener noreferrer">Main website <span aria-hidden="true">↗</span></a>
+        <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20.3 15.3A8.8 8.8 0 0 1 8.7 3.7a8.9 8.9 0 1 0 11.6 11.6Z"/></svg>
+        </button>
+        <button class="button button-small subtle" id="logoutBtn" type="button" hidden>Sign out</button>
+      </div>
+    </header>
+    <div id="globalAlert" class="global-alert" role="status" aria-live="polite" hidden></div>
+
+    <section id="authView" class="auth-layout" aria-labelledby="authTitle">
+      <div class="auth-intro">
+        <span class="eyebrow"><span class="live-dot"></span> PRIVATE WELLNESS SPACE</span>
+        <h1>Progress over<br><span class="gradient-text">perfection.</span></h1>
+        <p>Track your meals, 10K daily steps, fasting and weekly flexibility. One day at a time, without obsessing over the scale.</p>
+        <div class="auth-steps">
+          <span>30-day challenge</span>
+          <span>Approximate calories</span>
+          <span>Your data stays yours</span>
+        </div>
+      </div>
+      <div class="glass-card auth-card">
+        <span class="eyebrow">WELCOME BACK</span>
+        <h2 id="authTitle">Sign in to your tracker</h2>
+        <p class="muted auth-description">Secure email and password login, powered by Supabase.</p>
+        <form id="authForm" class="form-stack">
+          <label for="authEmail">Email address</label>
+          <input id="authEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required maxlength="254">
+          <label for="authPassword">Password</label>
+          <input id="authPassword" name="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" minlength="8" required>
+          <button id="authSubmit" class="button primary full" type="submit">Sign in</button>
+        </form>
+        <div class="auth-links">
+          <button class="text-button" id="toggleSignup" type="button">Create an account</button>
+          <button class="text-button" id="forgotPassword" type="button">Forgot password?</button>
+        </div>
+        <div id="resetView" hidden>
+          <p class="muted">Choose a new password for your account.</p>
+          <form id="resetForm" class="form-stack">
+            <label for="newPassword">New password</label>
+            <input id="newPassword" type="password" required minlength="8" autocomplete="new-password">
+            <button class="button primary full" type="submit">Update password</button>
+          </form>
+        </div>
+        <div id="authMessage" class="inline-message" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <main id="appView" hidden>
+      <section class="hero">
+        <div>
+          <span class="eyebrow"><span class="live-dot"></span> YOUR DAILY DASHBOARD</span>
+          <h1>Make today <span class="gradient-text">count.</span></h1>
+          <p class="muted" id="heroSubtitle">A flexible challenge built for consistency, not perfection.</p>
+        </div>
+        <div class="challenge-badge">
+          <span id="challengeLabel">30-DAY CHALLENGE</span>
+          <strong id="challengeDay">Day 1 / 30</strong>
+          <div class="track"><div id="challengeProgress" class="track-fill" style="width:0%"></div></div>
+          <small id="challengeDates">Nov 15 – Dec 14, 2026</small>
+        </div>
+      </section>
+
+      <section class="stats-grid" aria-label="Today's metrics">
+        <article class="glass-card stat-card">
+          <div class="stat-top"><span>DAILY STEPS</span><span class="stat-symbol" aria-hidden="true">◌</span></div>
+          <div class="stat-value" id="stepValue">—</div>
+          <div class="track"><div id="stepProgress" class="track-fill" style="width:0%"></div></div>
+          <small id="stepMeta">Goal: 10,000 steps</small>
+        </article>
+        <article class="glass-card stat-card">
+          <div class="stat-top"><span>FOOD ESTIMATE</span><span class="stat-symbol" aria-hidden="true">◈</span></div>
+          <div class="stat-value" id="calValue">—</div>
+          <small id="calMeta">Estimated kcal, no weighing</small>
+        </article>
+        <article class="glass-card stat-card">
+          <div class="stat-top"><span>FASTING</span><span class="stat-symbol" aria-hidden="true">◷</span></div>
+          <div class="stat-value" id="fastValue">—</div>
+          <small>Hours logged (optional)</small>
+        </article>
+        <article class="glass-card stat-card">
+          <div class="stat-top"><span>CONSISTENCY</span><span class="stat-symbol" aria-hidden="true">✳</span></div>
+          <div class="stat-value" id="daysValue">0<span class="stat-unit"> days</span></div>
+          <small>Days with saved entries</small>
+        </article>
+      </section>
+
+      <div class="content-grid">
+        <section class="glass-card logging-card" aria-labelledby="logTitle">
+          <div class="section-heading">
+            <div><span class="eyebrow">DAILY CHECK-IN</span><h2 id="logTitle">Log your day</h2></div>
+            <input id="entryDate" class="date-input" type="date" aria-label="Select date for daily entry">
+          </div>
+          <div class="day-label"><span id="dayKind" class="pill">Standard day</span><span id="dayHint" class="muted small">Your routine, your pace</span></div>
+          <form id="entryForm" class="form-stack">
+            <div class="field-grid">
+              <div><label for="steps">Steps today</label><input id="steps" type="number" min="0" max="100000" step="1" inputmode="numeric" placeholder="e.g. 10,000"></div>
+              <div><label for="calories">Estimated calories</label><input id="calories" type="number" min="0" max="15000" step="1" inputmode="numeric" placeholder="Rough estimate"></div>
+            </div>
+            <div><label for="meals">What did you eat?</label><textarea id="meals" rows="3" maxlength="3000" placeholder="e.g. Chicken shawarma platter, fries, garlic sauce..."></textarea>
+              <p class="field-help">Use quick estimates if helpful, and adjust for your portions:</p>
+              <div class="quick-foods" id="quickFoods">
+                <button type="button" class="quick-food" data-meal="Chicken shawarma platter" data-cal="800">+ Shawarma ~800</button>
+                <button type="button" class="quick-food" data-meal="Double cheeseburger" data-cal="800">+ Burger ~800</button>
+                <button type="button" class="quick-food" data-meal="3 medium pizza slices" data-cal="1050">+ Pizza ~1,050</button>
+                <button type="button" class="quick-food" data-meal="Chicken kabsa with rice" data-cal="1100">+ Kabsa ~1,100</button>
+              </div>
+            </div>
+            <div class="field-grid">
+              <div><label for="fasting">Fasting hours <span class="optional">(optional)</span></label><input id="fasting" type="number" min="0" max="24" step="0.5" inputmode="decimal" placeholder="e.g. 18"></div>
+              <div><label for="coffee">Black coffee cups</label><input id="coffee" type="number" min="0" max="30" step="1" inputmode="numeric" placeholder="e.g. 2"></div>
+            </div>
+            <label class="checkline" for="oneMeal"><input id="oneMeal" type="checkbox"><span><strong>One main meal today</strong><small>Record what actually happened, without judgment</small></span></label>
+            <details class="advanced">
+              <summary>More notes <span class="optional">optional</span></summary>
+              <div class="advanced-inner">
+                <label for="waist">Waist measurement (cm)</label>
+                <input id="waist" type="number" min="30" max="300" step="0.5" inputmode="decimal" placeholder="No scale needed">
+                <label for="notes">Day notes</label>
+                <textarea id="notes" rows="2" maxlength="3000" placeholder="Energy, mood, hunger, sleep or anything else..."></textarea>
+              </div>
+            </details>
+            <div class="form-actions">
+              <button class="button primary" id="saveEntryBtn" type="submit">Save today's check-in <span aria-hidden="true">↗</span></button>
+              <button class="button subtle" id="deleteEntryBtn" type="button" hidden>Delete entry</button>
+            </div>
+            <div id="entryMessage" class="inline-message" aria-live="polite"></div>
+          </form>
+        </section>
+
+        <aside class="sidebar">
+          <section class="glass-card flex-card" aria-labelledby="flexTitle">
+            <span class="eyebrow">WEEKLY FLEXIBILITY</span>
+            <h2 id="flexTitle">Two flexible days.</h2>
+            <p class="muted">Friday is always flexible. Choose one other day each week, depending on your schedule.</p>
+            <div class="week-row"><span>THIS SELECTED WEEK</span><strong id="weekRange">—</strong></div>
+            <div class="fixed-flex"><span class="flex-dot"></span><div><strong>Friday</strong><small>Fixed flexible day</small></div><span class="pill neutral">Always</span></div>
+            <label for="flexSelect">Your second flexible day</label>
+            <select id="flexSelect"><option value="">Not selected</option></select>
+            <button id="saveFlexBtn" type="button" class="button secondary full">Save weekly plan</button>
+            <div id="flexMessage" class="inline-message" aria-live="polite"></div>
+          </section>
+          <section class="glass-card guide-card">
+            <span class="eyebrow">THE PLAN</span>
+            <h2>Stay consistent.</h2>
+            <div class="guide-line"><span>Standard days</span><strong>5 per week</strong></div>
+            <div class="guide-line"><span>Flexible days</span><strong>2 per week</strong></div>
+            <div class="guide-line"><span>Daily steps</span><strong>10,000</strong></div>
+            <div class="guide-line"><span>Calorie approach</span><strong>Approximate</strong></div>
+            <p class="guide-footnote">Eat enough to meet your nutrition needs. One-meal fasting can make that difficult. It's okay to split food into more meals when needed; no punishment or compensatory fasting.</p>
+          </section>
+        </aside>
+      </div>
+
+      <section class="glass-card history-card" aria-labelledby="historyTitle">
+        <div class="section-heading history-heading">
+          <div><span class="eyebrow">PROGRESS OVER TIME</span><h2 id="historyTitle">Your calendar</h2></div>
+          <div class="history-actions">
+            <button id="prevMonth" class="icon-button" type="button" aria-label="Previous month">‹</button>
+            <strong id="monthLabel">November 2026</strong>
+            <button id="nextMonth" class="icon-button" type="button" aria-label="Next month">›</button>
+          </div>
+        </div>
+        <div class="calendar-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+        <div id="calendarGrid" class="calendar-grid" role="group" aria-label="Daily tracking calendar"></div>
+        <div class="calendar-key"><span><i class="key-dot logged"></i> Logged</span><span><i class="key-dot flex"></i> Flexible</span><span><i class="key-dot unlogged"></i> Not logged</span></div>
+        <div class="summary-panel">
+          <div><small>ENTRIES LOGGED</small><strong id="summaryLogged">0</strong></div>
+          <div><small>10K STEP DAYS</small><strong id="summarySteps">0</strong></div>
+          <div><small>AVERAGE STEPS</small><strong id="summaryAvg">—</strong></div>
+          <div><small>MEAL DAYS</small><strong id="summaryMeals">0</strong></div>
+        </div>
+        <div class="history-footer">
+          <span class="muted">No weigh-ins required. Your data is visible only to your account.</span>
+          <button id="exportBtn" class="button subtle" type="button">Export my data (CSV)</button>
+        </div>
+      </section>
+      <footer class="footer">
+        <span>© 2026 Omar Alfawzan · Built for progress, not perfection</span>
+        <span>Private tracker · <a href="https://oalfawzan.sa/privacy/" target="_blank" rel="noopener noreferrer">Website privacy</a></span>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

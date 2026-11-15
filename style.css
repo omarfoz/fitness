@@ -8,3 +8,239 @@
 @media(max-width:680px){body,html[data-theme=light] body{background-attachment:scroll}.layout{padding:0 14px}.topbar{min-height:73px}.header-actions{gap:7px}.back-link{display:none}.auth-layout{grid-template-columns:1fr;padding:37px 0;gap:24px;min-height:auto}.auth-intro h1{font-size:2.8rem}.auth-intro>p{font-size:.93rem}.auth-steps{margin-top:21px}.auth-card{padding:23px}.hero{align-items:flex-start;flex-direction:column;gap:15px;padding:32px 0 19px}.hero h1{font-size:2.65rem}.challenge-badge{width:100%;padding:15px 18px}.challenge-badge strong{margin:4px 0}.stats-grid{gap:10px}.stat-card{min-height:147px;padding:15px}.stat-value{font-size:1.85rem;margin-top:10px}.logging-card,.flex-card,.guide-card,.history-card{padding:18px}.section-heading{align-items:flex-start}.date-input{width:155px;max-width:48%;font-size:.76rem}.sidebar{display:flex}.field-grid{gap:9px}.form-actions{align-items:stretch}.form-actions button{flex:1}.calendar-weekdays,.calendar-grid{gap:4px}.calendar-day{min-height:57px;border-radius:10px;padding:9px 0 6px}.calendar-day .day-status{font-size:.51rem}.history-actions{gap:4px}.history-actions strong{min-width:96px;font-size:.76rem}.history-heading{flex-wrap:wrap}.summary-panel{grid-template-columns:repeat(2,1fr)}.history-footer{align-items:flex-start;flex-direction:column}.footer{gap:7px;padding-bottom:23px}}
 @media(max-width:380px){.identity strong{font-size:.85rem}.identity small{font-size:.58rem}.brand-icon{width:37px;height:37px}.date-input{font-size:.71rem}.calendar-day .day-status{font-size:.48rem}.calendar-key{gap:11px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
+
+
+/* --------------------------------------------------------------
+   Shared visual language from oalfawzan.sa/site.css.
+   Main-site colors, glass material, typography and responsive nav.
+   Keep fitness form layouts while matching the personal site.
+   -------------------------------------------------------------- */
+:root {
+  --bg: #010204;
+  --bg-panel: rgba(255,255,255,.032);
+  --bg-panel-h: rgba(255,255,255,.05);
+  --text: #ffffff;
+  --muted: rgba(255,255,255,.60);
+  --soft: rgba(255,255,255,.44);
+  --border: rgba(255,255,255,.13);
+  --shine: rgba(255,255,255,.20);
+  --accent: #007aff;
+  --accent2: #007aff;
+  --success: #53d5aa;
+  --shadow: 0 8px 26px rgba(0,0,0,.14);
+  --input: rgba(255,255,255,.035);
+  --field-border: rgba(255,255,255,.16);
+  --glass-blur: 20px;
+  --glass-saturation: 160%;
+  --site-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+:root[data-theme="light"] {
+  --bg: #dce8f5;
+  --bg-panel: rgba(255,255,255,.50);
+  --bg-panel-h: rgba(255,255,255,.66);
+  --text: #111827;
+  --muted: rgba(24,33,49,.76);
+  --soft: rgba(24,33,49,.68);
+  --border: rgba(255,255,255,.82);
+  --shine: rgba(255,255,255,.98);
+  --accent: #0062cc;
+  --accent2: #0062cc;
+  --success: #047d56;
+  --shadow: 0 5px 16px rgba(38,55,78,.055);
+  --input: rgba(255,255,255,.44);
+  --field-border: rgba(62,91,137,.21);
+}
+html { background: var(--bg); }
+body,
+input,
+button,
+select,
+textarea {
+  font-family: var(--site-font);
+}
+body {
+  color: var(--text);
+  background: linear-gradient(rgba(13,22,45,.84),rgba(1,2,4,.94)),
+    url("https://oalfawzan.sa/image-1600.webp") center/cover fixed;
+  background-color: var(--bg);
+  overflow-x: clip;
+}
+:root[data-theme="light"] body {
+  background: url("https://oalfawzan.sa/image-1600.webp") center/cover fixed;
+  background-color: var(--bg);
+}
+.layout { max-width: 900px; padding: 0 16px; }
+.ambient { display: none; }
+h1 { font-size: clamp(2.55rem,6vw,3.35rem); font-weight: 700; letter-spacing: -.035em; line-height: 1.06; }
+h2 { font-size: 1.35rem; font-weight: 600; letter-spacing: -.02em; }
+p { line-height: 1.65; }
+.eyebrow {
+  font-size: .72rem;
+  letter-spacing: .14em;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.gradient-text {
+  background: none;
+  color: var(--accent);
+  -webkit-text-fill-color: currentColor;
+}
+:root[data-theme="light"] .gradient-text { background: none; color: var(--accent); }
+.glass-card,
+.challenge-badge,
+.auth-steps span,
+.pill {
+  background: linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.004) 58%),var(--bg-panel);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 var(--shine), var(--shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+}
+:root[data-theme="light"] .glass-card,
+:root[data-theme="light"] .challenge-badge,
+:root[data-theme="light"] .auth-steps span,
+:root[data-theme="light"] .pill {
+  background: linear-gradient(145deg,rgba(255,255,255,.78),rgba(255,255,255,.24) 62%),var(--bg-panel);
+  box-shadow: inset 0 1px 0 var(--shine),inset 0 -1px 0 rgba(71,85,105,.10),0 9px 24px var(--shadow);
+}
+.glass-card { border-radius: 24px; }
+.auth-card { max-width: 100%; }
+.button.primary { background: #007aff; border-color: rgba(255,255,255,.22); box-shadow: inset 0 1px 0 rgba(255,255,255,.24),0 3px 10px rgba(0,122,255,.18); }
+:root[data-theme="light"] .button.primary { background: #0062cc; }
+.button.secondary { color: var(--text); }
+.button.subtle, .button.secondary, .quick-food, .icon-button {
+  border-color: var(--border);
+  background: rgba(255,255,255,.035);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  -webkit-backdrop-filter: blur(12px) saturate(145%);
+  backdrop-filter: blur(12px) saturate(145%);
+}
+:root[data-theme="light"] .button.subtle,
+:root[data-theme="light"] .button.secondary,
+:root[data-theme="light"] .quick-food,
+:root[data-theme="light"] .icon-button {
+  background: rgba(255,255,255,.42);
+  border-color: rgba(255,255,255,.78);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.96);
+}
+.track-fill { background: var(--accent); }
+.live-dot { background: var(--success); }
+.stat-symbol { display: inline-flex; align-items: center; justify-content: center; font-size: inherit; color: var(--accent); }
+.stat-symbol svg { width: 22px; height: 22px; display: block; }
+.inline-icon { width: 17px; height: 17px; flex: 0 0 17px; }
+
+/* Match the main site's liquid-glass navigation, including mobile 2-row behavior. */
+.skip-link {
+  position: fixed; top: 10px; left: 10px; z-index: 10000;
+  padding: 10px 14px; border-radius: 10px;
+  background: var(--accent); color: #fff;
+  font-weight: 600; transform: translateY(-180%);
+}
+.skip-link:focus-visible { transform: translateY(0); }
+.site-nav {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto auto;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 10px 14px;
+  margin: 16px 0 38px;
+  border-radius: 28px;
+  background: linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.008) 58%),var(--bg-panel);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 var(--shine),0 8px 24px var(--shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+}
+:root[data-theme="light"] .site-nav {
+  background: linear-gradient(145deg,rgba(255,255,255,.82),rgba(255,255,255,.30) 62%),var(--bg-panel);
+  box-shadow: inset 0 1px 0 var(--shine),inset 0 -1px 0 rgba(71,85,105,.10),0 6px 17px var(--shadow);
+}
+.nav-name {
+  grid-column: 1;
+  color: var(--text); font-size: 1.02rem; font-weight: 600;
+  line-height: 1.2; letter-spacing: -.02em; white-space: nowrap;
+}
+.nav-buttons {
+  grid-column: 2; display: flex; align-items: center; gap: 7px;
+  overflow-x: auto; white-space: nowrap;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.nav-buttons::-webkit-scrollbar { display: none; }
+.nav-link {
+  flex: 0 0 auto;
+  min-height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  padding: 7px 13px; border-radius: 18px;
+  color: var(--text);
+  font-size: .80rem; font-weight: 500; line-height: 1;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.035);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  -webkit-backdrop-filter: blur(12px) saturate(145%);
+  backdrop-filter: blur(12px) saturate(145%);
+}
+:root[data-theme="light"] .nav-link {
+  background: rgba(255,255,255,.42);
+  border-color: rgba(255,255,255,.78);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.96);
+}
+.nav-link.active,
+:root[data-theme="light"] .nav-link.active {
+  color: #fff;
+  background: var(--accent);
+  border-color: rgba(255,255,255,.22);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.24),0 3px 10px rgba(0,122,255,.18);
+}
+.theme-toggle {
+  grid-column: 3;
+  display: inline-grid; place-items: center;
+  width: 34px; height: 34px; padding: 0;
+  border: 0; border-radius: 50%;
+  color: var(--text); background: transparent;
+}
+.theme-toggle svg {
+  display: block; width: 17px; height: 17px;
+}
+.theme-icon-sun { display: none !important; }
+:root[data-theme="light"] .theme-icon-sun { display: block !important; }
+:root[data-theme="light"] .theme-icon-moon { display: none !important; }
+@media (hover:hover) and (pointer:fine) {
+  .nav-link:hover { background: var(--bg-panel-h); border-color: var(--field-border); }
+  .theme-toggle:hover { background: var(--bg-panel-h); }
+}
+
+/* Compact hero style: the same scale, type weight, and blue emphasis as home. */
+.auth-layout { min-height: calc(100vh - 125px); padding: 30px 0 75px; }
+.auth-intro > p { line-height: 1.65; }
+.hero { padding: 8px 0 25px; }
+.hero h1 { font-size: clamp(2.55rem,6vw,3.35rem); font-weight: 700; line-height: 1.06; letter-spacing: -.035em; }
+.stats-grid { gap: 12px; }
+.stat-card { min-height: 162px; }
+.stat-value { font-weight: 700; }
+.guide-footnote { line-height: 1.7; }
+.stat-card small { color: var(--soft); }
+.challenge-badge { border-radius: 24px; }
+.day-label .pill, .pill.neutral { box-shadow: none; }
+:root[data-theme="light"] .checkline,
+:root[data-theme="light"] .summary-panel { background: rgba(255,255,255,.34); }
+
+@media (max-width: 900px) {
+  .site-nav { grid-template-columns: minmax(0,1fr) auto; gap: 7px 8px; padding: 10px 12px; margin: 12px 0 34px; border-radius: 26px; }
+  .site-nav .nav-name { grid-column: 1; grid-row: 1; font-size: 1rem; }
+  .site-nav .theme-toggle { grid-column: 2; grid-row: 1; width: 32px; height: 32px; }
+  .site-nav .nav-buttons { grid-column: 1 / -1; grid-row: 2; margin-top: 4px; padding-bottom: 2px; }
+}
+@media (max-width: 700px), (pointer:coarse) {
+  :root { --glass-blur: 14px; --glass-saturation: 145%; }
+  body, :root[data-theme="light"] body { background-attachment: scroll; }
+  .layout { padding: 0 14px; }
+  .stat-card { min-height: 145px; }
+  .glass-card, .challenge-badge { box-shadow: inset 0 1px 0 var(--shine),0 3px 12px rgba(0,0,0,.05); }
+  .auth-layout { padding: 10px 0 42px; }
+  .auth-intro h1 { font-size: 2.48rem; }
+  .hero { padding: 0 0 20px; }
+  .hero h1 { font-size: 2.48rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-nav, .nav-link { transition: none; }
+}

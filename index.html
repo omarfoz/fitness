@@ -10,11 +10,11 @@
   <link rel="icon" type="image/svg+xml" href="/fitness-icon.svg">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/fitness-icon.svg">
-  <link rel="stylesheet" href="/style.css?v=20261115c">
+  <link rel="stylesheet" href="/style.css?v=20261115d">
   <script>try{document.documentElement.dataset.theme=localStorage.getItem('fitness-theme')==='light'?'light':'dark'}catch(e){}</script>
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script defer src="/config.js"></script>
-  <script defer src="/app.js?v=20261115c"></script>
+  <script defer src="/app.js?v=20261115d"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -92,6 +92,12 @@
         </div>
       </section>
 
+      <section id="trackerSwitcher" class="glass-card tracker-switcher" hidden aria-label="Choose a progress tracker">
+        <div><label for="trackerSelect">VIEWING PROGRESS</label><p class="muted small">Switch between your progress and people who shared theirs with you.</p></div>
+        <select id="trackerSelect" aria-label="Progress tracker"><option value="mine">My progress</option></select>
+        <span class="pill" id="viewOnlyBadge" hidden>View only</span>
+      </section>
+
       <section class="stats-grid" aria-label="Today's metrics">
         <article class="glass-card stat-card">
           <div class="stat-top"><span>DAILY STEPS</span><span class="stat-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 3 1.9 2.5M13.2 3.1l-1.5 3M3.5 9.3l3.2.7M10.5 9.7c1 2.5.5 4.2-1.2 5.2-1.9 1.1-4.2.5-5.2-1.1s-.4-3.5 1.5-4.3c1.9-.8 4.2-.8 4.9.2Z"/><path d="M15.6 11.8 18 10m-3.2 6.3 3 1.3m-5.5 1.5c.5-2.2 2-3.4 4-3.5 2-.1 3.5 1.6 3.4 3.2-.2 1.7-1.7 2.6-3.6 2.3-2.3-.3-4.2-1.2-3.8-2Z"/></svg></span></div>
@@ -143,7 +149,7 @@
             </div>
             <label class="checkline" for="oneMeal"><input id="oneMeal" type="checkbox"><span><strong>One main meal today</strong><small>Record what actually happened, without judgment</small></span></label>
             <details class="advanced">
-              <summary>More notes <span class="optional">optional</span></summary>
+              <summary><svg class="details-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg> More notes <span class="optional">optional</span></summary>
               <div class="advanced-inner">
                 <label for="waist">Waist measurement (cm)</label>
                 <input id="waist" type="number" min="30" max="300" step="0.5" inputmode="decimal" placeholder="No scale needed">
@@ -157,6 +163,12 @@
             </div>
             <div id="entryMessage" class="inline-message" aria-live="polite"></div>
           </form>
+          <div id="sharedDaySummary" class="shared-day-summary" hidden>
+            <span class="pill">View-only progress</span>
+            <p id="sharedDayNote" class="muted">Choose a day to view progress shared with you.</p>
+            <div id="sharedDayMetrics" class="shared-day-metrics"></div>
+            <p class="field-help">Private notes, meal descriptions and waist measurements aren't shared.</p>
+          </div>
         </section>
 
         <aside class="sidebar">
@@ -166,10 +178,13 @@
             <p class="muted">Friday is always flexible. Choose one other day each week, depending on your schedule.</p>
             <div class="week-row"><span>THIS SELECTED WEEK</span><strong id="weekRange">—</strong></div>
             <div class="fixed-flex"><span class="flex-dot"></span><div><strong>Friday</strong><small>Fixed flexible day</small></div><span class="pill neutral">Always</span></div>
-            <label for="flexSelect">Your second flexible day</label>
-            <select id="flexSelect"><option value="">Not selected</option></select>
-            <button id="saveFlexBtn" type="button" class="button secondary full">Save weekly plan</button>
-            <div id="flexMessage" class="inline-message" aria-live="polite"></div>
+            <div id="flexEditor">
+              <label for="flexSelect">Your second flexible day</label>
+              <select id="flexSelect"><option value="">Not selected</option></select>
+              <button id="saveFlexBtn" type="button" class="button secondary full">Save weekly plan</button>
+              <div id="flexMessage" class="inline-message" aria-live="polite"></div>
+            </div>
+            <p id="flexViewerNote" class="muted small" hidden></p>
           </section>
           <section class="glass-card guide-card">
             <span class="eyebrow">THE PLAN</span>
@@ -179,6 +194,20 @@
             <div class="guide-line"><span>Daily steps</span><strong>10,000</strong></div>
             <div class="guide-line"><span>Calorie approach</span><strong>Approximate</strong></div>
             <p class="guide-footnote">Eat enough to meet your nutrition needs. One-meal fasting can make that difficult. It's okay to split food into more meals when needed; no punishment or compensatory fasting.</p>
+          </section>
+          <section class="glass-card sharing-card" id="sharingPanel" aria-labelledby="sharingTitle">
+            <span class="eyebrow"><svg class="heading-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-2a5.5 5.5 0 0 1 11 0v2M17 9h5m-2.5-2.5v5"/></svg> PRIVATE SHARING</span>
+            <h2 id="sharingTitle">Share your progress</h2>
+            <p class="muted">Invite someone by email. They can view your steps, fasting and calorie estimates, but cannot edit anything. You can remove access at any time.</p>
+            <form id="shareForm" class="form-stack">
+              <label for="viewerEmail">Viewer's email address</label>
+              <input id="viewerEmail" type="email" maxlength="254" autocomplete="off" placeholder="friend@example.com" required>
+              <button id="inviteBtn" type="submit" class="button secondary full">Allow read-only access</button>
+            </form>
+            <div id="sharingMessage" class="inline-message" role="status" aria-live="polite"></div>
+            <div class="share-list-head"><strong>People with access</strong><span id="viewerCount" class="pill neutral">0</span></div>
+            <div id="viewerList" class="viewer-list"><p class="muted small">No one has access yet.</p></div>
+            <button id="copyInviteBtn" type="button" class="button subtle full" hidden>Copy invitation message</button>
           </section>
         </aside>
       </div>

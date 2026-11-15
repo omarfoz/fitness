@@ -14,6 +14,9 @@ Built with HTML, CSS and JavaScript, with the Liquid Glass styling of oalfawzan.
 - Dark/light mode, responsive layouts and Add to Home Screen manifest
 - Per-user PostgreSQL Row Level Security (RLS); no diet logs stored in the public repository or browser local storage
 - No analytics scripts on the tracker
+- **Private sharing by verified email**, with a dedicated viewer list, invitation message, and one-click access revocation
+- **Read-only shared progress:** viewers can see steps, approximate calories, fasting, coffee and one-meal check-ins, plus weekly flex days; meal descriptions, notes and waist measurements stay private
+- SVG-based checkbox and disclosure controls designed to avoid black native iPhone input rendering
 
 ## How to deploy
 
@@ -26,13 +29,26 @@ The files in this repository are ready to serve as a **static GitHub Pages site*
 5. In Supabase **Authentication → Providers → Email**, keep email/password enabled. Depending on your email provider's settings, confirmation emails may require additional setup or have free-tier limits.
 6. Visit `https://fitness.oalfawzan.sa/`, create an account, verify it if confirmation is on, and sign in.
 
-For a single-owner tracker, create your account first, then **disable new user sign-ups** in Supabase authentication settings. This is optional, but prevents other people from registering. RLS already prevents users from reading each other's records.
+If you want to invite someone who does **not** already have an account, keep Supabase email sign-ups enabled while that person registers and verifies their email. If you disable new sign-ups, only existing verified accounts can accept invitations. Each user's data remains protected by RLS.
+
+## Private, read-only progress sharing
+
+1. Sign in to **your own** Fitness Tracker, then scroll to **Share your progress**.
+2. Enter your chosen viewer's email and select **Allow read-only access**.
+3. Select **Copy invitation message** and send it to the viewer through your preferred messaging app. **The app does not automatically email invitations.**
+4. The viewer must create an account (if needed), **verify that same email address**, and sign in at `https://fitness.oalfawzan.sa/`. If already signed in, reloading the page claims the invitation.
+5. The viewer chooses your tracker from the progress selector near the top of the dashboard. They can browse progress but cannot add, edit, or delete records.
+6. To revoke access, choose **Remove** beside their email in **People with access**. After revocation, new data requests are denied.
+
+Data boundaries: sharing is restricted to date, steps, estimated calories, fasting hours, one-meal status, black-coffee cups, and selected weekly flexible days. The app intentionally does **not** expose exact meal descriptions, private notes or waist measurements in the viewer RPCs. There is no public, unauthenticated share URL.
+
+Security implementation is documented in `supabase/migrations/20261115_private_progress_sharing.sql`. Three `SECURITY DEFINER` RPCs are intentionally callable by logged-in users. Each verifies either the caller's confirmed email (to claim an invitation) or an active, owner-controlled share row (to read selected progress). This restricted design may produce an intentional Supabase advisory for authenticated SECURITY DEFINER functions. Review function changes carefully before deploying.
 
 ## Backend configuration and security
 
 - `config.js` contains only the **public Supabase project URL and publishable key**; these are safe for the browser. **Never commit a service-role or secret key.**
-- `supabase/migrations/20261115_initialize_fitness.sql` documents the schema and per-user RLS policies that have already been applied to the connected project.
-- API requests use the current signed-in user's session. All record reads and writes are restricted to `auth.uid() = user_id`.
+- `supabase/migrations/20261115_initialize_fitness.sql` documents the original schema and RLS policies; `supabase/migrations/20261115_private_progress_sharing.sql` documents owner-controlled invitations and restricted view-only access.
+- API requests use the current signed-in user's session. Standard tracking-table RLS restricts direct reads and writes to `auth.uid() = user_id`; signed-in invited viewers receive only selected summary fields via explicitly authorized RPCs.
 - The repository and page HTML are public even though the tracking records require authentication. The app sends `noindex` metadata and `robots.txt` denies indexing, but these are not access controls.
 - Data export is a local CSV download in your browser, not a cloud sharing service.
 - Use at least a strong unique password. Consider enabling multi-factor authentication in Supabase if desired.

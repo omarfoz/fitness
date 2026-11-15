@@ -8,6 +8,10 @@
   const $ = (id) => document.getElementById(id);
   let items = [], contextKey = null, manualTotal = false, manualValue = '';
   let category = 'Popular', searchText = '';
+  // Short first page on phones rather than a nested scroller.
+  const PAGE_FIRST = 8, PAGE_MORE = 16;
+  const pagedLayout = window.matchMedia('(max-width: 680px)');
+  let pageKey = '', pageLimit = PAGE_FIRST;
   const popularNames = [
     'Chicken shawarma Arabic','Chicken shawarma sandwich','Double cheeseburger',
     'Chicken burrito','Beef taco','Chicken taco','Margherita pizza slice',
@@ -192,6 +196,10 @@
     $('foodNoResults').hidden=visible.length>0;
     $('clearFoodSearchBtn').hidden=searchText.length===0;
     $('foodResultsMeta').textContent=category+(searchText?' · '+fmt(visible.length)+' matches':' · '+fmt(visible.length)+' foods');
+    const key=category+'|'+query;
+    if(key!==pageKey){pageKey=key;pageLimit=PAGE_FIRST;}
+    const remaining=pagedLayout.matches?Math.max(0,visible.length-pageLimit):0;
+    if(remaining>0) visible=visible.slice(0,pageLimit);
     for(const food of visible) {
       const button=el('button','food-result');
       button.type='button';
@@ -208,6 +216,17 @@
       button.append(foot);
       host.append(button);
     }
+    if(remaining>0){
+      const more=el('button','food-show-more','Show more foods ('+fmt(remaining)+' left)');
+      more.type='button'; more.dataset.foodMore='1';
+      host.append(more);
+    }
+  }
+  const resizeFoodResults = () => renderCatalog();
+  if (pagedLayout.addEventListener) {
+    pagedLayout.addEventListener('change', resizeFoodResults);
+  } else {
+    pagedLayout.addListener(resizeFoodResults);
   }
   $('foodCategories').addEventListener('click',event=>{
     const btn=event.target.closest('[data-food-category]');
@@ -228,6 +247,11 @@
     renderCatalog();$('foodSearch').focus();
   });
   $('foodResults').addEventListener('click',event=>{
+    if(event.target.closest('[data-food-more]')){
+      pageLimit+=PAGE_MORE;
+      renderCatalog();
+      return;
+    }
     const button=event.target.closest('[data-food-add]');
     if(!button) return;
     addFood(foods.find(food=>food.id===button.dataset.foodAdd));

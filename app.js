@@ -277,7 +277,7 @@
     entries.clear();
     flex.clear();
     renderShareControls();
-    renderSharingState();
+    renderAll();
     if (id === 'mine') {
       await loadData();
       return;
@@ -308,7 +308,7 @@
     if (!user || viewingShared() || !db) return;
     callWithButton($('inviteBtn'),async()=>{
       const email=$('viewerEmail').value.trim().toLowerCase();
-      if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         showMessage('sharingMessage','Enter a valid email address.','error'); return;
       }
       if (email === String(user.email||'').toLowerCase()) {

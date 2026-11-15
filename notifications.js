@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const conf = window.FITNESS_CONFIG || {};
-  const TIMES = ['09:00', '14:00', '20:00'];
+  const TIMES = ['10:00', '16:00', '21:00'];
   const $ = (id) => document.getElementById(id);
   let db = null, currentUser = null, registration = null, active = false, busy = false, initialized = false;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -70,7 +70,11 @@
     if (!selectedTimes().length) { note('Choose at least one daily reminder first.', 'error'); return; }
     toggleBusy(true);
     try {
-      // subscribe() is initiated by the user's tap, required for Apple Web Push.
+      // Apple requires permission to be requested by a direct user tap.
+      // On first activation ask for permission before subscribing.
+      const permission = Notification.permission === 'granted'
+        ? 'granted' : await Notification.requestPermission();
+      if (permission !== 'granted') throw new Error('Notifications permission was not granted.');
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true, applicationServerKey: publicKeyBytes(conf.vapidPublicKey)
       });

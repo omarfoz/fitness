@@ -208,7 +208,7 @@
   });
   $('foodSearch').addEventListener('input',event=>{
     searchText=event.target.value.trim().slice(0,100);
-    if(searchText && category==='Popular')category='All';
+    if(searchText)category='All'; // Searching always includes every category.
     if(!searchText && category==='All')category='Popular';
     renderCatalog();
     $('foodResults').scrollTop=0;
@@ -234,6 +234,16 @@
     addFood({id,name,arabic:'',serving:'1 serving',kcal});
     $('customFoodName').value='';$('customFoodCalories').value='';
   });
+  // Pressing Enter inside the custom-food mini form should add that item,
+  // not accidentally submit and save the entire daily entry.
+  for (const inputId of ['customFoodName','customFoodCalories']) {
+    $(inputId).addEventListener('keydown',event=>{
+      if(event.key==='Enter') {
+        event.preventDefault();
+        $('addCustomFoodBtn').click();
+      }
+    });
+  }
   $('selectedFoodList').addEventListener('click',event=>{
     const btn=event.target.closest('[data-food-remove]');
     if(!btn) return;

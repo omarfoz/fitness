@@ -3,6 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Fitness">
   <meta name="theme-color" content="#16233d">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="description" content="Private daily wellness tracker for food, steps, fasting and flexible days.">
@@ -10,7 +12,7 @@
   <link rel="icon" type="image/svg+xml" href="/fitness-icon.svg">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/fitness-icon.svg">
-  <link rel="stylesheet" href="/style.css?v=20261115e">
+  <link rel="stylesheet" href="/style.css?v=20261115-ios-status-v1">
   <link rel="stylesheet" href="/dashboard.css?v=20261115f">
   <link rel="stylesheet" href="/light-mode.css?v=20261115-light-v3">
   <link rel="stylesheet" href="/colors.css?v=20261115-colors-v1">
@@ -26,6 +28,8 @@
   <script defer src="/app.js?v=20261115-push-v1"></script>
 </head>
 <body>
+  <!-- iOS 27 samples this real fixed element for the Home Screen status bar color. -->
+  <div class="ios-status-sampler" aria-hidden="true"></div>
   <a class="skip-link" href="#main-content">Skip to content</a>
   <div class="layout">
     <header class="app-header" aria-label="Fitness Tracker">

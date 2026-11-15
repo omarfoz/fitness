@@ -8,6 +8,10 @@ Built with HTML, CSS and JavaScript, with the Liquid Glass styling of oalfawzan.
 
 - Email/password sign-in, account creation, password reset
 - Daily steps, rough calorie estimates, meals, fasting hours, black coffee, optional waist measurements and notes
+- **202 food options across 14 categories**, including burritos, tacos, shawarma, burgers, pizza, Saudi rice dishes, breakfast, salads, desserts, and drinks
+- **Arabic and English food search**, per-serving calorie estimates, adjustable serving quantity and individual calorie values, and custom foods
+- Daily calorie total automatically calculated from selected foods, with a manual override for more accurate restaurant or nutrition-label numbers
+- Itemized selected foods saved privately to Supabase in `daily_entries.meal_items` and restored when you reopen any saved day
 - One-meal checkbox to record the day's actual pattern (not a medical recommendation)
 - Friday as the fixed flexible day, plus **one selectable extra flexible day per Sunday-to-Saturday week**
 - Calendar of saved entries, 30-day progress, averages and CSV export
@@ -30,6 +34,20 @@ The files in this repository are ready to serve as a **static GitHub Pages site*
 6. Visit `https://fitness.oalfawzan.sa/`, create an account, verify it if confirmation is on, and sign in.
 
 If you want to invite someone who does **not** already have an account, keep Supabase email sign-ups enabled while that person registers and verifies their email. If you disable new sign-ups, only existing verified accounts can accept invitations. Each user's data remains protected by RLS.
+
+## Food library
+
+1. Go to **Log → Find something you ate**.
+2. Search in **English or Arabic** (e.g., `burrito`, `taco`, `شاورما`, or `رز`) or browse one of the **14 categories**. Tap **All** to browse the full 202-item library.
+3. Tap any food to add it. Tap it again to increase its quantity, or type a precise quantity in increments of 0.5 servings.
+4. Change **Kcal / serving** for that food if your restaurant or product label gives a better number.
+5. The **daily calorie total** automatically follows your selected foods, unless you edit that total manually. Use **Use food total** to recalculate it from your list.
+6. Use **Add a custom food** to log anything not listed, and write optional free-form notes.
+7. Select **Save today's check-in**. The item list is stored in your private daily record and is editable later.
+
+**Accuracy:** All catalog calorie numbers are ballpark examples for the serving shown, *not verified label values or nutrition prescriptions*. Recipe, restaurant, toppings, sauces, and portion size may significantly change the actual calories. The app allows you to replace estimates with restaurant nutrition facts or package labels when available. Food names and serving estimates are bundled in the static app; there is **no external nutrition API or additional subscription**.
+
+The new `supabase/migrations/20261115_itemized_foods.sql` adds a JSONB array to the existing daily table without removing older records. Existing owner-only RLS policies protect itemized foods. The restricted viewer RPC intentionally does not expose individual food names or meal notes.
 
 ## Private, read-only progress sharing
 

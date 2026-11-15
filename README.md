@@ -96,8 +96,8 @@ GitHub Pages and Supabase both offer free tiers that are appropriate for small p
 
 The tracker supports **Home Screen Web Push** on iOS/iPadOS 16.4+, without a native App Store app or an Apple Developer subscription.
 
-- Three independently selectable Riyadh-time reminder slots: **9:00 AM**, **2:00 PM**, and **8:00 PM**. Notifications are generic and do not contain private nutrition, fasting or measurement data.
-- On iPhone, open the site in Safari, tap **Share → Add to Home Screen**, open the new **Fitness** app icon, and sign in. In **iPhone notifications**, choose the reminders and tap **Enable notifications**. Accept the iOS permission prompt.
+- Three independently selectable Riyadh-time reminder slots: **10:00 AM**, **4:00 PM**, and **9:00 PM**. Notifications are generic and do not contain private nutrition, fasting or measurement data.
+- On iPhone, open the site in Safari, tap **Share → Add to Home Screen**, open the new **Fitness** app icon, and sign in. In **iPhone notifications**, choose the reminders and tap **Enable notifications**. Accept the iOS permission prompt (requested only when you tap the button).
 - Tap **Send test notification** to verify your registered device. The test uses your authenticated Supabase account and never exposes the server's VAPID private key.
 - Tap **Turn off reminders** to stop scheduled sends; sign-out unregisters that iPhone (without disabling notifications on your other devices).
 - iOS Focus and notification settings can silence/delay delivery. Notifications cannot be activated from an ordinary iPhone Safari browser tab.

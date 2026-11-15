@@ -402,3 +402,25 @@
   #entryForm .food-selection-bar > span { font-size: .76rem; }
   #entryForm .food-selection-bar button { min-height: 44px; font-size: .76rem; }
 }
+
+/* Consistent tap areas for search, removal and disclosure controls. */
+#entryForm .food-search-wrap input { padding-right: 55px; }
+#entryForm .food-search-wrap > button {
+  width: 44px;
+  height: 44px;
+  right: 3px;
+  border-radius: 12px;
+}
+#entryForm .food-search-wrap > button:focus-visible,
+#entryForm .food-selection-bar button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+#entryForm .food-category { flex-shrink: 0; }
+#entryForm .selected-food-side .food-remove { min-width: 44px; min-height: 44px; }
+#entryForm .food-show-more:hover { background: rgba(124,154,207,.09); }
+@media (max-width: 680px) {
+  #entryForm .food-results-header span { font-size: .73rem; }
+  .sidebar .card-collapse > summary { min-height: 48px; }
+  .sidebar .push-time-toggle { min-height: 48px; }
+}

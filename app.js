@@ -485,7 +485,7 @@
     $('dayKind').classList.toggle('flexible', flexible);
     setText('dayHint', flexible
       ? (isFriday(selectedDate) ? 'Friday · flexible meals' : 'Your selected second flexible day')
-      : 'One main meal is your preference; sufficient nutrition comes first');
+      : 'Prioritize enough nutrition.');
     setText('logTitle', viewingShared()
       ? 'Shared day: '+fmtDay(selectedDate,{month:'short',day:'numeric'})
       : (selectedDate === localDateKey(new Date()) ? 'Log your day' : 'Log ' + fmtDay(selectedDate, { month: 'short', day: 'numeric' })));

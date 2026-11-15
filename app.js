@@ -142,6 +142,7 @@
   });
   $('logoutBtn').addEventListener('click', async () => {
     if (!db) return;
+    try { await window.FitnessNotifications?.disconnect?.(); } catch (_) {}
     const { error } = await db.auth.signOut();
     if (error) return showMessage('globalAlert', errorText(error), 'error');
     user = null; entries.clear(); flex.clear();
@@ -157,6 +158,7 @@
     if (user && user.id === session.user.id && !$('appView').hidden) return;
     user = session.user;
     $('authView').hidden = true; $('appView').hidden = false; $('logoutBtn').hidden = false;
+    window.FitnessNotifications?.mount?.(db, user);
     showMessage('globalAlert', '');
     await loadShares();
     await loadData();
@@ -760,6 +762,7 @@
         return;
       }
       if (event === 'SIGNED_OUT') {
+        window.FitnessNotifications?.reset?.();
         user = null; entries.clear(); flex.clear();
         currentTrackerId='mine'; ownedShares=[]; incomingShares=[]; lastInvitedEmail='';
     window.FitnessFoodBrowser?.clear();

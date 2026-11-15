@@ -1,0 +1,25 @@
+/* Self-contained, colorful web push settings; compatible with light/dark glass cards. */
+.push-card{min-width:0;overflow:hidden;border-color:color-mix(in srgb,#50b9ca 27%,var(--border));}
+.push-card .eyebrow{color:#50b9ca}
+.push-card p{margin-bottom:12px}
+.push-times{display:grid;grid-template-columns:1fr;gap:9px;margin:15px 0}
+.push-time-toggle{display:flex;gap:12px;align-items:center;min-width:0;width:100%;padding:11px 13px;border-radius:15px;border:1px solid var(--border);background:color-mix(in srgb,#50b9ca 7%,var(--input));color:var(--text);text-align:left;transition:border-color .2s,background .2s}
+.push-time-toggle.is-on{border-color:color-mix(in srgb,#50b9ca 50%,var(--border));background:color-mix(in srgb,#50b9ca 12%,var(--bg-panel))}
+.push-time-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.push-time-toggle span:last-child{display:flex;flex-direction:column;min-width:0}
+.push-time-toggle strong{font-size:.83rem;font-weight:700}
+.push-time-toggle small{font-size:.72rem;color:var(--muted)}
+.push-time-indicator{width:24px;height:24px;border:1.5px solid var(--field-border);border-radius:8px;display:grid;place-items:center;flex:0 0 24px}
+.push-time-indicator svg{width:16px;height:16px;stroke:currentColor;opacity:0}
+.push-time-toggle.is-on .push-time-indicator{background:#15976d;border-color:#15976d;color:#fff}
+.push-time-toggle.is-on .push-time-indicator svg{opacity:1}
+.push-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.push-actions .button{flex:1 1 150px}
+.push-message{font-size:.75rem;color:var(--muted);margin-top:12px;line-height:1.6}
+.push-message.error{color:#e87474}
+.push-message.success{color:var(--success)}
+.push-install-hint{padding:13px;border:1px solid color-mix(in srgb,#e5ae43 35%,var(--border));border-radius:14px;background:color-mix(in srgb,#e5ae43 10%,var(--bg-panel));color:var(--text);font-size:.78rem;line-height:1.7}
+.push-install-hint strong{display:block;margin-bottom:3px}
+html[data-theme="light"] .push-time-toggle{background:rgba(236,252,255,.78);border-color:rgba(31,163,170,.23)}
+html[data-theme="light"] .push-time-toggle.is-on{background:rgba(205,246,242,.92);border-color:rgba(12,133,118,.40)}
+@media(max-width:420px){.push-actions .button{flex-basis:100%}}

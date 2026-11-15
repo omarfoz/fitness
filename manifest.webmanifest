@@ -5,8 +5,8 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#060a12",
-  "theme_color": "#101827",
+  "background_color": "#010204",
+  "theme_color": "#16233d",
   "icons": [
     {
       "src": "/fitness-icon.svg",

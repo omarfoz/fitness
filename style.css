@@ -50,7 +50,10 @@
   --input: rgba(255,255,255,.44);
   --field-border: rgba(62,91,137,.21);
 }
-html { background: var(--bg); }
+/* The iOS overscroll / safe-area region paints the root, not the body.
+   Give it the same upper-page color instead of an almost-black seam. */
+html { background: #16233d; }
+html[data-theme="light"] { background: #dce8f5; }
 body,
 input,
 button,

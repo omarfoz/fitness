@@ -5,6 +5,7 @@
  */
 :root {
   --ios-canvas: #16233d;
+  color-scheme: dark;
 }
 :root[data-theme="light"] {
   --ios-canvas: #f5f7fb;

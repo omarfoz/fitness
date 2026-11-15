@@ -1,0 +1,313 @@
+/*
+ * Fitness Tracker · Light Theme 2.0
+ * A deliberate daytime palette, not a pale overlay over the dark photography.
+ * Original, mobile-first Liquid Glass styling with clear text and form contrast.
+ * Only applies when the user selects light mode. Dark mode stays untouched.
+ */
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f7fb;
+  --bg-panel: rgba(255,255,255,.91);
+  --bg-panel-h: rgba(248,251,255,.98);
+  --text: #142339;
+  --muted: #4b5f78;
+  --soft: #60738e;
+  --border: rgba(118,145,181,.22);
+  --shine: rgba(255,255,255,1);
+  --accent: #075fcc;
+  --accent2: #075fcc;
+  --success: #087a55;
+  --shadow: 0 14px 38px rgba(42,67,108,.09), 0 3px 9px rgba(42,67,108,.035);
+  --input: #f5f8fd;
+  --field-border: #bbcbe0;
+  --ring-inner: #fff;
+  --ring-track: #e2eaf5;
+  --progress-blue: #086bde;
+  --progress-blue-soft: #e5f0ff;
+  --progress-green: #148563;
+  --progress-orange: #af690c;
+  --progress-purple: #6556b9;
+  background: #f5f7fb;
+}
+
+/* A quiet, continuous backdrop with soft blue light.
+   Eliminate the large mountain photo and harsh contrast in light mode. */
+html[data-theme="light"] body {
+  color: var(--text);
+  background:
+    radial-gradient(ellipse 580px 420px at 7% -10%, rgba(165,209,255,.28), transparent 75%),
+    radial-gradient(ellipse 560px 490px at 100% 20%, rgba(194,209,247,.20), transparent 72%),
+    linear-gradient(155deg, #f8fbff 0%, #f0f5fc 52%, #f9fbff 100%);
+  background-color: #f5f7fb;
+  background-attachment: scroll;
+}
+html[data-theme="light"] .gradient-text {
+  color: #075fcc;
+  -webkit-text-fill-color: #075fcc;
+}
+html[data-theme="light"] .eyebrow,
+html[data-theme="light"] .today-date-chip svg {
+  color: #095cb8;
+}
+html[data-theme="light"] .live-dot {
+  background: #149971;
+  box-shadow: 0 0 0 4px rgba(20,153,113,.12);
+}
+
+/* Make card boundaries legible on both bright and dim iPhone screens. */
+html[data-theme="light"] :is(
+  .glass-card, .app-header, .challenge-badge, .today-date-chip,
+  .auth-steps span
+) {
+  background: linear-gradient(146deg, rgba(255,255,255,.97), rgba(252,253,255,.87) 72%);
+  border: 1px solid rgba(111,141,180,.20);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 -1px 0 rgba(108,133,174,.055),
+    0 14px 37px rgba(41,66,108,.077),
+    0 2px 6px rgba(41,66,108,.025);
+  -webkit-backdrop-filter: blur(20px) saturate(130%);
+  backdrop-filter: blur(20px) saturate(130%);
+}
+html[data-theme="light"] .energy-card {
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(194,225,255,.40), transparent 65%),
+    linear-gradient(150deg, rgba(255,255,255,.99), rgba(246,250,255,.94));
+  border-color: rgba(84,135,204,.25);
+}
+html[data-theme="light"] .energy-ring {
+  box-shadow:
+    0 0 0 1px rgba(10,75,156,.13),
+    0 14px 27px rgba(29,98,195,.10);
+}
+html[data-theme="light"] .energy-ring-core {
+  background: #fff;
+  border-color: rgba(115,149,192,.15);
+}
+html[data-theme="light"] .energy-number,
+html[data-theme="light"] .energy-summary strong,
+html[data-theme="light"] .steps-total strong,
+html[data-theme="light"] .compact-metric strong {
+  color: #142339;
+}
+html[data-theme="light"] .energy-unit,
+html[data-theme="light"] .energy-summary small,
+html[data-theme="light"] .energy-summary p,
+html[data-theme="light"] .goal-caption {
+  opacity: 1;
+}
+html[data-theme="light"] .goal-caption {
+  color: #0f785a;
+}
+html[data-theme="light"] .steps-card .track {
+  background: #e8eef6;
+}
+html[data-theme="light"] .steps-card .track-fill {
+  background: linear-gradient(90deg, #148563, #23aa80);
+}
+html[data-theme="light"] .challenge-strip .track,
+html[data-theme="light"] .energy-range-line,
+html[data-theme="light"] .track {
+  background: #e8eef6;
+}
+html[data-theme="light"] :is(.metric-kicker, .energy-label, .stat-top) {
+  color: #60738e;
+}
+html[data-theme="light"] .metric-icon-blue {
+  color: #075fcc;
+  background: #e7f1ff;
+}
+html[data-theme="light"] .metric-icon-green {
+  color: #138160;
+  background: #e7f7ee;
+}
+html[data-theme="light"] .metric-icon-purple {
+  color: #6253ad;
+  background: #f0edfc;
+}
+html[data-theme="light"] .metric-icon-orange {
+  color: #a85d0b;
+  background: #fff2e3;
+}
+
+/* Controls use solid pale surfaces rather than translucent overlays. */
+html[data-theme="light"] :is(
+  input:not([type="checkbox"]), select, textarea
+) {
+  background: #f8faff;
+  color: #17273e;
+  border: 1px solid #becde1;
+  box-shadow: inset 0 1px 2px rgba(26,57,101,.025);
+  color-scheme: light;
+}
+html[data-theme="light"] :is(
+  input:not([type="checkbox"]), select, textarea
+)::placeholder {
+  color: #72829a;
+  opacity: 1;
+}
+html[data-theme="light"] :is(input, select, textarea):focus {
+  border-color: #086bde;
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(8,107,222,.14);
+}
+html[data-theme="light"] :is(input, select, textarea):disabled {
+  color: #73829a;
+  background: #f2f5f9;
+}
+html[data-theme="light"] select option {
+  background: white;
+  color: #17273e;
+}
+html[data-theme="light"] .checkline {
+  background: #f8faff;
+  border-color: #d5dfee;
+}
+html[data-theme="light"] .checkbox-visual {
+  background: #fff;
+  border: 1.5px solid #899bb5;
+  box-shadow: 0 1px 2px rgba(23,55,105,.07);
+}
+html[data-theme="light"] .checkline .native-checkbox:checked + .checkbox-visual {
+  background: #075fcc;
+  border-color: #075fcc;
+}
+html[data-theme="light"] .day-label .pill,
+html[data-theme="light"] .pill,
+html[data-theme="light"] .subtle-tag {
+  background: #edf4ff;
+  color: #125baa;
+  border-color: #c9dcf5;
+  box-shadow: none;
+}
+html[data-theme="light"] .pill.flexible {
+  color: #865316;
+  background: #fff5e5;
+  border-color: #f5dbac;
+}
+html[data-theme="light"] .pill.neutral {
+  color: #526580;
+  background: #f4f7fc;
+  border-color: #d4dfed;
+}
+html[data-theme="light"] .subtle-tag.is-saved {
+  color: #0b7757;
+  background: #e9f8f1;
+  border-color: #c4e8d7;
+}
+html[data-theme="light"] .quick-food {
+  color: #1158a8;
+  background: #eaf3ff;
+  border-color: #c9dcf5;
+}
+html[data-theme="light"] .quick-food:hover {
+  color: #064b9f;
+  background: #dcecff;
+  border-color: #9fc3f3;
+}
+html[data-theme="light"] .button.primary {
+  background: #086bde;
+  color: #fff;
+  border-color: #086bde;
+  box-shadow: 0 6px 16px rgba(8,107,222,.20), inset 0 1px 0 rgba(255,255,255,.28);
+}
+html[data-theme="light"] .button.primary:hover {
+  background: #0759bb;
+  filter: none;
+}
+html[data-theme="light"] :is(
+  .button.secondary, .button.subtle, .icon-button, .tracker-actions .button-small
+) {
+  background: #f4f8ff;
+  color: #243c5a;
+  border: 1px solid #d4deed;
+  box-shadow: 0 1px 3px rgba(31,61,98,.045);
+}
+html[data-theme="light"] :is(.button.secondary,.button.subtle,.icon-button):hover {
+  background: #e9f3ff;
+}
+html[data-theme="light"] .theme-toggle {
+  color: #344c69;
+  background: transparent;
+}
+html[data-theme="light"] .theme-toggle:hover {
+  background: #edf3fb;
+}
+
+/* Details and calendar stay distinct, without gray-on-gray text. */
+html[data-theme="light"] :is(
+  .checkline, .summary-panel, .viewer-row, .shared-metric
+) {
+  background: #f8faff;
+  border-color: #d8e2ef;
+}
+html[data-theme="light"] .calendar-day {
+  background: #f8fbff;
+  border-color: #d8e2ef;
+  color: #23334b;
+}
+html[data-theme="light"] .calendar-day:hover {
+  background: #eef5ff;
+}
+html[data-theme="light"] .calendar-day.is-flex {
+  background: #fff8ee;
+  border-color: #f0e0c6;
+}
+html[data-theme="light"] .calendar-day.is-selected {
+  border-color: #075fcc;
+  box-shadow: inset 0 0 0 1px #075fcc;
+}
+html[data-theme="light"] .calendar-day.is-today {
+  color: #075fcc;
+}
+html[data-theme="light"] .calendar-day.is-logged .day-status {
+  color: #087a55;
+}
+html[data-theme="light"] .calendar-day.is-flex .day-status {
+  color: #926217;
+}
+html[data-theme="light"] .day-status,
+html[data-theme="light"] .calendar-key,
+html[data-theme="light"] .calendar-weekdays span,
+html[data-theme="light"] .summary-panel small {
+  color: #62738b;
+}
+html[data-theme="light"] .fixed-flex .flex-dot {
+  background: #d7932d;
+}
+html[data-theme="light"] .guide-line {
+  border-color: #e0e7f1;
+}
+html[data-theme="light"] :is(.inline-message.error, .global-alert.error) {
+  color: #a72134;
+}
+html[data-theme="light"] :is(.inline-message.success, .global-alert.success) {
+  color: #087a55;
+}
+
+/* Clear mobile navigation with enough separation from the page content. */
+@media (max-width:680px) {
+  html[data-theme="light"] .app-bottom-nav {
+    background: rgba(252,254,255,.96);
+    border-top: 1px solid #cfdded;
+    box-shadow: 0 -9px 28px rgba(52,81,119,.10);
+    -webkit-backdrop-filter: blur(22px);
+    backdrop-filter: blur(22px);
+  }
+  html[data-theme="light"] .bottom-tab {
+    color: #53677f;
+  }
+  html[data-theme="light"] .bottom-tab.is-active {
+    color: #075fcc;
+    background: #e8f2ff;
+  }
+}
+
+/* A quiet focus outline, visible under keyboard navigation. */
+html[data-theme="light"] :is(
+  button, a, input, select, textarea, summary
+):focus-visible {
+  outline: 3px solid rgba(8,107,222,.5);
+  outline-offset: 2px;
+}

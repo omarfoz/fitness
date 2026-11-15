@@ -1,0 +1,343 @@
+/*
+ * Fitness UI/UX refinement, mobile first.
+ * Purpose: eliminate the uneven steps/calories fields, reduce unnecessary
+ * scrolling, and keep each interactive part of the page readable at 320px+.
+ * Loaded after all themes; no database, API, or auth behavior changes.
+ */
+:root {
+  --ux-radius: 17px;
+  --ux-gap: 12px;
+  --ux-green: #76e1bd;
+  --ux-coral: #ffa094;
+  --ux-line: rgba(172,198,232,.22);
+}
+:root[data-theme="light"] {
+  --ux-green: #126f51;
+  --ux-coral: #a34438;
+  --ux-line: #dce4ef;
+}
+/* Shared page containment. Prevent long user-supplied food names from
+ * widening the viewport or creating "zoomed out" iPhone layouts. */
+#appView, .content-grid, .content-grid > *,
+.logging-card, .sidebar, #entryForm,
+.quick-entry-grid, .quick-entry-field, .food-browser,
+.food-browser-heading, .food-results,
+.selected-food-row, .selected-foods-header, .custom-food-fields,
+.shared-day-metrics, .form-actions, .calendar-grid {
+  min-width: 0;
+  max-width: 100%;
+}
+#entryForm input, #entryForm textarea, #entryForm select {
+  min-width: 0;
+  max-width: 100%;
+}
+#entryForm label { overflow-wrap: break-word; }
+#entryForm .field-grid:not(.quick-entry-grid) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+#entryForm .field-grid:not(.quick-entry-grid) > div { min-width: 0; }
+#entryForm .field-grid:not(.quick-entry-grid) > div > label {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex-wrap: wrap;
+  min-height: 18px;
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: .85rem;
+}
+/* Daily metrics: balanced cards. Helper message belongs below the complete
+ * grid, so only one side can no longer become abnormally tall. */
+#entryForm .quick-entry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 11px;
+  margin-top: 7px;
+}
+.quick-entry-field {
+  display: grid;
+  grid-template-columns: minmax(0,1fr);
+  grid-template-rows: 1fr auto;
+  align-content: space-between;
+  gap: 12px;
+  padding: 15px;
+  border-radius: var(--ux-radius);
+  border: 1px solid var(--ux-line);
+  background: rgba(255,255,255,.045);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
+}
+.quick-entry-steps {
+  border-color: rgba(82,210,161,.25);
+  background: linear-gradient(135deg,rgba(66,192,150,.10),rgba(255,255,255,.02));
+}
+.quick-entry-calories {
+  border-color: rgba(247,142,127,.28);
+  background: linear-gradient(135deg,rgba(251,134,118,.11),rgba(255,255,255,.02));
+}
+.quick-entry-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.quick-entry-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 11px;
+}
+.quick-entry-icon svg { width: 18px; height: 18px; }
+.quick-entry-steps .quick-entry-icon { background: rgba(71,215,159,.14); color: var(--ux-green); }
+.quick-entry-calories .quick-entry-icon { background: rgba(251,145,125,.15); color: var(--ux-coral); }
+.quick-entry-copy { min-width: 0; }
+#entryForm .quick-entry-field label {
+  display: block;
+  margin: 0 0 3px;
+  color: var(--text);
+  font-size: .9rem;
+  font-weight: 730;
+  line-height: 1.22;
+  letter-spacing: -.012em;
+}
+.quick-entry-caption {
+  display: block;
+  font-size: .73rem;
+  line-height: 1.3;
+  color: var(--muted);
+}
+#entryForm .quick-entry-field input {
+  width: 100%;
+  min-height: 49px;
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 680;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+  border-radius: 13px;
+  background: rgba(18,35,63,.28);
+  text-align: left;
+}
+#entryForm .quick-entry-steps input:focus {
+  border-color: var(--ux-green);
+  box-shadow: 0 0 0 3px rgba(73,199,146,.16);
+}
+#entryForm .quick-entry-calories input:focus {
+  border-color: var(--ux-coral);
+  box-shadow: 0 0 0 3px rgba(249,143,120,.16);
+}
+#entryForm .quick-entry-grid > .calorie-mode-row {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  min-width: 0;
+  padding: 0 3px;
+  margin-top: 0;
+}
+#entryForm .calorie-mode-row .field-help {
+  margin: 0;
+  font-size: .74rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+#entryForm .calorie-mode-row .text-button {
+  margin: 0;
+  padding: 4px 0;
+  min-height: 35px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+:root[data-theme="light"] .quick-entry-field {
+  box-shadow: inset 0 1px 0 #fff;
+}
+:root[data-theme="light"] .quick-entry-steps {
+  background: linear-gradient(145deg,#e9f8ef,#fbfffc);
+  border-color: #b9e5cd;
+}
+:root[data-theme="light"] .quick-entry-calories {
+  background: linear-gradient(145deg,#fff0ec,#fffaf8);
+  border-color: #f1c8bc;
+}
+:root[data-theme="light"] #entryForm .quick-entry-field input {
+  background: rgba(255,255,255,.94);
+}
+/* Calendar/date and day-type strip should not dominate daily logging. */
+.logging-card .section-heading { gap: 10px; margin-bottom: 15px; }
+.logging-card .section-heading > div { min-width: 0; }
+.logging-card .date-input { width: auto; min-width: 0; min-height: 44px; flex: 0 0 auto; }
+.logging-card .day-label {
+  display: flex;
+  align-items: center;
+  gap: 8px 10px;
+  margin-bottom: 12px;
+  line-height: 1.35;
+}
+.logging-card .day-label .pill { flex: 0 0 auto; white-space: nowrap; }
+.logging-card .day-label .muted { flex: 1 1 170px; min-width: 0; }
+.logging-card .section-heading h2 { line-height: 1.22; }
+/* Food library: shorten explanatory area and make scanning faster. */
+#entryForm .food-browser {
+  margin-top: 14px;
+  padding: 17px;
+  border-radius: 19px;
+}
+#entryForm .food-browser-heading {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  align-items: start;
+  gap: 10px;
+  margin-bottom: 17px;
+}
+#entryForm .food-browser-heading > div { min-width: 0; }
+#entryForm .food-browser-heading p { max-width: 44ch; margin: 5px 0 0; line-height: 1.43; }
+#entryForm .food-browser h3 { font-size: 1.08rem; line-height: 1.28; }
+#entryForm .food-browser-tag { margin-top: 0; }
+#entryForm .food-browser > label {
+  display: flex;
+  gap: 7px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin: 0 0 8px;
+  font-size: .83rem;
+}
+#entryForm .food-browser > label .optional { color: var(--muted); font-size: .75rem; }
+#entryForm .food-categories { margin-top: 11px; margin-bottom: 12px; }
+#entryForm .food-result {
+  min-width: 0;
+  min-height: 108px;
+  padding: 12px;
+  gap: 5px;
+  border-radius: 14px;
+}
+#entryForm .food-result-name { font-size: .84rem; line-height: 1.35; }
+#entryForm .food-result-ar { font-size: .75rem; }
+#entryForm .food-result-bottom { margin-top: auto; gap: 5px; }
+#entryForm .food-result-serve { font-size: .71rem; }
+#entryForm .food-result-energy { font-size: .78rem; }
+#entryForm .food-show-more { width: 100%; }
+#entryForm .selected-foods-header { gap: 10px; }
+#entryForm .selected-foods-header > div { min-width: 0; }
+#entryForm .selected-foods-header h3 { font-size: 1.04rem; }
+#entryForm .selected-foods-total { white-space: nowrap; margin-top: 1px; }
+#entryForm .selected-food-row { overflow: hidden; border-radius: 14px; }
+#entryForm .selected-food-side { min-width: 48px; }
+#entryForm .selected-food-edit { gap: 9px; }
+#entryForm .selected-food-edit > label { min-width: 0; }
+#entryForm .selected-food-edit input { font-size: 16px; }
+#entryForm .custom-food { margin-top: 14px; }
+#entryForm .custom-food-title { margin-bottom: 9px; }
+#entryForm .custom-food-fields > div { min-width: 0; }
+#entryForm .custom-food-fields .button { white-space: normal; }
+/* The remaining daily form follows the same vertical rhythm. */
+#entryForm .meal-notes { margin-top: 15px; }
+#entryForm .meal-notes textarea { min-height: 80px; }
+#entryForm .field-grid:not(.quick-entry-grid) { margin-top: 15px; }
+#entryForm .checkline { margin-top: 16px; }
+#entryForm .advanced { margin-top: 17px; }
+#entryForm .form-actions { margin-top: 18px; gap: 10px; }
+#entryForm .form-actions .button { min-height: 49px; }
+#entryForm .form-actions #deleteEntryBtn:not([hidden]) {
+  color: var(--muted);
+}
+/* Secondary cards retain function, with deliberate visual hierarchy. */
+.sidebar > .glass-card { max-width: 100%; }
+.sidebar h2 { line-height: 1.25; }
+.sidebar .guide-card .card-collapse-body,
+.sidebar .push-card .card-collapse-body { min-width: 0; }
+.sidebar .card-collapse > summary { gap: 11px; }
+.sidebar .card-collapse-head { min-width: 0; }
+.sidebar .card-collapse-head .eyebrow { margin-bottom: 4px; }
+.sidebar .card-collapse-head h2 { font-size: 1.16rem; }
+/* Prevent selected state / history details from clipping at smaller widths. */
+.history-card, .history-card .summary-panel { min-width: 0; }
+.history-card .summary-panel > div { min-width: 0; }
+.calendar-grid { grid-template-columns: repeat(7,minmax(0,1fr)); }
+.calendar-day { min-width: 0; }
+.calendar-day .calendar-metric { min-width: 0; }
+/* Inputs remain >=16px at touch breakpoints; keep pinch zoom enabled. */
+@media (max-width: 1000px) {
+  #entryForm .quick-entry-grid { grid-template-columns: minmax(0,1fr); }
+  .quick-entry-field {
+    grid-template-columns: minmax(0,1fr) minmax(118px,38%);
+    grid-template-rows: auto;
+    align-items: center;
+    gap: 10px;
+    min-height: 73px;
+    padding: 11px 13px;
+  }
+  #entryForm .quick-entry-field input { min-height: 48px; }
+  .quick-entry-icon { width: 34px; height: 34px; flex-basis: 34px; }
+}
+@media (max-width: 680px) {
+  .logging-card { padding: 16px; }
+  .logging-card .section-heading { flex-wrap: wrap; }
+  .logging-card .section-heading .date-input {
+    font-size: 16px;
+    flex: 0 0 auto;
+    width: 160px;
+    max-width: min(160px,100%);
+  }
+  .logging-card .day-label { margin-bottom: 12px; }
+  .logging-card .day-label .muted { font-size: .76rem; }
+  .quick-entry-field { grid-template-columns: minmax(0,1fr) minmax(111px,39%); }
+  #entryForm .quick-entry-field label { font-size: .9rem; }
+  #entryForm .quick-entry-field input {
+    min-height: 49px;
+    font-size: 1.03rem;
+    padding: 10px 11px;
+  }
+  .quick-entry-caption { font-size: .73rem; }
+  #entryForm .quick-entry-grid > .calorie-mode-row { padding: 0 2px; }
+  #entryForm .food-browser { padding: 13px; }
+  #entryForm .food-browser h3 { font-size: 1.03rem; }
+  #entryForm .food-result {
+    min-height: 105px;
+    padding: 11px 9px;
+  }
+  #entryForm .food-result-name { font-size: .82rem; }
+  #entryForm .food-result-serve { font-size: .73rem; }
+  #entryForm .food-result-energy { font-size: .76rem; }
+  #entryForm .selected-foods-header { flex-wrap: wrap; align-items: baseline; }
+  #entryForm .selected-foods-header > div { flex: 1 1 100%; }
+  #entryForm .selected-foods-total { margin-top: -4px; }
+  #entryForm .selected-food-edit {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 8px;
+  }
+  #entryForm .selected-food-edit > label { max-width: none; }
+  #entryForm .custom-food-fields {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 9px;
+  }
+  #entryForm .custom-food-fields .button { grid-column: 1 / -1; }
+  #entryForm .form-actions {
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+  }
+  #entryForm .form-actions .button { width: 100%; }
+  #entryForm .field-grid:not(.quick-entry-grid) > div > label {
+    font-size: .79rem;
+  }
+}
+@media (max-width: 380px) {
+  .quick-entry-field { grid-template-columns: minmax(0,1fr) minmax(106px,38%); gap: 7px; padding: 10px 11px; }
+  .quick-entry-info { gap: 7px; }
+  .quick-entry-icon { width: 30px; height: 30px; flex-basis: 30px; }
+  .quick-entry-caption { font-size: .69rem; }
+  #entryForm .field-grid:not(.quick-entry-grid) > div > label .optional { display: none; }
+}
+@media (max-width: 355px) {
+  .logging-card .section-heading .date-input { flex: 1 1 100%; width: 100%; max-width: 100%; }
+  .logging-card .section-heading > div { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #entryForm .food-result { transition: none; }
+}

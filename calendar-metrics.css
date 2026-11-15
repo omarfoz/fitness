@@ -1,0 +1,121 @@
+/* Saved-day summaries inside the 7-column calendar.
+ * Compact enough for a 375px iPhone, with full figures in button labels.
+ * This stylesheet changes presentation only, never stored metrics.
+ */
+.calendar-grid {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  min-width: 0;
+}
+.calendar-day {
+  min-width: 0;
+  width: 100%;
+  min-height: 84px;
+  padding: 8px 2px 7px;
+  gap: 4px;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.calendar-day-number {
+  display: block;
+  flex: 0 0 auto;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+.calendar-day-metrics {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+  min-width: 0;
+  width: 100%;
+  margin-top: auto;
+  padding-bottom: 1px;
+}
+.calendar-metric {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  max-width: 100%;
+  white-space: nowrap;
+  font-size: .66rem;
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+}
+.calendar-metric-icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 11px;
+  width: 11px;
+  height: 11px;
+}
+.calendar-metric-icon svg {
+  width: 11px;
+  height: 11px;
+  display: block;
+}
+.calendar-metric-number {
+  display: inline-block;
+  min-width: 0;
+}
+.calendar-metric--steps { color: #53d6aa; }
+.calendar-metric--calories { color: #f0a391; }
+:root[data-theme="light"] .calendar-metric--steps { color: #0b7954; }
+:root[data-theme="light"] .calendar-metric--calories { color: #a94d3b; }
+.calendar-day .day-status {
+  margin-top: auto;
+  font-size: .60rem;
+}
+.calendar-metrics-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 15px;
+  margin: 11px 0 0;
+  font-size: .73rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.calendar-metrics-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.calendar-metrics-legend svg {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+}
+.calendar-metrics-legend .legend-step { color: #53d6aa; }
+.calendar-metrics-legend .legend-calorie { color: #f0a391; }
+:root[data-theme="light"] .calendar-metrics-legend .legend-step { color: #0b7954; }
+:root[data-theme="light"] .calendar-metrics-legend .legend-calorie { color: #a94d3b; }
+
+@media(max-width:680px) {
+  .calendar-grid { gap: 4px; }
+  .calendar-day {
+    min-height: 75px;
+    padding: 7px 1px 5px;
+    gap: 3px;
+    border-radius: 10px;
+  }
+  .calendar-day-number { font-size: 1.02rem; }
+  .calendar-day-metrics { gap: 3px; }
+  .calendar-metric { font-size: .56rem; gap: 2px; }
+  .calendar-metric-icon,
+  .calendar-metric-icon svg { width: 9px; height: 9px; flex-basis: 9px; }
+  .calendar-day .day-status { font-size: .55rem; }
+  .calendar-metrics-legend { margin-top: 12px; font-size: .69rem; gap: 5px 11px; }
+}
+@media(max-width:365px) {
+  .calendar-day { min-height: 72px; }
+  .calendar-metric { font-size: .53rem; gap: 1px; }
+  .calendar-metric-icon,
+  .calendar-metric-icon svg { width: 8px; height: 8px; flex-basis: 8px; }
+}

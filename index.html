@@ -14,10 +14,12 @@
   <link rel="stylesheet" href="/dashboard.css?v=20261115f">
   <link rel="stylesheet" href="/light-mode.css?v=20261115-light-v3">
   <link rel="stylesheet" href="/colors.css?v=20261115-colors-v1">
+  <link rel="stylesheet" href="/food-browser.css?v=20261115-food-v1">
   <script>try{const mode=localStorage.getItem('fitness-theme')==='light'?'light':'dark';document.documentElement.dataset.theme=mode;document.querySelector('meta[name="theme-color"]').setAttribute('content',mode==='light'?'#f5f7fb':'#16233d')}catch(e){}</script>
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script defer src="/config.js"></script>
-  <script defer src="/app.js?v=20261115-light-v2"></script>
+  <script defer src="/food-catalog.js?v=20261115-food-v1"></script>
+  <script defer src="/app.js?v=20261115-food-v1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -186,17 +188,45 @@
           <form id="entryForm" class="form-stack">
             <div class="field-grid">
               <div><label for="steps">Steps today</label><input id="steps" type="number" min="0" max="100000" step="1" inputmode="numeric" placeholder="e.g. 10,000"></div>
-              <div><label for="calories">Estimated calories</label><input id="calories" type="number" min="0" max="15000" step="1" inputmode="numeric" placeholder="Rough estimate"></div>
+              <div><label for="calories">Daily calorie total <span class="optional">(editable)</span></label><input id="calories" type="number" min="0" max="15000" step="1" inputmode="numeric" placeholder="Auto-filled from foods"><div class="calorie-mode-row"><span class="field-help" id="calorieModeHint">Add foods to calculate an estimated total.</span><button class="text-button" id="useFoodSumBtn" type="button" hidden>Use food total</button></div></div>
             </div>
-            <div><label for="meals">What did you eat?</label><textarea id="meals" rows="3" maxlength="3000" placeholder="e.g. Chicken shawarma platter, fries, garlic sauce..."></textarea>
-              <p class="field-help">Use quick estimates if helpful, and adjust for your portions:</p>
-              <div class="quick-foods" id="quickFoods">
-                <button type="button" class="quick-food" data-meal="Chicken shawarma platter" data-cal="800">+ Shawarma ~800</button>
-                <button type="button" class="quick-food" data-meal="Double cheeseburger" data-cal="800">+ Burger ~800</button>
-                <button type="button" class="quick-food" data-meal="3 medium pizza slices" data-cal="1050">+ Pizza ~1,050</button>
-                <button type="button" class="quick-food" data-meal="Chicken kabsa with rice" data-cal="1100">+ Kabsa ~1,100</button>
+            <section class="food-browser" aria-labelledby="foodBrowserTitle">
+              <div class="food-browser-heading">
+                <div><span class="eyebrow">FOOD LIBRARY</span><h3 id="foodBrowserTitle">Find something you ate</h3><p class="field-help">Over 200 popular foods with rough per-serving estimates. Edit any number to match your meal.</p></div>
+                <span class="food-browser-tag" id="foodCatalogCount">200+ foods</span>
               </div>
-            </div>
+              <label for="foodSearch">Search by food name, English or Arabic</label>
+              <div class="food-search-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.2 4.2"/></svg>
+                <input id="foodSearch" type="search" maxlength="100" autocomplete="off" placeholder="Burrito, taco, شاورما, رز..." aria-controls="foodResults">
+                <button id="clearFoodSearchBtn" type="button" aria-label="Clear food search" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6 18 18M18 6 6 18"/></svg></button>
+              </div>
+              <div id="foodCategories" class="food-categories" role="group" aria-label="Filter food categories"></div>
+              <div class="food-results-header"><span id="foodResultsMeta" class="muted small">Popular foods</span><span class="muted small">kcal per serving</span></div>
+              <div id="foodResults" class="food-results" role="group" aria-label="Choose foods"></div>
+              <div id="foodNoResults" class="food-empty" hidden>No matching food. Try another word or add your own below.</div>
+              <div class="custom-food">
+                <div class="custom-food-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                  <strong>Add a custom food</strong>
+                </div>
+                <div class="custom-food-fields">
+                  <div><label for="customFoodName">Food name</label><input id="customFoodName" type="text" maxlength="100" placeholder="e.g. My homemade sandwich"></div>
+                  <div><label for="customFoodCalories">kcal per serving</label><input id="customFoodCalories" type="number" min="0" max="10000" step="1" inputmode="numeric" placeholder="e.g. 450"></div>
+                  <button class="button secondary" type="button" id="addCustomFoodBtn">Add food</button>
+                </div>
+              </div>
+              <section class="selected-foods" aria-labelledby="selectedFoodsHeading">
+                <div class="selected-foods-header">
+                  <div><h3 id="selectedFoodsHeading">Your food list</h3><p class="field-help">Change quantity or kcal for each serving. Changes update the daily total unless you set it manually.</p></div>
+                  <span class="selected-foods-total"><strong id="foodSum">0</strong> kcal</span>
+                </div>
+                <div id="selectedFoodList" class="selected-food-list"></div>
+                <p class="food-empty" id="selectedFoodEmpty">No foods selected yet. Tap a food above to add it.</p>
+                <div id="foodMessage" class="inline-message" role="status" aria-live="polite"></div>
+              </section>
+            </section>
+            <div class="meal-notes"><label for="meals">Additional food notes <span class="optional">(optional)</span></label><textarea id="meals" rows="2" maxlength="3000" placeholder="Anything else about your meal, sauce, preparation, etc."></textarea></div>
             <div class="field-grid">
               <div><label for="fasting">Fasting hours <span class="optional">(optional)</span></label><input id="fasting" type="number" min="0" max="24" step="0.5" inputmode="decimal" placeholder="e.g. 18"></div>
               <div><label for="coffee">Black coffee cups</label><input id="coffee" type="number" min="0" max="30" step="1" inputmode="numeric" placeholder="e.g. 2"></div>

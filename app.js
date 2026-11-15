@@ -66,8 +66,17 @@
     toggle.setAttribute('aria-label', mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
     toggle.setAttribute('title', mode === 'light' ? 'Dark mode' : 'Light mode');
     toggle.setAttribute('aria-pressed', String(mode === 'light'));
+    // Reinsert the theme-color element to prompt WebKit to re-evaluate
+    // native status-bar tint on a Home Screen app when the theme changes.
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', mode === 'light' ? '#f5f7fb' : '#16233d');
+    if (meta) {
+      const color = mode === 'light' ? '#f5f7fb' : '#16233d';
+      if (meta.content !== color) {
+        const updated = meta.cloneNode();
+        updated.setAttribute('content', color);
+        meta.replaceWith(updated);
+      }
+    }
     if (persist) {
       try { localStorage.setItem('fitness-theme', mode); } catch (_) {}
     }

@@ -67,7 +67,7 @@
     toggle.setAttribute('title', mode === 'light' ? 'Dark mode' : 'Light mode');
     toggle.setAttribute('aria-pressed', String(mode === 'light'));
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', mode === 'light' ? '#e7eff8' : '#16233d');
+    if (meta) meta.setAttribute('content', mode === 'light' ? '#f5f7fb' : '#16233d');
     if (persist) {
       try { localStorage.setItem('fitness-theme', mode); } catch (_) {}
     }

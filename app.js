@@ -146,6 +146,7 @@
     if (error) return showMessage('globalAlert', errorText(error), 'error');
     user = null; entries.clear(); flex.clear();
     currentTrackerId='mine'; ownedShares=[]; incomingShares=[]; lastInvitedEmail='';
+    window.FitnessFoodBrowser?.clear();
     $('appView').hidden = true; $('authView').hidden = false; $('logoutBtn').hidden = true;
     $('authPassword').value = '';
     showMessage('authMessage', 'Signed out successfully.', 'success');
@@ -443,7 +444,7 @@
     $('oneMeal').checked = entry?.one_meal ?? false;
     $('waist').value = entry?.waist_cm ?? '';
     $('notes').value = entry?.notes ?? '';
-    window.FitnessFoodBrowser?.openEntry(entry, currentTrackerId + '|' + selectedDate);
+    window.FitnessFoodBrowser?.openEntry(entry, (user?.id || '') + '|' + currentTrackerId + '|' + selectedDate);
     $('deleteEntryBtn').hidden = !entry || viewingShared();
     if (viewingShared()) {
       const box=$('sharedDayMetrics');
@@ -719,6 +720,7 @@
       if (event === 'SIGNED_OUT') {
         user = null; entries.clear(); flex.clear();
         currentTrackerId='mine'; ownedShares=[]; incomingShares=[]; lastInvitedEmail='';
+    window.FitnessFoodBrowser?.clear();
         $('appView').hidden = true; $('authView').hidden = false; $('logoutBtn').hidden = true;
         return;
       }

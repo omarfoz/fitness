@@ -1,0 +1,289 @@
+/*
+ * Fitness Tracker · Vibrant Colors
+ * Original colour system: warm coral for nutrition, jade for steps,
+ * violet for fasting, gold for consistency, blue for challenge,
+ * peach for check-in, amber for flexibility, cyan for sharing.
+ * Presentation only, no changes to Supabase or tracking calculations.
+ *
+ * These rules intentionally load after both base and light-mode styles.
+ */
+
+/* Dark appearance: colorful highlights without losing Liquid Glass depth. */
+:root:not([data-theme="light"]) {
+  --nutrition: #fb8e7d;
+  --walking: #64dfbd;
+  --fasting: #c4a7ff;
+  --consistency: #f6c87c;
+  --challenge: #7aafff;
+}
+:root:not([data-theme="light"]) .energy-card {
+  --progress-blue: var(--nutrition);
+  background:
+    radial-gradient(ellipse at 9% 4%, rgba(249,113,102,.19), transparent 59%),
+    radial-gradient(ellipse at 95% 88%, rgba(221,108,164,.085), transparent 62%),
+    linear-gradient(145deg,rgba(255,255,255,.042),rgba(255,255,255,.006) 64%),
+    var(--bg-panel);
+  border-color: rgba(250,142,125,.26);
+}
+:root:not([data-theme="light"]) .energy-card .metric-icon-blue {
+  color: #ffc0ae;
+  background: rgba(255,138,112,.17);
+}
+:root:not([data-theme="light"]) .energy-card .energy-ring {
+  box-shadow: 0 0 0 1px rgba(251,142,125,.22), 0 16px 35px rgba(236,108,100,.08);
+}
+:root:not([data-theme="light"]) .steps-card {
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(47,201,162,.16), transparent 67%),
+    var(--bg-panel);
+  border-color: rgba(100,223,189,.24);
+}
+:root:not([data-theme="light"]) .steps-card .steps-total strong,
+:root:not([data-theme="light"]) .steps-card .goal-caption {
+  color: #91f0d1;
+}
+:root:not([data-theme="light"]) .compact-metric:first-child {
+  background: radial-gradient(ellipse at 0% 0%, rgba(160,124,245,.20), transparent 90%), var(--bg-panel);
+  border-color: rgba(196,167,255,.25);
+}
+:root:not([data-theme="light"]) .compact-metric:last-child {
+  background: radial-gradient(ellipse at 100% 0%, rgba(251,182,76,.17), transparent 88%), var(--bg-panel);
+  border-color: rgba(246,200,124,.25);
+}
+:root:not([data-theme="light"]) .compact-metric:first-child strong { color: #d0baff; }
+:root:not([data-theme="light"]) .compact-metric:last-child strong { color: #f8d89b; }
+:root:not([data-theme="light"]) .challenge-strip {
+  background: linear-gradient(120deg,rgba(45,113,224,.20),rgba(105,100,209,.09)),var(--bg-panel);
+  border-color: rgba(122,175,255,.21);
+}
+:root:not([data-theme="light"]) .logging-card {
+  background: radial-gradient(ellipse at 0% 0%, rgba(244,119,174,.08), transparent 65%), var(--bg-panel);
+}
+:root:not([data-theme="light"]) .flex-card {
+  background: radial-gradient(ellipse at 96% 0%, rgba(251,184,79,.12), transparent 67%), var(--bg-panel);
+}
+:root:not([data-theme="light"]) .sharing-card {
+  background: radial-gradient(ellipse at 96% 0%, rgba(62,194,224,.12), transparent 68%), var(--bg-panel);
+}
+:root:not([data-theme="light"]) .history-card {
+  background: radial-gradient(ellipse at 0% 0%, rgba(128,114,240,.095), transparent 65%), var(--bg-panel);
+}
+
+/* Light appearance: clearly differentiated pastel glass cards. */
+:root[data-theme="light"] {
+  --nutrition: #da5348;
+  --walking: #147a58;
+  --fasting: #6840bb;
+  --consistency: #935608;
+  --challenge: #155fb9;
+}
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(ellipse 470px 420px at 4% 0%, rgba(255,201,194,.30),transparent 78%),
+    radial-gradient(ellipse 580px 440px at 96% 15%,rgba(184,166,247,.24),transparent 74%),
+    radial-gradient(ellipse 470px 440px at 6% 68%,rgba(150,231,209,.20),transparent 72%),
+    linear-gradient(145deg,#fff9f8 0%,#f7f8ff 42%,#f3fbf9 78%,#fff9f1 100%);
+}
+:root[data-theme="light"] .today-header .gradient-text {
+  color: #7253cb;
+  -webkit-text-fill-color: #7253cb;
+}
+:root[data-theme="light"] .today-date-chip {
+  color: #245381;
+  border-color: #c7d8ee;
+  background: #e8f2ff;
+}
+:root[data-theme="light"] .today-date-chip svg { color: #1569d2; }
+
+/* Nutrition: peach and coral */
+:root[data-theme="light"] .energy-card {
+  --progress-blue: #eb6d62;
+  background:
+    radial-gradient(ellipse at 6% 0%,rgba(255,191,173,.48),transparent 63%),
+    linear-gradient(150deg,#fff2ed 0%,#fff9f5 61%,#fff 100%);
+  border-color: #f5c4b5;
+  box-shadow: inset 0 1px 0 #fff,0 13px 30px rgba(205,116,92,.10);
+}
+:root[data-theme="light"] .energy-card .metric-icon-blue {
+  background: #ffe0d7;
+  color: #ca4c3d;
+}
+:root[data-theme="light"] .energy-card .metric-kicker { color: #aa503f; }
+:root[data-theme="light"] .energy-card .energy-label { color: #965b52; }
+:root[data-theme="light"] .energy-card .energy-ring {
+  box-shadow: 0 0 0 1px rgba(227,98,78,.20),0 14px 24px rgba(222,102,86,.12);
+}
+:root[data-theme="light"] .energy-card .energy-ring-core { background: #fffaf7; }
+:root[data-theme="light"] .energy-card .energy-range-line { background: #f8dfd7; }
+:root[data-theme="light"] .energy-card .energy-summary strong { color: #934536; }
+:root[data-theme="light"] .energy-card .subtle-tag {
+  background: #ffebe4;
+  border-color: #f5c5b6;
+  color: #a35344;
+}
+:root[data-theme="light"] .energy-card .subtle-tag.is-saved {
+  background: #e7f7ef;
+  border-color: #b5e6d0;
+  color: #147a58;
+}
+
+/* Walking: jade and mint */
+:root[data-theme="light"] .steps-card {
+  background:
+    radial-gradient(ellipse at 95% -15%,rgba(131,222,178,.36),transparent 70%),
+    linear-gradient(150deg,#eafaef 0%,#f5fff8 75%,#fff 100%);
+  border-color: #b9e7ce;
+  box-shadow: inset 0 1px 0 #fff,0 11px 26px rgba(38,139,94,.08);
+}
+:root[data-theme="light"] .steps-card .metric-icon-green {
+  background: #d1f1df;
+  color: #10764f;
+}
+:root[data-theme="light"] .steps-card .metric-kicker,
+:root[data-theme="light"] .steps-card .steps-total strong,
+:root[data-theme="light"] .steps-card .goal-caption {
+  color: #147a58;
+}
+:root[data-theme="light"] .steps-card .track { background: #cdecdc; }
+:root[data-theme="light"] .steps-card .track-fill {
+  background: linear-gradient(90deg,#15976d,#3dcaa3);
+}
+
+/* Fasting: lavender and violet */
+:root[data-theme="light"] .compact-metric:first-child {
+  background: linear-gradient(145deg,#f0e7ff 0%,#f9f6ff 82%,#fff 100%);
+  border-color: #d8c7f5;
+  box-shadow: inset 0 1px 0 #fff,0 10px 25px rgba(112,70,189,.085);
+}
+:root[data-theme="light"] .compact-metric:first-child .metric-icon-purple {
+  color: #6d40b9;
+  background: #e4d5fc;
+}
+:root[data-theme="light"] .compact-metric:first-child .metric-kicker,
+:root[data-theme="light"] .compact-metric:first-child strong { color: #6840bb; }
+
+/* Consistency: butter yellow, warm amber */
+:root[data-theme="light"] .compact-metric:last-child {
+  background: linear-gradient(145deg,#fff0cf 0%,#fff9eb 82%,#fff 100%);
+  border-color: #f2dbab;
+  box-shadow: inset 0 1px 0 #fff,0 10px 25px rgba(160,105,24,.075);
+}
+:root[data-theme="light"] .compact-metric:last-child .metric-icon-orange {
+  color: #a86a11;
+  background: #ffe4ad;
+}
+:root[data-theme="light"] .compact-metric:last-child .metric-kicker,
+:root[data-theme="light"] .compact-metric:last-child strong { color: #935608; }
+:root[data-theme="light"] .compact-metric:last-child .stat-unit { color: #926b35; }
+
+/* Challenge: sky blue */
+:root[data-theme="light"] .challenge-strip {
+  background: linear-gradient(115deg,#e6f1ff 0%,#f1f7ff 65%,#fff 100%);
+  border-color: #c8defb;
+  box-shadow: inset 0 1px 0 #fff,0 9px 24px rgba(47,112,185,.07);
+}
+:root[data-theme="light"] .challenge-strip .metric-kicker,
+:root[data-theme="light"] .challenge-strip strong { color: #155fb9; }
+:root[data-theme="light"] .challenge-strip .track { background: #d5e6fa; }
+
+/* The lower dashboard now has recognizable sections by color. */
+:root[data-theme="light"] .logging-card {
+  background: linear-gradient(155deg,#fff3f6 0%,#fffafa 34%,#fff 80%);
+  border-color: #f2d2df;
+}
+:root[data-theme="light"] .logging-card .eyebrow,
+:root[data-theme="light"] .section-title-row .eyebrow { color: #b34572; }
+:root[data-theme="light"] .section-title-row > svg { color: #c24e81; }
+:root[data-theme="light"] .flex-card {
+  background: linear-gradient(150deg,#fff3e1 0%,#fffaf3 38%,#fff 100%);
+  border-color: #efdabd;
+}
+:root[data-theme="light"] .flex-card .eyebrow { color: #975d13; }
+:root[data-theme="light"] .sharing-card {
+  background: linear-gradient(150deg,#e7f8fb 0%,#f6fdff 42%,#fff 100%);
+  border-color: #bde5ea;
+}
+:root[data-theme="light"] .sharing-card .eyebrow { color: #176c7c; }
+:root[data-theme="light"] .guide-card {
+  background: linear-gradient(145deg,#f2f0ff 0%,#fbfaff 42%,#fff 100%);
+  border-color: #ded8f4;
+}
+:root[data-theme="light"] .guide-card .eyebrow { color: #6956ac; }
+:root[data-theme="light"] .history-card {
+  background: linear-gradient(150deg,#f3f1ff 0%,#fff 42%);
+  border-color: #e0d9f3;
+}
+:root[data-theme="light"] .history-card .eyebrow { color: #7258bb; }
+:root[data-theme="light"] .auth-card {
+  background: linear-gradient(145deg,#f2f3ff 0%,#fff 60%);
+  border-color: #dedaf5;
+}
+:root[data-theme="light"] .auth-card .eyebrow { color: #7357b7; }
+
+/* Quick food chips: recognizable accents, still buttons not diet labels. */
+:root[data-theme="light"] .quick-food:nth-child(4n+1) {
+  background: #ffe7dc;
+  border-color: #f2c6ad;
+  color: #9c4c24;
+}
+:root[data-theme="light"] .quick-food:nth-child(4n+2) {
+  background: #f1e8ff;
+  border-color: #d8c5f5;
+  color: #6a438f;
+}
+:root[data-theme="light"] .quick-food:nth-child(4n+3) {
+  background: #e0f7ec;
+  border-color: #b6e6cc;
+  color: #11694a;
+}
+:root[data-theme="light"] .quick-food:nth-child(4n) {
+  background: #fff1d3;
+  border-color: #efd6a2;
+  color: #825515;
+}
+:root[data-theme="light"] .quick-food:hover { filter: brightness(.965); }
+
+/* More legible, colorful calendar state markers. */
+:root[data-theme="light"] .calendar-day.is-logged:not(.is-flex) {
+  background: #eaf9ef;
+  border-color: #bce7cb;
+}
+:root[data-theme="light"] .calendar-day.is-flex {
+  background: #fff2db;
+  border-color: #efd6a2;
+}
+:root[data-theme="light"] .calendar-day.is-logged.is-flex {
+  background: #e9f7f4;
+  border-color: #a6ddcc;
+}
+:root[data-theme="light"] .calendar-day.is-selected {
+  box-shadow: inset 0 0 0 2px #155fb9;
+}
+:root[data-theme="light"] .summary-panel {
+  background: linear-gradient(100deg,#ecf5ff,#faf5ff);
+  border-color: #d8e2f4;
+}
+:root[data-theme="light"] .summary-panel > div:nth-child(2) strong { color: #147a58; }
+:root[data-theme="light"] .summary-panel > div:nth-child(3) strong { color: #6742af; }
+:root[data-theme="light"] .summary-panel > div:nth-child(4) strong { color: #ae6725; }
+
+/* Bottom navigation: colored active destinations with readable labels. */
+@media (max-width:680px) {
+  :root[data-theme="light"] .bottom-tab:nth-child(1).is-active {
+    color: #1d5fc4;
+    background: #e2edff;
+  }
+  :root[data-theme="light"] .bottom-tab:nth-child(2).is-active {
+    color: #ad4676;
+    background: #ffe9f3;
+  }
+  :root[data-theme="light"] .bottom-tab:nth-child(3).is-active {
+    color: #6743b9;
+    background: #efe9ff;
+  }
+  :root[data-theme="light"] .bottom-tab:nth-child(4).is-active {
+    color: #116a79;
+    background: #e2f8fc;
+  }
+}
+/* Motion sensitivity is respected by existing reduced-motion rules. */

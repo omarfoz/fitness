@@ -169,7 +169,7 @@
     try {
       const [dayResult, flexResult] = await Promise.all([
         db.from('daily_entries')
-          .select('id,entry_date,steps,calories_estimate,meals,fasting_hours,one_meal,coffee_cups,waist_cm,notes')
+          .select('id,entry_date,steps,calories_estimate,meals,fasting_hours,one_meal,coffee_cups,waist_cm,notes,meal_items')
           .eq('user_id', uid).gte('entry_date', START_DATE).order('entry_date', { ascending: false }).limit(1000),
         db.from('weekly_flex')
           .select('week_start,flex_date')
@@ -278,6 +278,7 @@
     currentTrackerId = id;
     entries.clear();
     flex.clear();
+    window.FitnessFoodBrowser?.invalidate();
     renderShareControls();
     renderAll();
     if (id === 'mine') {
@@ -442,6 +443,7 @@
     $('oneMeal').checked = entry?.one_meal ?? false;
     $('waist').value = entry?.waist_cm ?? '';
     $('notes').value = entry?.notes ?? '';
+    window.FitnessFoodBrowser?.openEntry(entry, currentTrackerId + '|' + selectedDate);
     $('deleteEntryBtn').hidden = !entry || viewingShared();
     if (viewingShared()) {
       const box=$('sharedDayMetrics');
@@ -611,21 +613,27 @@
         showMessage('entryMessage', 'Check your numbers. Steps, calories and coffee should be whole numbers.', 'error'); return;
       }
       const meals = $('meals').value.trim(), notes = $('notes').value.trim();
-      if (steps == null && cals == null && fasting == null && coffee === 0 && waist == null && !meals && !notes && !$('oneMeal').checked) {
+      const browser = window.FitnessFoodBrowser;
+      const mealItems = browser?.getItems() || [];
+      if (browser && !browser.validItems()) {
+        showMessage('entryMessage', 'Please check each food quantity and calorie value. The daily total must be 15,000 kcal or less.', 'error'); return;
+      }
+      if (steps == null && cals == null && fasting == null && coffee === 0 && waist == null && !meals && !notes && !mealItems.length && !$('oneMeal').checked) {
         showMessage('entryMessage', 'Add at least one detail before saving.', 'error'); return;
       }
       const data = {
         user_id: user.id, entry_date: selectedDate, steps, calories_estimate: cals, meals,
         fasting_hours: fasting, coffee_cups: coffee, one_meal: $('oneMeal').checked,
-        waist_cm: waist, notes
+        waist_cm: waist, notes, meal_items: mealItems
       };
       try {
         const { data: saved, error } = await db.from('daily_entries')
           .upsert(data, { onConflict: 'user_id,entry_date' })
-          .select('id,entry_date,steps,calories_estimate,meals,fasting_hours,one_meal,coffee_cups,waist_cm,notes')
+          .select('id,entry_date,steps,calories_estimate,meals,fasting_hours,one_meal,coffee_cups,waist_cm,notes,meal_items')
           .single();
         if (error) throw error;
         entries.set(saved.entry_date, saved);
+        window.FitnessFoodBrowser?.invalidate();
         renderAll();
         showMessage('entryMessage', 'Saved securely for ' + fmtDay(saved.entry_date) + '.', 'success');
       } catch (e) { showMessage('entryMessage', errorText(e), 'error'); }
@@ -638,18 +646,10 @@
         .eq('user_id', user.id).eq('entry_date', selectedDate);
       if (error) throw error;
       entries.delete(selectedDate);
+      window.FitnessFoodBrowser?.invalidate();
       renderAll();
       showMessage('entryMessage', 'Entry deleted.', 'success');
     } catch (e) { showMessage('entryMessage', errorText(e), 'error'); }
-  });
-  $('quickFoods').addEventListener('click', (event) => {
-    const chip = event.target.closest('[data-meal]');
-    if (!chip || viewingShared()) return;
-    const existingMeal = $('meals').value.trim();
-    $('meals').value = (existingMeal ? existingMeal + '\n' : '') + chip.dataset.meal;
-    const oldCal = numericValue('calories') || 0;
-    $('calories').value = String(oldCal + Number(chip.dataset.cal));
-    showMessage('entryMessage', 'Added a rough estimate. Adjust calories based on your actual portion.', 'success');
   });
   $('saveFlexBtn').addEventListener('click', () => {
     if (!user || viewingShared()) return;

@@ -12,10 +12,11 @@
   <link rel="apple-touch-icon" href="/fitness-icon.svg">
   <link rel="stylesheet" href="/style.css?v=20261115e">
   <link rel="stylesheet" href="/dashboard.css?v=20261115f">
-  <script>try{document.documentElement.dataset.theme=localStorage.getItem('fitness-theme')==='light'?'light':'dark'}catch(e){}</script>
+  <link rel="stylesheet" href="/light-mode.css?v=20261115-light-v2">
+  <script>try{const mode=localStorage.getItem('fitness-theme')==='light'?'light':'dark';document.documentElement.dataset.theme=mode;document.querySelector('meta[name="theme-color"]').setAttribute('content',mode==='light'?'#f5f7fb':'#16233d')}catch(e){}</script>
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script defer src="/config.js"></script>
-  <script defer src="/app.js?v=20261115e"></script>
+  <script defer src="/app.js?v=20261115-light-v2"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>

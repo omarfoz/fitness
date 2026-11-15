@@ -130,7 +130,8 @@ p { line-height: 1.65; }
 .stat-symbol svg { width: 22px; height: 22px; display: block; }
 .inline-icon { width: 17px; height: 17px; flex: 0 0 17px; }
 
-/* Match the main site's liquid-glass navigation, including mobile 2-row behavior. */
+/* Standalone, compact header with the same liquid-glass material as oalfawzan.sa.
+   Fitness is a separate application: no personal-site navigation or branding. */
 .skip-link {
   position: fixed; top: 10px; left: 10px; z-index: 10000;
   padding: 10px 14px; border-radius: 10px;
@@ -138,13 +139,13 @@ p { line-height: 1.65; }
   font-weight: 600; transform: translateY(-180%);
 }
 .skip-link:focus-visible { transform: translateY(0); }
-.site-nav {
-  display: grid;
-  grid-template-columns: minmax(0,1fr) auto auto;
+.app-header {
+  display: flex;
   align-items: center;
-  gap: 8px 10px;
-  padding: 10px 14px;
-  margin: 16px 0 38px;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 17px;
+  margin: 16px 0 36px;
   border-radius: 28px;
   background: linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.008) 58%),var(--bg-panel);
   border: 1px solid var(--border);
@@ -152,60 +153,45 @@ p { line-height: 1.65; }
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
 }
-:root[data-theme="light"] .site-nav {
+:root[data-theme="light"] .app-header {
   background: linear-gradient(145deg,rgba(255,255,255,.82),rgba(255,255,255,.30) 62%),var(--bg-panel);
   box-shadow: inset 0 1px 0 var(--shine),inset 0 -1px 0 rgba(71,85,105,.10),var(--shadow);
 }
-.nav-name {
-  grid-column: 1;
-  color: var(--text); font-size: 1.02rem; font-weight: 600;
-  line-height: 1.2; letter-spacing: -.02em; white-space: nowrap;
+.tracker-identity {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
-.nav-buttons {
-  grid-column: 2; display: flex; align-items: center; gap: 7px;
-  overflow-x: auto; white-space: nowrap;
-  scrollbar-width: none; -webkit-overflow-scrolling: touch;
-}
-.nav-buttons::-webkit-scrollbar { display: none; }
-.nav-link {
-  flex: 0 0 auto;
-  min-height: 34px; display: inline-flex; align-items: center; justify-content: center;
-  padding: 7px 13px; border-radius: 18px;
-  color: var(--text);
-  font-size: .80rem; font-weight: 500; line-height: 1;
+.tracker-mark {
+  display: inline-grid; place-items: center; flex: 0 0 39px;
+  width: 39px; height: 39px;
+  color: var(--accent);
   border: 1px solid var(--border);
+  border-radius: 14px;
   background: rgba(255,255,255,.035);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-  -webkit-backdrop-filter: blur(12px) saturate(145%);
-  backdrop-filter: blur(12px) saturate(145%);
+  box-shadow: inset 0 1px 0 var(--shine);
 }
-:root[data-theme="light"] .nav-link {
-  background: rgba(255,255,255,.42);
-  border-color: rgba(255,255,255,.78);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.96);
-}
-.nav-link.active,
-:root[data-theme="light"] .nav-link.active {
-  color: #fff;
-  background: var(--accent);
-  border-color: rgba(255,255,255,.22);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.24),0 3px 10px rgba(0,122,255,.18);
-}
+.tracker-mark svg { width: 23px; height: 23px; }
+.tracker-heading { display: flex; flex-direction: column; min-width: 0; }
+.tracker-heading strong { color: var(--text); font-size: 1rem; font-weight: 600; letter-spacing: -.02em; line-height: 1.3; }
+.tracker-heading small { color: var(--muted); font-size: .72rem; font-weight: 400; }
+.tracker-actions { display: flex; align-items: center; justify-content: flex-end; gap: 9px; flex: 0 0 auto; }
+.tracker-actions .button-small { min-height: 34px; padding: 7px 12px; border-radius: 18px; font-size: .8rem; }
 .theme-toggle {
-  grid-column: 3;
   display: inline-grid; place-items: center;
-  width: 34px; height: 34px; padding: 0;
-  border: 0; border-radius: 50%;
-  color: var(--text); background: transparent;
+  width: 34px; height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--text);
+  background: transparent;
 }
-.theme-toggle svg {
-  display: block; width: 17px; height: 17px;
-}
+.theme-toggle svg { display: block; width: 17px; height: 17px; }
 .theme-icon-sun { display: none !important; }
 :root[data-theme="light"] .theme-icon-sun { display: block !important; }
 :root[data-theme="light"] .theme-icon-moon { display: none !important; }
-@media (hover:hover) and (pointer:fine) {
-  .nav-link:hover { background: var(--bg-panel-h); border-color: var(--field-border); }
+@media(hover:hover) and (pointer:fine) {
   .theme-toggle:hover { background: var(--bg-panel-h); }
 }
 
@@ -224,16 +210,13 @@ p { line-height: 1.65; }
 :root[data-theme="light"] .checkline,
 :root[data-theme="light"] .summary-panel { background: rgba(255,255,255,.34); }
 
-@media (max-width: 900px) {
-  .site-nav { grid-template-columns: minmax(0,1fr) auto; gap: 7px 8px; padding: 10px 12px; margin: 12px 0 34px; border-radius: 26px; }
-  .site-nav .nav-name { grid-column: 1; grid-row: 1; font-size: 1rem; }
-  .site-nav .theme-toggle { grid-column: 2; grid-row: 1; width: 32px; height: 32px; }
-  .site-nav .nav-buttons { grid-column: 1 / -1; grid-row: 2; margin-top: 4px; padding-bottom: 2px; }
-}
 @media (max-width: 700px), (pointer:coarse) {
   :root { --glass-blur: 14px; --glass-saturation: 145%; }
   body, :root[data-theme="light"] body { background-attachment: scroll; }
   .layout { padding: 0 14px; }
+  .app-header { margin: 12px 0 29px; padding: 11px 13px; border-radius: 24px; }
+  .tracker-heading small { font-size: .68rem; }
+  .tracker-mark { width: 36px; height: 36px; flex-basis: 36px; border-radius: 12px; }
   .stat-card { min-height: 145px; }
   .glass-card, .challenge-badge { box-shadow: inset 0 1px 0 var(--shine),0 3px 12px rgba(0,0,0,.05); }
   .auth-layout { padding: 10px 0 42px; }
@@ -242,5 +225,5 @@ p { line-height: 1.65; }
   .hero h1 { font-size: 2.48rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .site-nav, .nav-link { transition: none; }
+  .app-header, .theme-toggle { transition: none; }
 }

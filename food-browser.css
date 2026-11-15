@@ -343,3 +343,69 @@
 @media(max-width:360px) {
   .food-results {grid-template-columns:1fr;}
 }
+
+
+/* iPhone horizontal-overflow fix.
+ * A scrollable chip row inside an auto-sized CSS grid can give the grid item a
+ * 1,000px+ intrinsic minimum width. Safari then scales the whole page down and
+ * the dashboard becomes a tiny left-hand column. Contain the grid's min-content
+ * sizing instead of hiding overflow at the page level.
+ */
+.layout,
+#appView,
+.overview-board,
+.content-grid,
+.content-grid > *,
+.logging-card,
+#entryForm,
+.food-browser,
+.food-browser-heading,
+.selected-foods,
+.selected-foods-header,
+.food-results,
+.food-search-wrap,
+.food-categories,
+.meal-notes {
+  min-width: 0;
+  max-width: 100%;
+}
+.layout,
+#appView,
+.overview-board,
+.content-grid,
+.logging-card,
+.food-browser,
+.food-search-wrap,
+.food-categories {
+  width: 100%;
+}
+.content-grid > * {
+  min-width: 0;
+}
+.food-browser-heading > div,
+.selected-foods-header > div,
+.food-result,
+.custom-food-fields > div,
+.field-grid > div {
+  min-width: 0;
+}
+.food-categories {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+.food-results { width: 100%; }
+.field-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (max-width: 900px) {
+  .content-grid { grid-template-columns: minmax(0, 1fr); }
+  .sidebar { min-width: 0; max-width: 100%; }
+}
+@media (max-width: 680px) {
+  .logging-card { padding: 16px; }
+  .food-browser { padding: 12px; }
+  .section-heading > div { min-width: 0; }
+  .section-heading .date-input { flex-shrink: 0; }
+}

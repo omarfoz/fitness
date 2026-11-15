@@ -52,12 +52,24 @@
     try { await task(); } finally { button.disabled = false; }
   }
 
-  function setTheme(theme) {
+  function setTheme(theme, persist = true) {
     const mode = theme === 'light' ? 'light' : 'dark';
     document.documentElement.dataset.theme = mode;
-    try { localStorage.setItem('fitness-theme', mode); } catch (_) {}
+    const toggle = $('themeToggle');
+    toggle.setAttribute('aria-label', mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
+    toggle.setAttribute('title', mode === 'light' ? 'Dark mode' : 'Light mode');
+    toggle.setAttribute('aria-pressed', String(mode === 'light'));
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', mode === 'light' ? '#e7eff8' : '#16233d');
+    if (persist) {
+      try { localStorage.setItem('fitness-theme', mode); } catch (_) {}
+    }
   }
-  $('themeToggle').addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'));
+  setTheme(document.documentElement.dataset.theme, false);
+  $('themeToggle').addEventListener('click', () => {
+    setTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
+    $('themeToggle').blur();
+  });
 
   function authUI() {
     $('authTitle').textContent = authMode === 'signup' ? 'Create your account' : 'Sign in to your tracker';

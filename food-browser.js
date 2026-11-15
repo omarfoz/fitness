@@ -82,6 +82,16 @@
   function invalidate() {
     contextKey=null;
   }
+  function clear() {
+    contextKey=null;
+    items=[];
+    manualTotal=false;
+    manualValue='';
+    $('calories').value='';
+    $('meals').value='';
+    renderSelected();
+    setFoodMessage('');
+  }
   function getItems() {
     return items.map(({id,name,arabic,serving,quantity,kcal})=>({id,name,arabic,serving,quantity,kcal}));
   }
@@ -289,6 +299,6 @@
   renderCatalog();
   renderSelected();
   window.FitnessFoodBrowser=Object.freeze({
-    openEntry,invalidate,getItems,validItems,selectedTotal:total
+    openEntry,invalidate,clear,getItems,validItems,selectedTotal:total
   });
 })();

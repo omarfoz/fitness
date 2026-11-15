@@ -9,11 +9,11 @@ create extension if not exists pg_net with schema extensions;
 create table public.fitness_push_preferences (
   user_id uuid primary key references auth.users(id) on delete cascade,
   enabled boolean not null default true,
-  reminder_times text[] not null default array['09:00','14:00','20:00']::text[],
+  reminder_times text[] not null default array['10:00','16:00','21:00']::text[],
   updated_at timestamptz not null default now(),
   constraint fitness_push_times_valid check (
     cardinality(reminder_times) between 0 and 3
-    and reminder_times <@ array['09:00','14:00','20:00']::text[]
+    and reminder_times <@ array['10:00','16:00','21:00']::text[]
   )
 );
 create table public.fitness_push_subscriptions (
@@ -84,7 +84,7 @@ grant execute on function public.fitness_push_sender_secrets() to service_role;
 
 -- Supabase Cron uses UTC. Asia/Riyadh is UTC+3 year-round.
 -- Replace PROJECT_REF with your own Supabase project ref when setting up a different project.
-select cron.schedule('fitness-morning-ksa', '0 6 * * *', $job$
+select cron.schedule('fitness-morning-ksa', '0 7 * * *', $job$
   select net.http_post(
     url := 'https://PROJECT_REF.supabase.co/functions/v1/fitness-push-send',
     headers := jsonb_build_object(
@@ -92,10 +92,10 @@ select cron.schedule('fitness-morning-ksa', '0 6 * * *', $job$
       'x-fitness-cron-secret',
       (select decrypted_secret from vault.decrypted_secrets where name = 'fitness_push_cron_token' limit 1)
     ),
-    body := jsonb_build_object('slot','09:00')
+    body := jsonb_build_object('slot','10:00')
   );
 $job$);
-select cron.schedule('fitness-afternoon-ksa', '0 11 * * *', $job$
+select cron.schedule('fitness-afternoon-ksa', '0 13 * * *', $job$
   select net.http_post(
     url := 'https://PROJECT_REF.supabase.co/functions/v1/fitness-push-send',
     headers := jsonb_build_object(
@@ -103,10 +103,10 @@ select cron.schedule('fitness-afternoon-ksa', '0 11 * * *', $job$
       'x-fitness-cron-secret',
       (select decrypted_secret from vault.decrypted_secrets where name = 'fitness_push_cron_token' limit 1)
     ),
-    body := jsonb_build_object('slot','14:00')
+    body := jsonb_build_object('slot','16:00')
   );
 $job$);
-select cron.schedule('fitness-evening-ksa', '0 17 * * *', $job$
+select cron.schedule('fitness-evening-ksa', '0 18 * * *', $job$
   select net.http_post(
     url := 'https://PROJECT_REF.supabase.co/functions/v1/fitness-push-send',
     headers := jsonb_build_object(
@@ -114,6 +114,6 @@ select cron.schedule('fitness-evening-ksa', '0 17 * * *', $job$
       'x-fitness-cron-secret',
       (select decrypted_secret from vault.decrypted_secrets where name = 'fitness_push_cron_token' limit 1)
     ),
-    body := jsonb_build_object('slot','20:00')
+    body := jsonb_build_object('slot','21:00')
   );
 $job$);

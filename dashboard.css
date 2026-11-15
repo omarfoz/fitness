@@ -402,6 +402,7 @@ html[data-theme="light"] .energy-card {
   }
   html[data-theme="light"] .app-bottom-nav {background:rgba(232,240,250,.93);box-shadow:0 -8px 24px rgba(34,52,74,.08);}
   .app-bottom-nav-inner {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;max-width:520px;margin:0 auto;}
+  .app-bottom-nav-inner:has(#bottomShareBtn[hidden]) {grid-template-columns:repeat(3,minmax(0,1fr));}
   .bottom-tab {
     display:flex;
     flex-direction:column;

@@ -77,3 +77,43 @@ Observe whether the calorie-focused card is genuinely helpful and whether the di
 - No backend schema changes; daily entry, editable food totals, and verified-email sharing persist as before.
 - JavaScript syntax, duplicate IDs, DOM selectors, food-list addition and live calorie recalculation were checked through static checks and a simulated browser DOM.
 - iPhone visual QA, large system-font settings, landscape rotation, keyboard focus and real Supabase save/reload still require device testing; do not treat simulated checks as an iOS browser test.
+
+
+## Typography palette audit, 16 Nov 2026
+
+This audit affects text colors only. The Liquid Glass backgrounds, cards, SVGs,
+spacing, saved data, and mobile layout remain as designed.
+
+### Hierarchy
+
+| Role | Dark | Light |
+|---|---|---|
+| Main headings / primary text | `#F6F8FF` | `#17263F` |
+| Supporting text | `#B9C8DD` | `#40536E` |
+| Eyebrow / understated labels | `#A8BAD3` | `#4E6179` |
+| Action blue | `#91C0FF` | `#0756B4` |
+| Food / coral | `#FFB4A7` | `#963D34` |
+| Steps / mint | `#8DE7C8` | `#126B4D` |
+| Fasting / purple | `#D0BCFF` | `#6140A5` |
+| Consistency / amber | `#F8D69B` | `#815014` |
+| Log / pink | `#FFB3D3` | `#983C6B` |
+| Sharing / cyan | `#98E1ED` | `#116777` |
+
+**Design reasoning:** Neutral, near-white/navy ink for headings; lighter but
+readable secondary text; colored ink only where it labels a distinct activity
+or status. In light mode the same semantic accents become deeper, less saturated
+ink rather than reusing dark-theme pastels. Status, calendar, food shortcuts,
+and bottom navigation retain consistent color meaning.
+
+**Contrast:** Checked combinations with 3 representative solid navy backgrounds
+and 10 representative pale glass colors. Minimum calculated text-background
+contrast was **6.10:1 for dark subdued text**, **5.31:1 for light subdued text**,
+and **11.36:1 for dark / 12.69:1 for light primary text**. All chosen ink colors
+tested at least 5.31:1 in these samples. This is a mathematical source-level
+test, not a claim that every live pixel of a translucent backdrop passes WCAG;
+device visual QA remains necessary.
+
+**Implementation:** `type-palette.css` is the last external stylesheet.
+Repaired a malformed `mobile-polish.css` link in `index.html` so both sheets
+parse independently. No changes were made to the critical inline log-grid
+hotfix or business logic.

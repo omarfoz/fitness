@@ -639,6 +639,7 @@
   function jumpToSection(target, focusMeal = false) {
     const section = $(target);
     if (!section || section.hidden) return;
+    spyPausedUntil = performance.now() + 900;
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     activateBottomTab(target);
     if (focusMeal && !viewingShared()) {
@@ -653,6 +654,52 @@
     jumpToSection(target.dataset.navTarget);
   });
   $('quickLogBtn').addEventListener('click', () => jumpToSection('logSection', false));
+
+  // Follow the section actually being read, not only the last navigation tap.
+  // Temporarily pause the scroll spy during smooth scrolling after a tab tap.
+  let spyPausedUntil = 0, spyQueued = false;
+  function syncBottomTabToScroll() {
+    spyQueued = false;
+    if ($('appView').hidden || performance.now() < spyPausedUntil) return;
+    const line = window.innerHeight * 0.35;
+    let current = null, currentTop = -Infinity;
+    document.querySelectorAll('.bottom-tab').forEach((button) => {
+      if (button.hidden) return;
+      const section = $(button.dataset.navTarget);
+      if (!section || section.hidden) return;
+      const top = section.getBoundingClientRect().top;
+      if (top <= line && top > currentTop) {
+        current = button.dataset.navTarget;
+        currentTop = top;
+      }
+    });
+    if (!current) current = 'todaySection';
+    if (!document.querySelector('.bottom-tab.is-active[data-nav-target="' + current + '"]')) {
+      activateBottomTab(current);
+    }
+  }
+  function queueScrollSpy() {
+    if (spyQueued) return;
+    spyQueued = true;
+    requestAnimationFrame(syncBottomTabToScroll);
+  }
+  window.addEventListener('scroll', queueScrollSpy, { passive: true });
+  window.addEventListener('resize', queueScrollSpy, { passive: true });
+
+  // Keep reference cards open on desktop and collapsible on mobile, including
+  // after a screen rotation or viewport resize.
+  const desktopDisclosure = window.matchMedia('(min-width: 681px)');
+  function syncReferenceCards() {
+    document.querySelectorAll('details[data-collapse-mobile]').forEach((details) => {
+      details.open = desktopDisclosure.matches;
+    });
+  }
+  syncReferenceCards();
+  if (desktopDisclosure.addEventListener) {
+    desktopDisclosure.addEventListener('change', syncReferenceCards);
+  } else {
+    desktopDisclosure.addListener(syncReferenceCards);
+  }
 
   $('entryForm').addEventListener('submit', (event) => {
     event.preventDefault();

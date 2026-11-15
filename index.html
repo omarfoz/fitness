@@ -6,11 +6,11 @@
   <meta name="theme-color" content="#16233d">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="description" content="Private daily wellness tracker for food, steps, fasting and flexible days.">
-  <title>Fitness Tracker | Omar Alfawzan</title>
+  <title>Fitness Tracker</title>
   <link rel="icon" type="image/svg+xml" href="/fitness-icon.svg">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/fitness-icon.svg">
-  <link rel="stylesheet" href="/style.css?v=20261115a">
+  <link rel="stylesheet" href="/style.css?v=20261115b">
   <script>try{document.documentElement.dataset.theme=localStorage.getItem('fitness-theme')==='light'?'light':'dark'}catch(e){}</script>
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script defer src="/config.js"></script>
@@ -19,21 +19,23 @@
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
   <div class="layout">
-    <nav class="site-nav" aria-label="Primary navigation">
-      <a class="nav-name" href="https://oalfawzan.sa/">Omar Alfawzan</a>
-      <div class="nav-buttons">
-        <a class="nav-link" href="https://oalfawzan.sa/">Home</a>
-        <a class="nav-link" href="https://oalfawzan.sa/experience/">Experience</a>
-        <a class="nav-link" href="https://oalfawzan.sa/blog/">Blog</a>
-        <a class="nav-link" href="https://oalfawzan.sa/social/">Social</a>
-        <a class="nav-link active" href="/" aria-current="page">Fitness</a>
-        <button class="nav-link" id="logoutBtn" type="button" hidden>Sign out</button>
+    <header class="app-header" aria-label="Fitness Tracker">
+      <a class="tracker-identity" href="/" aria-label="Fitness Tracker home">
+        <span class="tracker-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12h4l2.8-5.5 4.4 11 2.7-5.5H21"/>
+          </svg>
+        </span>
+        <span class="tracker-heading"><strong>Fitness</strong><small>Daily wellness tracker</small></span>
+      </a>
+      <div class="tracker-actions">
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode" aria-pressed="false" title="Light mode">
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.8 15.1A8 8 0 0 1 8.9 4.2 8 8 0 1 0 19.8 15.1Z"/></svg>
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.4"/><path d="M12 3v1.8M12 19.2V21M3 12h1.8M19.2 12H21M5.64 5.64l1.27 1.27M17.09 17.09l1.27 1.27M5.64 18.36l1.27-1.27M17.09 6.91l1.27-1.27"/></svg>
+        </button>
+        <button class="button button-small subtle" id="logoutBtn" type="button" hidden>Sign out</button>
       </div>
-      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode" aria-pressed="false" title="Light mode">
-        <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.8 15.1A8 8 0 0 1 8.9 4.2 8 8 0 1 0 19.8 15.1Z"/></svg>
-        <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.4"/><path d="M12 3v1.8M12 19.2V21M3 12h1.8M19.2 12H21M5.64 5.64l1.27 1.27M17.09 17.09l1.27 1.27M5.64 18.36l1.27-1.27M17.09 6.91l1.27-1.27"/></svg>
-      </button>
-    </nav>
+    </header>
     <div id="main-content">
     <div id="globalAlert" class="global-alert" role="status" aria-live="polite" hidden></div>
 
@@ -205,8 +207,8 @@
         </div>
       </section>
       <footer class="footer">
-        <span>© 2026 Omar Alfawzan · Built for progress, not perfection</span>
-        <span>Private tracker · <a href="https://oalfawzan.sa/privacy/" target="_blank" rel="noopener noreferrer">Website privacy</a></span>
+        <span>Built for progress, not perfection.</span>
+        <span>Private wellness tracker · Your progress stays yours</span>
       </footer>
     </main>
     </div>

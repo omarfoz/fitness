@@ -247,3 +247,74 @@ body,
 :root[data-theme="light"] .button.primary {
   color: #FFFFFF;
 }
+
+/* 6. Light-mode specificity corrections.
+ * Prior theme files used more specific selectors, leaving some small labels
+ * at only ~4:1 on lavender or cream. Override them without altering fills. */
+:root[data-theme="light"] :is(
+  .metric-kicker, .energy-label, .stat-top,
+  .calendar-weekdays span, .calendar-key,
+  .summary-panel small
+) {
+  color: var(--type-subtle);
+}
+:root[data-theme="light"] .energy-card :is(.metric-kicker, .energy-label) {
+  color: var(--type-coral);
+}
+:root[data-theme="light"] .steps-card :is(
+  .metric-kicker, .steps-total strong, .goal-caption
+) {
+  color: var(--type-mint);
+}
+:root[data-theme="light"] .compact-metric:first-child :is(.metric-kicker, strong) {
+  color: var(--type-purple);
+}
+:root[data-theme="light"] .compact-metric:last-child :is(.metric-kicker, strong) {
+  color: var(--type-amber);
+}
+:root[data-theme="light"] .compact-metric:last-child .stat-unit {
+  color: var(--type-secondary);
+}
+:root[data-theme="light"] .challenge-strip :is(.metric-kicker, .challenge-strip-top strong) {
+  color: var(--type-blue);
+}
+:root[data-theme="light"] .calendar-day .day-status { color: var(--type-subtle); }
+:root[data-theme="light"] .calendar-day.is-logged:not(.is-flex) .day-status {
+  color: var(--type-mint);
+}
+:root[data-theme="light"] .calendar-day.is-flex .day-status {
+  color: var(--type-amber);
+}
+:root[data-theme="light"] .logging-card .eyebrow { color: var(--type-pink); }
+:root[data-theme="light"] .flex-card .eyebrow { color: var(--type-amber); }
+:root[data-theme="light"] .guide-card .eyebrow,
+:root[data-theme="light"] .history-card .eyebrow,
+:root[data-theme="light"] .auth-card .eyebrow { color: var(--type-purple); }
+:root[data-theme="light"] .sharing-card .eyebrow,
+:root[data-theme="light"] .push-card .eyebrow { color: var(--type-cyan); }
+:root[data-theme="light"] :is(
+  input:not([type="checkbox"]), select, textarea
+)::placeholder {
+  color: var(--type-placeholder);
+  opacity: 1;
+}
+:root[data-theme="light"] .food-category.is-active { color: var(--type-pink); }
+:root[data-theme="light"] .food-result-energy,
+:root[data-theme="light"] .food-browser-tag,
+:root[data-theme="light"] .selected-foods-total {
+  color: var(--type-pink);
+}
+
+/* Dark-mode specificity corrections for the similarly scoped accent cards. */
+:root:not([data-theme="light"]) .steps-card :is(
+  .steps-total strong, .goal-caption, .metric-kicker
+) { color: var(--type-mint); }
+:root:not([data-theme="light"]) .energy-card :is(.metric-kicker,.energy-label) {
+  color: var(--type-coral);
+}
+:root:not([data-theme="light"]) .compact-metric:first-child :is(.metric-kicker,strong) {
+  color: var(--type-purple);
+}
+:root:not([data-theme="light"]) .compact-metric:last-child :is(.metric-kicker,strong) {
+  color: var(--type-amber);
+}

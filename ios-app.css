@@ -1,0 +1,83 @@
+/*
+ * iPhone installed-app polish
+ * Align the document paint, safe-area backdrop and the scrolled content.
+ * Hide scroll indicators, not scrolling itself.
+ */
+:root {
+  --ios-canvas: #16233d;
+}
+:root[data-theme="light"] {
+  --ios-canvas: #f5f7fb;
+}
+html {
+  min-height: 100%;
+  min-height: 100dvh;
+  background: var(--ios-canvas);
+  overscroll-behavior-y: none;
+  overscroll-behavior-x: none;
+  overflow-x: clip;
+}
+body {
+  min-height: 100%;
+  min-height: 100dvh;
+  margin: 0;
+  background: var(--ios-canvas);
+  overscroll-behavior-y: none;
+  overscroll-behavior-x: none;
+  overflow-x: clip;
+}
+/* Override the old dark background photo and its black top edge.
+ * Paint a continuous navy backdrop all the way through rubber-band areas. */
+:root:not([data-theme="light"]) body {
+  background: linear-gradient(
+    180deg,
+    #16233d 0%,
+    #192943 52%,
+    #16233d 100%
+  );
+  background-color: #16233d;
+  background-attachment: scroll;
+}
+:root[data-theme="light"] body {
+  background-color: #f5f7fb;
+}
+/* iOS may reveal the page's root when elastically scrolling at the top or bottom.
+ * Keep its color identical to the status-bar band. */
+html,
+body,
+.layout {
+  -webkit-overflow-scrolling: touch;
+}
+/* Preserve all scrolling, including the food-category horizontal carousel.
+ * Only the visual indicators are removed. */
+html, body, .layout, .food-categories, .food-results,
+.nav-buttons, .viewer-list {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.layout::-webkit-scrollbar,
+.food-categories::-webkit-scrollbar,
+.food-results::-webkit-scrollbar,
+.nav-buttons::-webkit-scrollbar,
+.viewer-list::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+/* Keep control text >=16px so focusing an input does not trigger Safari's
+ * automatic zoom. The control dimensions from existing styles remain. */
+@media (hover: none) and (pointer: coarse) {
+  input:not([type="checkbox"]), select, textarea {
+    font-size: 16px;
+  }
+}
+/* Installed iOS app: allow one-finger page scroll but not gesture pinch zoom.
+ * Standard device accessibility zoom controls remain outside the website. */
+@media (display-mode: standalone) {
+  html, body {
+    touch-action: pan-x pan-y;
+  }
+}

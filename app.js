@@ -535,6 +535,30 @@
       ? 'Extra flexible day: '+fmtDay(value,{weekday:'long',month:'short',day:'numeric'})
       : 'Friday is the only flexible day selected for this week.');
   }
+  // Fit two values into narrow seven-column iPhone calendar cells.
+  // Full, unrounded numbers remain available in the button's accessible label.
+  function compactCalendarNumber(value) {
+    const n = Number(value);
+    if (n >= 10000) return Math.round(n / 1000) + 'k';
+    if (n >= 1000) return (Math.round(n / 100) / 10).toString() + 'k';
+    return String(n);
+  }
+  function calendarMetric(kind, value) {
+    const item = document.createElement('span');
+    item.className = 'calendar-metric calendar-metric--' + kind;
+    item.title = kind === 'steps' ? shortNum(value) + ' steps' : 'Approximately ' + shortNum(value) + ' kcal';
+    item.setAttribute('aria-hidden', 'true'); // The button announces the full values.
+    const icon = document.createElement('span');
+    icon.className = 'calendar-metric-icon';
+    icon.innerHTML = kind === 'steps'
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3c-1.3 0-2.2 1.8-2.2 3.2s.8 2.7 2.2 2.7 2.2-1.3 2.2-2.7S9.3 3 8 3ZM16 12c-1.3 0-2.2 1.8-2.2 3.2s.9 2.8 2.2 2.8 2.2-1.4 2.2-2.8S17.3 12 16 12Z"/><path d="M5.3 11.6c1.8-.9 4.5-.2 5.1 2 1 3.5-2.1 5.9-4.8 4.3-2.1-1.3-2.3-5.1-.3-6.3Zm8.1 6c2.1-1.3 4.6-.2 5.2 1.9.5 1.7-.6 3-2 3.1-2.4.1-5.5-3.6-3.2-5Z"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4.8 0 8-3.3 8-7.7 0-2.6-1.4-4.3-3.8-6.5.2 2-.7 3.3-1.5 4-1.1-4.1-2.2-6.4-5.2-9.8-.2 3.2-1.1 5-3.2 7.4C4.8 11 4 13 4 15.1 4 19.1 7.3 22 12 22Z"/></svg>';
+    const number = document.createElement('span');
+    number.className = 'calendar-metric-number';
+    number.textContent = compactCalendarNumber(value);
+    item.append(icon, number);
+    return item;
+  }
   function renderCalendar() {
     const grid = $('calendarGrid'); grid.replaceChildren();
     setText('monthLabel', displayedMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }));
@@ -546,18 +570,36 @@
     }
     for (let day = 1; day <= days; day++) {
       const key = localDateKey(new Date(y, m, day, 12));
-      const btn = document.createElement('button'); btn.type = 'button';
+      const entry = entries.get(key);
       const logged = entries.has(key);
       const flexible = isFlexDay(key);
+      const btn = document.createElement('button'); btn.type = 'button';
       btn.className = 'calendar-day' + (logged ? ' is-logged' : '') + (flexible ? ' is-flex' : '') +
         (key === selectedDate ? ' is-selected' : '') + (key === localDateKey(new Date()) ? ' is-today' : '');
       btn.disabled = key < START_DATE;
-      btn.title = fmtDay(key, { weekday: 'long', month: 'long', day: 'numeric' }) +
-        ' · ' + (logged ? 'Entry saved' : 'No entry') + (flexible ? ' · Flexible day' : '');
-      const number = document.createElement('span'); number.textContent = String(day);
-      const status = document.createElement('span'); status.className = 'day-status';
+      const description = [fmtDay(key, { weekday: 'long', month: 'long', day: 'numeric' }), logged ? 'Entry saved' : 'No entry'];
+      if (entry?.steps != null) description.push(shortNum(entry.steps) + ' steps');
+      if (entry?.calories_estimate != null) description.push('approximately ' + shortNum(entry.calories_estimate) + ' kcal');
+      if (flexible) description.push('Flexible day');
+      btn.title = description.join(' · ');
+      btn.setAttribute('aria-label', description.join(', '));
+      const number = document.createElement('span');
+      number.className = 'calendar-day-number';
+      number.textContent = String(day);
+      const status = document.createElement('span');
+      status.className = 'day-status';
       status.textContent = logged ? 'Saved' : (flexible ? 'Flex' : '·');
-      btn.append(number, status);
+      btn.append(number);
+      // Show only metrics the user actually logged; missing values are not zeros.
+      if (logged && (entry?.steps != null || entry?.calories_estimate != null)) {
+        const metrics = document.createElement('span');
+        metrics.className = 'calendar-day-metrics';
+        if (entry.steps != null) metrics.append(calendarMetric('steps', entry.steps));
+        if (entry.calories_estimate != null) metrics.append(calendarMetric('calories', entry.calories_estimate));
+        btn.append(metrics);
+      } else {
+        btn.append(status);
+      }
       btn.addEventListener('click', () => setDate(key, true));
       grid.append(btn);
     }

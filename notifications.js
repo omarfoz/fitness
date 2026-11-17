@@ -75,9 +75,10 @@
       const permission = Notification.permission === 'granted'
         ? 'granted' : await Notification.requestPermission();
       if (permission !== 'granted') throw new Error('Notifications permission was not granted.');
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true, applicationServerKey: publicKeyBytes(conf.vapidPublicKey)
-      });
+      const subscription = await registration.pushManager.getSubscription() ||
+        await registration.pushManager.subscribe({
+          userVisibleOnly: true, applicationServerKey: publicKeyBytes(conf.vapidPublicKey)
+        });
       try {
         await saveSubscription(subscription);
         active = true;
@@ -116,6 +117,16 @@
   async function sendTest() {
     toggleBusy(true);
     try {
+      // A successful browser permission is not proof that Supabase still has
+      // the device. Repair a missing database row before testing delivery.
+      const subscription = await registration?.pushManager.getSubscription();
+      if (!subscription) {
+        active = false;
+        note('This iPhone is not registered for daily reminders. Tap Enable notifications again.', 'error');
+        return;
+      }
+      await saveSubscription(subscription);
+      await savePreferences(true);
       const { data, error } = await db.functions.invoke('fitness-push-send', { body: { test: true } });
       if (error || !data?.success) throw new Error(data?.error || error?.message || 'No registered device received the alert.');
       note('Test sent. Check your iPhone Lock Screen or Notification Center.', 'success');
@@ -154,7 +165,13 @@
       active = Boolean(subscription && pref?.enabled);
       if (subscription && active) await saveSubscription(subscription);
       if (active) note('Notifications are enabled. Select reminders or send a test.', 'success');
-      else if (pref?.enabled && !subscription) note('Tap Enable notifications to register this device.');
+      else if (pref?.enabled && !subscription) {
+        note('Daily reminders are selected, but this iPhone is not registered. Tap Enable notifications to restore scheduled alerts.', 'error');
+        // Keep the repair instruction visible rather than hidden in the
+        // collapsed mobile notifications panel.
+        const panel = $('pushPanel')?.querySelector('details[data-collapse-mobile]');
+        if (panel) panel.open = true;
+      }
       else if (!pref) note('Choose your reminder times, then enable notifications.');
       render();
     } catch (error) {

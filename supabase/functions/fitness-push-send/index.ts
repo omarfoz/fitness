@@ -78,7 +78,7 @@ Deno.serve(async (req: Request) => {
       for (const sub of subscriptions) {
         devices++;
         try {
-          await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth_secret } }, payload, { TTL: 3600 });
+          await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth_secret } }, payload, { TTL: 3600, timeout: 12000 });
           delivered++;
           success++;
         } catch (error) {
@@ -94,6 +94,10 @@ Deno.serve(async (req: Request) => {
           .eq("user_id", userId).eq("reminder_date", today).eq("reminder_time", slot);
       }
     }
+    // Count results only, never log subscription endpoints, keys or user IDs.
+    console.info("Fitness push run complete", JSON.stringify({
+      mode: test ? "test" : slot, recipients: owners.length, devices, success, failed
+    }));
     return json({ ok: true, success, failed, devices, recipients: owners.length, test });
   } catch (error) {
     console.error("Fitness push function failed", error instanceof Error ? error.message : "unknown");

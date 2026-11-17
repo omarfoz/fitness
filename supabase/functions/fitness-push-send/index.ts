@@ -67,10 +67,24 @@ Deno.serve(async (req: Request) => {
       if (subsError) { failed++; continue; }
       if (!subscriptions?.length) continue;
       if (!test) {
-        const { data: reservation, error: reserveError } = await admin.from("fitness_push_delivery_runs")
-          .upsert({ user_id: userId, reminder_date: today, reminder_time: slot },
-            { onConflict: "user_id,reminder_date,reminder_time", ignoreDuplicates: true }).select("user_id");
-        if (reserveError || !reservation?.length) continue;
+        // A claimed slot is not proof of successful delivery. A previous run
+        // might have been interrupted by an HTTP timeout. Retry unfinished
+        // slots and suppress only pushes accepted by a push provider.
+        const runKey = { user_id: userId, reminder_date: today, reminder_time: slot };
+        const { data: prior, error: readError } = await admin
+          .from("fitness_push_delivery_runs").select("delivered_at")
+          .eq("user_id", userId).eq("reminder_date", today)
+          .eq("reminder_time", slot).maybeSingle();
+        if (readError) { failed++; continue; }
+        if (prior?.delivered_at) continue;
+        if (!prior) {
+          const { error: reserveError } = await admin.from("fitness_push_delivery_runs")
+            .upsert(runKey, {
+              onConflict: "user_id,reminder_date,reminder_time",
+              ignoreDuplicates: true
+            });
+          if (reserveError) { failed++; continue; }
+        }
       }
       const bodyText = test ? "Your Fitness Tracker notifications are working!" : SLOTS[slot];
       const payload = JSON.stringify({ title: "Fitness Tracker", body: bodyText, url: ORIGIN + "/", tag: "fitness-" + (test ? "test" : slot + "-" + today) });
@@ -87,6 +101,12 @@ Deno.serve(async (req: Request) => {
           if (status === 404 || status === 410) await admin.from("fitness_push_subscriptions").delete().eq("id", sub.id).eq("user_id", userId);
           else console.warn("Fitness push delivery failed with status", status || "unknown");
         }
+      }
+      if (!test && delivered > 0) {
+        const { error: confirmError } = await admin.from("fitness_push_delivery_runs")
+          .update({ delivered_at: new Date().toISOString() })
+          .eq("user_id", userId).eq("reminder_date", today).eq("reminder_time", slot);
+        if (confirmError) console.warn("Fitness push confirmation could not be recorded");
       }
       if (!test && delivered === 0) {
         // Allow a later controlled retry if all devices failed.

@@ -84,7 +84,7 @@ grant execute on function public.fitness_push_sender_secrets() to service_role;
 
 -- Supabase Cron uses UTC. Asia/Riyadh is UTC+3 year-round.
 -- Replace PROJECT_REF with your own Supabase project ref when setting up a different project.
-select cron.schedule('fitness-morning-ksa', '0 7 * * *', $job$
+select cron.schedule('fitness-morning-ksa', '0,5 7 * * *', $job$
   select net.http_post(
     url := 'https://PROJECT_REF.supabase.co/functions/v1/fitness-push-send',
     headers := jsonb_build_object(
@@ -92,10 +92,11 @@ select cron.schedule('fitness-morning-ksa', '0 7 * * *', $job$
       'x-fitness-cron-secret',
       (select decrypted_secret from vault.decrypted_secrets where name = 'fitness_push_cron_token' limit 1)
     ),
-    body := jsonb_build_object('slot','10:00')
+    body := jsonb_build_object('slot','10:00',
+    timeout_milliseconds := 30000
   );
 $job$);
-select cron.schedule('fitness-afternoon-ksa', '0 13 * * *', $job$
+select cron.schedule('fitness-afternoon-ksa', '0,5 13 * * *', $job$
   select net.http_post(
     url := 'https://PROJECT_REF.supabase.co/functions/v1/fitness-push-send',
     headers := jsonb_build_object(
@@ -103,10 +104,11 @@ select cron.schedule('fitness-afternoon-ksa', '0 13 * * *', $job$
       'x-fitness-cron-secret',
       (select decrypted_secret from vault.decrypted_secrets where name = 'fitness_push_cron_token' limit 1)
     ),
-    body := jsonb_build_object('slot','16:00')
+    body := jsonb_build_object('slot','16:00',
+    timeout_milliseconds := 30000
   );
 $job$);
-select cron.schedule('fitness-evening-ksa', '0 18 * * *', $job$
+select cron.schedule('fitness-evening-ksa', '0,5 18 * * *', $job$
   select net.http_post(
     url := 'https://PROJECT_REF.supabase.co/functions/v1/fitness-push-send',
     headers := jsonb_build_object(
@@ -114,6 +116,7 @@ select cron.schedule('fitness-evening-ksa', '0 18 * * *', $job$
       'x-fitness-cron-secret',
       (select decrypted_secret from vault.decrypted_secrets where name = 'fitness_push_cron_token' limit 1)
     ),
-    body := jsonb_build_object('slot','21:00')
+    body := jsonb_build_object('slot','21:00',
+    timeout_milliseconds := 30000
   );
 $job$);

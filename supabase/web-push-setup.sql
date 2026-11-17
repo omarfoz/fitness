@@ -42,6 +42,7 @@ create table public.fitness_push_delivery_runs (
   reminder_date date not null,
   reminder_time text not null,
   sent_at timestamptz not null default now(),
+  delivered_at timestamptz,
   primary key (user_id, reminder_date, reminder_time)
 );
 alter table public.fitness_push_preferences enable row level security;

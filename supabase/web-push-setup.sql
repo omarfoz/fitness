@@ -92,7 +92,7 @@ select cron.schedule('fitness-morning-ksa', '0,5 7 * * *', $job$
       'x-fitness-cron-secret',
       (select decrypted_secret from vault.decrypted_secrets where name = 'fitness_push_cron_token' limit 1)
     ),
-    body := jsonb_build_object('slot','10:00',
+    body := jsonb_build_object('slot','10:00'),
     timeout_milliseconds := 30000
   );
 $job$);
@@ -104,7 +104,7 @@ select cron.schedule('fitness-afternoon-ksa', '0,5 13 * * *', $job$
       'x-fitness-cron-secret',
       (select decrypted_secret from vault.decrypted_secrets where name = 'fitness_push_cron_token' limit 1)
     ),
-    body := jsonb_build_object('slot','16:00',
+    body := jsonb_build_object('slot','16:00'),
     timeout_milliseconds := 30000
   );
 $job$);
@@ -116,7 +116,7 @@ select cron.schedule('fitness-evening-ksa', '0,5 18 * * *', $job$
       'x-fitness-cron-secret',
       (select decrypted_secret from vault.decrypted_secrets where name = 'fitness_push_cron_token' limit 1)
     ),
-    body := jsonb_build_object('slot','21:00',
+    body := jsonb_build_object('slot','21:00'),
     timeout_milliseconds := 30000
   );
 $job$);

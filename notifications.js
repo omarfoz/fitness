@@ -57,7 +57,15 @@
       user_id: currentUser.id, endpoint: json.endpoint,
       p256dh: json.keys.p256dh, auth_secret: json.keys.auth
     }, { onConflict: 'endpoint' });
-    if (error) throw error;
+    if (error) {
+      // Show only the provider hostname, never the secret subscription path
+      // or its encryption keys. This makes Samsung vendor cases diagnosable.
+      const host=(()=>{try{return new URL(json.endpoint).hostname}catch(_){return 'unknown'}})();
+      if(String(error.message||'').includes('fitness_push_trusted_endpoint'))
+        throw new Error('Push provider '+host+' was blocked by the server. Please send this provider hostname for a secure allowlist update.');
+      throw error;
+    }
+    return new URL(json.endpoint).hostname;
   }
   async function savePreferences(enabled) {
     if (!db || !currentUser) return;
@@ -83,10 +91,10 @@
           userVisibleOnly: true, applicationServerKey: publicKeyBytes(conf.vapidPublicKey)
         });
       try {
-        await saveSubscription(subscription);
-        active = true;
+        const host=await saveSubscription(subscription);
         await savePreferences(true);
-        note('Notifications enabled for this device. You can send a test now.', 'success');
+        active = true;
+        note('Device registered successfully via '+host+'. Send a test, then check your scheduled reminder.', 'success');
       } catch (error) {
         // Keep an existing browser subscription if the server rejects it:
         // another attempt can re-register without losing its endpoint.
@@ -94,6 +102,7 @@
         throw error;
       }
     } catch (error) {
+      active = false;
       note('Could not enable notifications: ' + (error?.message || 'Permission was not granted.'), 'error');
     } finally { toggleBusy(false); render(); }
   }
@@ -134,7 +143,7 @@
       await savePreferences(true);
       const { data, error } = await db.functions.invoke('fitness-push-send', { body: { test: true } });
       if (error || !data?.success) throw new Error(data?.error || error?.message || 'No registered device received the alert.');
-      note('Test sent. Check the notifications on your '+deviceName+'.', 'success');
+      note('Push service accepted the test. Check your '+deviceName+' notifications. A successful test does not guarantee Android/iPhone will display every scheduled alert.', 'success');
     } catch (error) {
       note('Test failed: ' + (error?.message || 'Unknown error'), 'error');
     } finally { toggleBusy(false); render(); }
@@ -167,9 +176,12 @@
       if (error) throw error;
       applyTimes(pref?.reminder_times || TIMES);
       const subscription = await registration.pushManager.getSubscription();
-      active = Boolean(subscription && pref?.enabled);
-      if (subscription && active) await saveSubscription(subscription);
-      if (active) note('Notifications are enabled. Select reminders or send a test.', 'success');
+      active = false;
+      if (subscription && pref?.enabled && Notification.permission === 'granted') {
+        const host=await saveSubscription(subscription);
+        active = true;
+        note('Device confirmed with Supabase via '+host+'. Scheduled reminders are enabled.', 'success');
+      }
       else if (pref?.enabled && !subscription) {
         note('Daily reminders are selected, but this device is not registered. Tap Enable notifications to restore scheduled alerts.', 'error');
         // Keep the repair instruction visible rather than hidden in the

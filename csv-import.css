@@ -97,7 +97,9 @@
   color: var(--text);
   padding: 9px 12px;
   min-height: 40px;
-  font: 600 13px inherit;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
   margin-right: 10px;
 }
 .csv-import-preview {

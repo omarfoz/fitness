@@ -28,7 +28,7 @@
   }
   function toggleBusy(isBusy) {
     busy = isBusy;
-    for (const el of [...buttons(), $('pushEnableBtn'), $('pushDisableBtn'), $('pushTestBtn')]) {
+    for (const el of [...buttons(), $('pushEnableBtn'), $('pushDisableBtn'), $('pushTestBtn'), $('pushVerifyBtn')]) {
       if (el) el.disabled = isBusy;
     }
   }
@@ -42,6 +42,7 @@
     }
     if ($('pushDisableBtn')) $('pushDisableBtn').hidden = !active;
     if ($('pushTestBtn')) $('pushTestBtn').hidden = !active;
+    if ($('pushVerifyBtn')) $('pushVerifyBtn').hidden = !active;
     if (installNeeded) note('To receive iPhone alerts, open Fitness from the Home Screen, not a Safari tab.');
     else if (!supported()) note('Push notifications are not supported in this browser.');
     else if (Notification.permission === 'denied') note('Notifications are blocked. Allow notifications for Fitness in your device or browser settings.', 'error');
@@ -148,6 +149,36 @@
       note('Test failed: ' + (error?.message || 'Unknown error'), 'error');
     } finally { toggleBusy(false); render(); }
   }
+  async function checkRegistration(){
+    if(!registration || !currentUser || !db)return;
+    toggleBusy(true);
+    try{
+      const sub=await registration.pushManager.getSubscription();
+      if(!sub){
+        active=false;
+        note('No browser Push subscription is present on this device. Tap Enable notifications.','error');
+        return;
+      }
+      const {data:record,error:rowError}=await db.from('fitness_push_subscriptions')
+        .select('id').eq('user_id',currentUser.id).eq('endpoint',sub.endpoint)
+        .maybeSingle();
+      if(rowError)throw rowError;
+      const {data:pref,error:prefError}=await db.from('fitness_push_preferences')
+        .select('enabled,reminder_times').eq('user_id',currentUser.id).maybeSingle();
+      if(prefError)throw prefError;
+      active=Boolean(record && pref?.enabled && Notification.permission==='granted');
+      const host=(()=>{try{return new URL(sub.endpoint).hostname}catch(_){return 'unknown'}})();
+      if(active){
+        const times=(pref.reminder_times||[]).join(', ');
+        note('Confirmed: '+deviceName+' is registered in Supabase via '+host+'. Reminders: '+(times||'none')+' (Riyadh time).','success');
+      }else{
+        note('Device not fully enabled. Browser permission: '+Notification.permission+
+          ', stored subscription: '+(record?'yes':'no')+', reminders: '+(pref?.enabled?'on':'off')+
+          '. Tap Enable notifications to repair.', 'error');
+      }
+    }catch(e){note('Could not verify registration: '+(e?.message||'Unknown error'),'error');}
+    finally{toggleBusy(false);render();}
+  }
   function setupControls() {
     if (initialized) return;
     initialized = true;
@@ -162,6 +193,7 @@
     $('pushEnableBtn')?.addEventListener('click', openDevice);
     $('pushDisableBtn')?.addEventListener('click', turnOff);
     $('pushTestBtn')?.addEventListener('click', sendTest);
+    $('pushVerifyBtn')?.addEventListener('click', checkRegistration);
   }
   async function mount(client, user) {
     db = client;

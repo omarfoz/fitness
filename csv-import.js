@@ -137,6 +137,7 @@
     for(const item of pending.days.slice(0,18)){
       const row=document.createElement('div');
       row.className='csv-import-row';
+      row.setAttribute('role','listitem');
       const heading=document.createElement('span');
       heading.className='csv-import-day';
       heading.textContent=item.date+' · '+item.readings+' samples';
@@ -206,12 +207,6 @@
       message('Sign in to your own tracker before importing.','error');return;
     }
     const client=initial.db,uid=initial.userId,mode=$('csvConflictMode').value;
-    const planned=pending.days.map(item=>({...item,...candidate(item,mode)}))
-      .filter(x=>x.type==='add'||x.type==='replace');
-    if(!planned.length){message('Nothing new to import.','error');return;}
-    const replaces=planned.filter(x=>x.type==='replace').length;
-    if(replaces && !window.confirm('Replace existing steps on '+replaces+
-        ' '+(replaces===1?'date':'dates')+'? Calories, meals and other details will be preserved.'))return;
     busyState(true);
     let saved=0,skipped=0;
     try{
@@ -222,6 +217,18 @@
         .select('id,entry_date,steps').eq('user_id',uid).in('entry_date',dates);
       if(readError)throw readError;
       const existing=new Map((live||[]).map(x=>[x.entry_date,x]));
+      if(context?.()?.userId!==uid || context?.()?.readonly)
+        throw new Error('The active account changed. Stop and sign in again.');
+      // Confirm replacement based on fresh database rows, not cached preview.
+      const replacementCount=pending.days.filter(item=>{
+        const old=existing.get(item.date)?.steps??null;
+        return old!=null && old!==item.steps && mode==='replace';
+      }).length;
+      if(replacementCount && !window.confirm('Replace existing steps on '+replacementCount+
+          ' '+(replacementCount===1?'date':'dates')+'? Calories, meals and other details will be preserved.')){
+        message('Import canceled. No data was changed.','');
+        return;
+      }
       for(const item of pending.days){
         if(context?.()?.userId!==uid || context?.()?.readonly)
           throw new Error('The active account changed. Stop and sign in again.');

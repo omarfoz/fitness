@@ -30,12 +30,7 @@ create table public.fitness_push_subscriptions (
     and char_length(auth_secret) between 10 and 250
   ),
   constraint fitness_push_trusted_endpoint check (
-    endpoint ~ '^https://([a-zA-Z0-9-]+[.])*push[.]apple[.]com/'
-    or endpoint ~ '^https://fcm[.]googleapis[.]com/'
-    or endpoint ~ '^https://android[.]googleapis[.]com/gcm/send/'
-    or endpoint ~ '^https://updates[.]push[.]services[.]mozilla[.]com/'
-    or endpoint ~ '^https://([a-zA-Z0-9-]+[.])*notify[.]windows[.]com/'
-    or endpoint ~ '^https://([a-zA-Z0-9-]+[.])*push[.]samsungosp[.]com/'
+    endpoint ~ '^https://([a-zA-Z0-9-]+[.])*(googleapis[.]com|samsungosp[.]com|push[.]apple[.]com|push[.]services[.]mozilla[.]com|notify[.]windows[.]com)(:[0-9]{2,5})?/'
   ));
 create index fitness_push_subscriptions_by_owner on public.fitness_push_subscriptions(user_id);
 create table public.fitness_push_delivery_runs (

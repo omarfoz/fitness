@@ -6,7 +6,7 @@
   'use strict';
   const START='2026-11-15',GOAL=10000;
   const $=id=>document.getElementById(id);
-  let getState=null,blob=null,previewURL=null,currentDate=null,busy=false,serial=0;
+  let getState=null,blob=null,previewURL=null,currentDate=null,busy=false,serial=0,queued=false;
   const K={white:'#F9FBFF',muted:'#B7CAE5',blue:'#8DC8FF',
     mint:'#90E8C7',coral:'#FFBAAE',gold:'#FFDC9A'};
   const number=v=>Number(v).toLocaleString('en-US');
@@ -134,7 +134,7 @@
     return el?.value||key(new Date());
   }
   async function prepare(){
-    if(busy)return;
+    if(busy){queued=true;return;}
     const state=getState?.();
     if(!state?.userId||state.readonly)throw new Error('Only your own progress can be shared.');
     const selected=chosenDate();
@@ -155,7 +155,15 @@
       $('storyPreviewCaption').textContent=label+' · '+dateText(info.date)+' · '+
         display(info.entry?.steps)+' steps · '+display(info.entry?.calories_estimate)+' kcal';
       status('Image ready. Share it or save to your photos.','success');
-    }finally{busy=false;}
+    }finally{
+      busy=false;
+      // On iOS the PNG encoding may still be running as the user picks a
+      // different date. Always render the last date selected in the picker.
+      if(queued){
+        queued=false;
+        prepare().catch(e=>status(e?.message||'Could not update the story.','error'));
+      }
+    }
   }
   async function open(){
     const dlg=$('storyDialog');

@@ -27,7 +27,6 @@
   <link rel="stylesheet" href="/type-palette.css?v=20261116-typography-v3">
   <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
   <link rel="stylesheet" href="/pages.css?v=20261119-routes-v4">
-  <link rel="stylesheet" href="/page-loading.css?v=20261119-loader-v1">
 
   <!-- Inline critical layout: prevents giant icons and uneven daily-input cards
        if GitHub Pages deploys HTML before an external stylesheet update. -->
@@ -148,7 +147,7 @@
     }
   </style>
   <script>try{const mode=localStorage.getItem('fitness-theme')==='light'?'light':'dark';document.documentElement.dataset.theme=mode;document.querySelector('meta[name="theme-color"]').setAttribute('content',mode==='light'?'#f5f7fb':'#16233d')}catch(e){}</script>
-  <script defer src="/page-loading.js?v=20261119-loader-v1"></script>
+  <script defer src="/page-loading.js?v=20261119-background-v2"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script defer src="/config.js"></script>
   <script defer src="/csv-import.js?v=20261118-csv-history-v3"></script>
@@ -321,12 +320,6 @@
       </footer>
     </main>
     </div>
-  </div>
-  <div class="page-load-overlay" id="pageLoadOverlay" hidden role="status" aria-live="polite" aria-atomic="true">
-    <span class="page-load-indicator" aria-hidden="true"></span>
-    <strong>Fitness Tracker</strong>
-    <p id="pageLoadText">Loading your progress…</p>
-    <button id="pageLoadRetry" type="button" onclick="window.location.reload()">Retry loading</button>
   </div>
 </body>
 </html>

@@ -152,6 +152,7 @@
   $('logoutBtn').addEventListener('click', async () => {
     if (!db) return;
     try { await window.FitnessNotifications?.disconnect?.(); } catch (_) {}
+    window.FitnessCsvImport?.reset?.();
     const { error } = await db.auth.signOut();
     if (error) return showMessage('globalAlert', errorText(error), 'error');
     user = null; entries.clear(); flex.clear();
@@ -281,6 +282,8 @@
     $('flexViewerNote').hidden = !readonly;
     $('sharingPanel').hidden = readonly;
     $('exportBtn').hidden = readonly;
+    $('csvImportPanel').hidden = readonly;
+    if (readonly) window.FitnessCsvImport?.reset?.();
     $('bottomShareBtn').hidden = readonly;
     $('quickLogBtn').firstChild.textContent = readonly ? 'View day ' : 'Log a meal ';
   }
@@ -787,6 +790,17 @@
     displayedMonth = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth() + 1, 1, 12);
     renderCalendar();
   });
+  // Import reads the CSV locally. All Supabase writes are scoped to the
+  // authenticated owner's daily entries; viewers cannot import or overwrite.
+  window.FitnessCsvImport?.mount?.({
+    getContext: () => ({
+      db,
+      userId: user?.id || null,
+      readonly: viewingShared(),
+      existing: entries
+    }),
+    onSaved: async () => { await loadData(); }
+  });
   $('exportBtn').addEventListener('click', () => {
     if (!user || viewingShared() || entries.size === 0) return showMessage('globalAlert', 'No saved entries to export yet.');
     const cols = ['entry_date', 'steps', 'calories_estimate', 'meals', 'fasting_hours', 'one_meal', 'coffee_cups', 'waist_cm', 'notes'];
@@ -819,6 +833,7 @@
       }
       if (event === 'SIGNED_OUT') {
         window.FitnessNotifications?.reset?.();
+        window.FitnessCsvImport?.reset?.();
         user = null; entries.clear(); flex.clear();
         currentTrackerId='mine'; ownedShares=[]; incomingShares=[]; lastInvitedEmail='';
     window.FitnessFoodBrowser?.clear();

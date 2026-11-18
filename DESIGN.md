@@ -117,3 +117,32 @@ device visual QA remains necessary.
 Repaired a malformed `mobile-polish.css` link in `index.html` so both sheets
 parse independently. No changes were made to the critical inline log-grid
 hotfix or business logic.
+
+
+## CSV steps import, 18 Nov 2026
+
+A signed-in tracker owner can expand **Import steps from CSV** under the History
+calendar, next to the existing CSV export. The importer runs entirely in the
+browser, then writes *daily step totals only* using Supabase RLS. No CSV file,
+per-minute timestamps, or raw health records are uploaded or retained. Shared
+progress viewers cannot import.
+
+- Accepts `Date,Time,Steps`, where each row is an incremental reading, and
+  `entry_date,steps`, where each row is a daily total.
+- Accepts dates like `2026.11.15 02:32:00` or `2026-11-15`. Groups all rows by
+  the local calendar date written in the CSV without time-zone conversion.
+- Shows days, samples, totals and add/replace/skip counts **before** saving.
+- Skips dates with an existing step count by default, so reimporting the same
+  CSV cannot double-count those steps.
+- Owners may deliberately choose to replace *steps only*; existing meals,
+  calories, fasting, coffee and notes are preserved. Replacement is confirmed
+  against current database state before it is applied.
+- On success the calendar and metrics reload. Invalid rows block the import.
+- Native Apple Health ZIP/XML archives are not CSV, and are **not supported**.
+  Use a CSV from Apple Shortcuts or another trusted step-exporting app.
+
+Validation: JavaScript syntax and DOM references pass; CSV date formats,
+quoted fields and rejection of invalid/future data pass; a simulated Supabase
+flow verified that replacing steps keeps prior calorie and meal values and
+that repeated imports skip unchanged values. iPhone visual and live-account
+end-to-end import still require user-device verification.

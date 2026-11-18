@@ -35,3 +35,31 @@
  .page-layout-share{gap:14px}
  .page-intro .page-link{width:100%}
 }
+
+/* Navigation is available on desktop too; the fixed tab bar owns mobile. */
+.desktop-page-nav {
+ display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
+ gap:4px;min-width:0;
+ padding:5px;background:rgba(110,157,221,.07);
+ border:1px solid var(--border);border-radius:15px;
+}
+.page-nav-link {
+ display:inline-flex;align-items:center;justify-content:center;
+ min-height:41px;min-width:65px;padding:8px 13px;
+ border-radius:11px;text-decoration:none;font-size:.79rem;font-weight:670;
+ color:var(--type-secondary,var(--muted));transition:background .15s,color .15s;
+}
+.page-nav-link:hover,.page-nav-link:focus-visible {
+ background:rgba(110,157,221,.12);color:var(--text);
+}
+.page-nav-link.is-active {
+ color:var(--type-blue,var(--accent));
+ background:rgba(110,157,221,.17);font-weight:780;
+}
+.page-nav-link:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(min-width:681px) and (max-width:950px) {
+ .app-header{gap:8px;flex-wrap:wrap}
+ .desktop-page-nav{order:3;flex:1 1 100%}
+ .page-nav-link{flex:1}
+}
+@media(max-width:680px){.desktop-page-nav{display:none!important}}

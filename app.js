@@ -448,7 +448,7 @@
     if (!user) return;
     renderSharingState();
     if(page==='todaySection'){
-      renderHero();renderStats();
+      renderHero();renderStats();renderStreak();
     }else if(page==='logSection'){
       renderDay();renderFlex();
     }else if(page==='historySection'){
@@ -551,6 +551,19 @@
     setText('logTitle', viewingShared()
       ? 'Shared day: '+fmtDay(selectedDate,{month:'short',day:'numeric'})
       : (selectedDate === localDateKey(new Date()) ? 'Log your day' : 'Log ' + fmtDay(selectedDate, { month: 'short', day: 'numeric' })));
+  }
+  function renderStreak() {
+    const info=window.FitnessProgress?.streak(entries,localDateKey(new Date()));
+    if(!info)return;
+    setText('streakCurrent',shortNum(info.current));
+    setText('streakBest',shortNum(info.best));
+    setText('streakMessage',info.metToday
+      ? '10,000-step goal reached today. Keep the streak going!'
+      : info.pendingToday
+        ? 'Your streak is alive. Reach 10K steps today to extend it.'
+        : info.current===0 && info.goalDays===0
+          ? 'Reach 10,000 steps to start your first streak.'
+          : 'A fresh 10,000-step streak can begin today.');
   }
   function renderStats() {
     const entry = entries.get(selectedDate);

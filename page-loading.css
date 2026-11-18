@@ -1,0 +1,22 @@
+/* Navigation loading only appears when switching true HTML pages. */
+.page-load-overlay{
+ position:fixed;inset:0;z-index:10000;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:17px;
+ padding:28px;background:rgba(8,18,36,.92);backdrop-filter:blur(15px);
+ color:#f6f8ff;text-align:center;
+}
+.page-load-overlay[hidden]{display:none!important}
+.page-load-indicator{
+ width:48px;height:48px;border-radius:50%;border:4px solid rgba(180,219,255,.23);
+ border-top-color:#8cc8ff;animation:fitness-load-spin .75s linear infinite;
+}
+.page-load-overlay strong{font-size:1.02rem;font-weight:730;letter-spacing:-.01em}
+.page-load-overlay p{max-width:275px;margin:0;color:#baccdf;font-size:.79rem;line-height:1.5}
+.page-load-overlay button{min-height:44px;padding:9px 18px;color:#f6f8ff;
+ background:rgba(255,255,255,.1);border:1px solid rgba(203,224,255,.3);
+ border-radius:13px;font:600 13px inherit;}
+@keyframes fitness-load-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.page-load-indicator{animation:none;border-top-color:#8cc8ff}}
+:root[data-theme="light"] .page-load-overlay{background:rgba(246,249,255,.96);color:#17263f}
+:root[data-theme="light"] .page-load-overlay p{color:#4a5d74}
+:root[data-theme="light"] .page-load-overlay button{color:#17263f;background:#fff;border-color:#cad6e8}

@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="/type-palette.css?v=20261116-typography-v3">
   <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
   <link rel="stylesheet" href="/pages.css?v=20261119-pages-v2">
-  <link rel="stylesheet" href="/story-card.css?v=20261119-stories-v1">
+  <link rel="stylesheet" href="/story-card.css?v=20261119-stories-v2">
 
   <!-- Inline critical layout: prevents giant icons and uneven daily-input cards
        if GitHub Pages deploys HTML before an external stylesheet update. -->
@@ -148,8 +148,9 @@
   <script>try{const mode=localStorage.getItem('fitness-theme')==='light'?'light':'dark';document.documentElement.dataset.theme=mode;document.querySelector('meta[name="theme-color"]').setAttribute('content',mode==='light'?'#f5f7fb':'#16233d')}catch(e){}</script>
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script defer src="/config.js"></script>
-  <script defer src="/story-card.js?v=20261119-stories-v1"></script>
-  <script defer src="/app.js?v=20261119-pages-v2"></script>
+  <script defer src="/progress-metrics.js?v=20261119-streak-v1"></script>
+  <script defer src="/story-card.js?v=20261119-stories-v2"></script>
+  <script defer src="/app.js?v=20261119-streak-v3"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -309,6 +310,18 @@
         </div>
       </section>
 
+      <section class="glass-card streak-panel" aria-labelledby="streakHeading">
+        <div class="streak-icon" aria-hidden="true">🔥</div>
+        <div class="streak-copy">
+          <span class="streak-kicker">YOUR 10K STREAK</span>
+          <h2 id="streakHeading"><span id="streakCurrent">0</span> <small>day streak</small></h2>
+          <p id="streakMessage">Reach 10,000 steps each day to keep your streak alive.</p>
+        </div>
+        <div class="streak-best">
+          <strong id="streakBest">0</strong>
+          <span>Best streak</span>
+        </div>
+      </section>
       <section class="story-cta" id="storySection" aria-labelledby="storyHeading">
         <div class="story-cta-copy">
           <span class="story-eyebrow">SHARE THE MOMENT</span>
@@ -319,6 +332,11 @@
       </section>
       <dialog class="story-dialog" id="storyDialog" aria-labelledby="storyDialogTitle">
         <div class="story-dialog-header"><h2 id="storyDialogTitle">Your achievement story</h2><button id="storyCloseBtn" type="button" class="story-close" aria-label="Close preview">×</button></div>
+        <div class="story-date-control">
+          <label for="storySelectedDate">Story for</label>
+          <input id="storySelectedDate" type="date" aria-describedby="storyDateHelp">
+        </div>
+        <p id="storyDateHelp" class="story-date-help">Choose any past day. Earlier days and totals are shown as they were on that date.</p>
         <div class="story-preview-shell"><img id="storyPreviewImage" alt="Your progress story with challenge day, completed days and step counts" width="1080" height="1920"></div>
         <p id="storyPreviewCaption" class="story-preview-caption">1080 × 1920 · Ready for Stories</p>
         <div class="story-dialog-actions"><button id="storyDownloadBtn" type="button" class="button subtle">Save image</button><button id="storyShareBtn" type="button" class="button primary">Share story</button></div>

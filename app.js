@@ -40,7 +40,16 @@
     return localDateKey(d);
   }
   function isFriday(key) { return dateFromKey(key).getDay() === 5; }
-  function isFlexDay(key) { return isFriday(key) || flex.get(mondayFreeWeekStart(key)) === key; }
+  function isFlexDay(key) {
+    // The flexible-day challenge starts 15 Nov 2026. Imported historical
+    // steps may be older, but should not become challenge/flex days.
+    return key >= START_DATE && (isFriday(key) || flex.get(mondayFreeWeekStart(key)) === key);
+  }
+  function earliestLogDate() {
+    let first=START_DATE;
+    for(const date of entries.keys())if(date<first)first=date;
+    return first;
+  }
   function fmtDay(key, opts = { month: 'short', day: 'numeric' }) {
     return dateFromKey(key).toLocaleDateString('en-US', opts);
   }
@@ -174,29 +183,45 @@
     await loadData();
   }
 
+  async function fetchOwnedHistory(uid) {
+    // Supabase can cap each PostgREST response at 1,000 rows. Cursor
+    // pagination keeps years of imported steps visible, not just the latest
+    // 1,000 days, without huge URLs or OFFSET drift.
+    const size=800,records=[];
+    let before=null;
+    for(let page=0;page<20;page++){
+      let query=db.from('daily_entries')
+        .select('id,entry_date,steps,calories_estimate,meals,fasting_hours,one_meal,coffee_cups,waist_cm,notes,meal_items')
+        .eq('user_id',uid).order('entry_date',{ascending:false}).limit(size);
+      if(before)query=query.lt('entry_date',before);
+      const {data,error}=await query;
+      if(error)throw error;
+      records.push(...(data||[]));
+      if(!data || data.length<size)return records;
+      before=data[data.length-1].entry_date;
+    }
+    throw new Error('Your tracker has more than 16,000 daily entries. Contact support to view older history.');
+  }
   async function loadData() {
     if (!user) return;
     const uid = user.id;
     if (loadingFor === uid) return;
     loadingFor = uid;
     try {
-      const [dayResult, flexResult] = await Promise.all([
-        db.from('daily_entries')
-          .select('id,entry_date,steps,calories_estimate,meals,fasting_hours,one_meal,coffee_cups,waist_cm,notes,meal_items')
-          .eq('user_id', uid).gte('entry_date', START_DATE).order('entry_date', { ascending: false }).limit(1000),
+      const [days,flexResult] = await Promise.all([
+        fetchOwnedHistory(uid),
         db.from('weekly_flex')
           .select('week_start,flex_date')
-          .eq('user_id', uid).order('week_start', { ascending: false }).limit(250)
+          .eq('user_id',uid).order('week_start',{ascending:false}).limit(250)
       ]);
-      if (dayResult.error) throw dayResult.error;
-      if (flexResult.error) throw flexResult.error;
-      if (!user || user.id !== uid || viewingShared()) return;
-      entries = new Map((dayResult.data || []).map((row) => [row.entry_date, row]));
-      flex = new Map((flexResult.data || []).map((row) => [row.week_start, row.flex_date]));
+      if(flexResult.error)throw flexResult.error;
+      if(!user || user.id!==uid || viewingShared())return;
+      entries = new Map(days.map(row=>[row.entry_date,row]));
+      flex = new Map((flexResult.data||[]).map(row=>[row.week_start,row.flex_date]));
       renderAll();
-    } catch (e) {
-      showMessage('globalAlert', 'Could not load your private data: ' + errorText(e), 'error');
-    } finally { loadingFor = null; }
+    }catch(e){
+      showMessage('globalAlert','Could not load your private data: '+errorText(e),'error');
+    }finally{loadingFor=null;}
   }
 
 
@@ -373,7 +398,7 @@
   });
 
   function setDate(key, scroll = false) {
-    if (key < START_DATE) return;
+    if (!key || key < earliestLogDate()) return;
     selectedDate = key;
     $('entryDate').value = key;
     displayedMonth = firstOfMonth(dateFromKey(key));
@@ -448,6 +473,7 @@
         : 'Your check-in for '+dayText+'. Progress at your own pace.');
   }
   function renderDay() {
+    $('entryDate').min = earliestLogDate();
     const entry = entries.get(selectedDate);
     $('entryDate').value = selectedDate;
     $('steps').value = entry?.steps ?? '';
@@ -524,7 +550,7 @@
       ? 'Your daily walking goal is complete'
       : shortNum(STEP_GOAL - entry.steps) + ' steps until your goal');
     setText('fastValue', entry?.fasting_hours == null ? '—' : entry.fasting_hours + 'h');
-    $('daysValue').innerHTML = String(entries.size) + '<span class="stat-unit"> days</span>';
+    $('daysValue').innerHTML = String([...entries.keys()].filter(date=>date>=START_DATE).length) + '<span class="stat-unit"> days</span>';
   }
   function renderFlex() {
     const week = mondayFreeWeekStart(selectedDate);
@@ -576,6 +602,16 @@
   function renderCalendar() {
     const grid = $('calendarGrid'); grid.replaceChildren();
     setText('monthLabel', displayedMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }));
+    // A native month picker makes years of imported history reachable without
+    // tapping Previous dozens of times on a phone.
+    const monthKey=localDateKey(displayedMonth).slice(0,7);
+    const oldestMonth=earliestLogDate().slice(0,7);
+    const latestMonth=localDateKey(new Date()).slice(0,7);
+    $('calendarJumpMonth').min=oldestMonth;
+    $('calendarJumpMonth').max=latestMonth;
+    $('calendarJumpMonth').value=monthKey;
+    $('prevMonth').disabled=monthKey<=oldestMonth;
+    $('nextMonth').disabled=monthKey>=latestMonth;
     const y = displayedMonth.getFullYear(), m = displayedMonth.getMonth();
     const blank = new Date(y, m, 1).getDay();
     const days = new Date(y, m + 1, 0).getDate();
@@ -590,7 +626,7 @@
       const btn = document.createElement('button'); btn.type = 'button';
       btn.className = 'calendar-day' + (logged ? ' is-logged' : '') + (flexible ? ' is-flex' : '') +
         (key === selectedDate ? ' is-selected' : '') + (key === localDateKey(new Date()) ? ' is-today' : '');
-      btn.disabled = key < START_DATE;
+      btn.disabled = key < earliestLogDate();
       const description = [fmtDay(key, { weekday: 'long', month: 'long', day: 'numeric' }), logged ? 'Entry saved' : 'No entry'];
       if (entry?.steps != null) description.push(shortNum(entry.steps) + ' steps');
       if (entry?.calories_estimate != null) description.push('approximately ' + shortNum(entry.calories_estimate) + ' kcal');
@@ -781,6 +817,18 @@
         showMessage('flexMessage', chosen ? 'Your second flexible day is saved.' : 'Extra flexible day cleared.', 'success');
       } catch (e) { showMessage('flexMessage', errorText(e), 'error'); }
     });
+  });
+  $('calendarJumpMonth').addEventListener('change', (event) => {
+    const month=event.target.value;
+    const first=earliestLogDate().slice(0,7);
+    const latest=localDateKey(new Date()).slice(0,7);
+    if(!/^\d{4}-\d{2}$/.test(month)||month<first||month>latest){
+      event.target.value=localDateKey(displayedMonth).slice(0,7);
+      return;
+    }
+    const [year,m]=month.split('-').map(Number);
+    displayedMonth=new Date(year,m-1,1,12);
+    renderCalendar();
   });
   $('prevMonth').addEventListener('click', () => {
     displayedMonth = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth() - 1, 1, 12);

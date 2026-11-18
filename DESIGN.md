@@ -146,3 +146,30 @@ quoted fields and rejection of invalid/future data pass; a simulated Supabase
 flow verified that replacing steps keeps prior calorie and meal values and
 that repeated imports skip unchanged values. iPhone visual and live-account
 end-to-end import still require user-device verification.
+
+
+### Historical steps CSV follow-up, 18 Nov 2026
+
+The challenge starts on **15 Nov 2026**, but exported historical pedometer
+samples often start much earlier. The original CSV importer rejected those rows,
+and the tracker also filtered older dates from loading and disabled their
+calendar cells. Both restrictions were removed from *history* without changing
+the start of the 30-day challenge.
+
+- CSV accepts pre-challenge dates, still rejects future/invalid dates.
+- CSV aggregation now works row by row rather than storing all CSV rows.
+  Limits: 20 MB, 300,000 samples, 5,000 unique dates per file.
+- The database lookup for existing entries uses chunks of 120 dates to avoid
+  oversized PostgREST URLs. Steps-only updates still preserve meals/calories.
+- The tracker now fetches daily entries using date-key cursor pagination, so
+  the previous 1,000-row cap cannot silently hide the older imported days.
+- A native **Jump to month** picker allows browsing years of historical data
+  on mobile; the minimum date is the first date saved to this tracker.
+- The challenge retains its original start date, calendar days before that date
+  are not treated as flexible days, and challenge check-in counts exclude
+  imported pre-challenge history. All-time history statistics still include it.
+
+Validated by parser tests (including 2016 dates and quoted CSVs), JavaScript
+syntax, stylesheet structure, and checking all new DOM IDs and JS references.
+Visual confirmation and first-hand import of the user's full CSV on their
+device are still pending.

@@ -6,15 +6,35 @@
   const START_DATE = '2026-11-15';
   const CHALLENGE_DAYS = 30;
   const STEP_GOAL = 10000;
-  const $ = (id) => document.getElementById(id);
+  // The four routes are real HTML documents; absent page-specific controls
+  // use detached elements so shared authentication code never needs to copy
+  // forms or metrics into the other pages.
+  const inertElements = Object.create(null);
+  const $ = (id) => document.getElementById(id) ||
+    (inertElements[id] ||= document.createElement('div'));
+  const page = document.getElementById('appView')?.dataset.page || 'todaySection';
+  const routes = Object.freeze({todaySection:'/', logSection:'/log.html',
+    historySection:'/history.html', sharingPanel:'/share.html'});
+  function rememberTracker(id) {
+    try {
+      if(id==='mine')sessionStorage.removeItem('fitness-active-tracker');
+      else sessionStorage.setItem('fitness-active-tracker',id);
+    }catch(_){}
+  }
+  function restoredTracker() {
+    try{return sessionStorage.getItem('fitness-active-tracker')||'mine';}
+    catch(_){return 'mine';}
+  }
   const config = window.FITNESS_CONFIG || {};
   let db, user = null, authMode = 'signin', recovering = false, entries = new Map(), flex = new Map();
   let lastObservedDate = localDateKey(new Date());
   let rolloverTimer = null;
-  let selectedDate = localDateKey(new Date());
+  const queryDate = new URLSearchParams(window.location.search).get('date');
+  let selectedDate = /^\d{4}-\d{2}-\d{2}$/.test(queryDate||'') && queryDate<=localDateKey(new Date())
+    ? queryDate : localDateKey(new Date());
   let displayedMonth = firstOfMonth(dateFromKey(selectedDate));
   let loadingFor = null;
-  let currentTrackerId = 'mine';
+  let currentTrackerId = restoredTracker();
   let ownedShares = [];
   let incomingShares = [];
   let lastInvitedEmail = '';
@@ -165,7 +185,7 @@
     const { error } = await db.auth.signOut();
     if (error) return showMessage('globalAlert', errorText(error), 'error');
     user = null; entries.clear(); flex.clear();
-    currentTrackerId='mine'; ownedShares=[]; incomingShares=[]; lastInvitedEmail='';
+    currentTrackerId='mine';rememberTracker('mine'); ownedShares=[]; incomingShares=[]; lastInvitedEmail='';
     window.FitnessFoodBrowser?.clear();
     $('appView').hidden = true; $('authView').hidden = false; $('logoutBtn').hidden = true;
     $('authPassword').value = '';
@@ -180,7 +200,11 @@
     window.FitnessNotifications?.mount?.(db, user);
     showMessage('globalAlert', '');
     await loadShares();
-    await loadData();
+    if(viewingShared()){
+      const wanted=currentTrackerId;
+      currentTrackerId='mine';
+      await openTracker(wanted);
+    }else await loadData();
   }
 
   async function fetchOwnedHistory(uid) {
@@ -264,7 +288,7 @@
       select.append(option);
     }
     if (previous !== 'mine' && !incomingShares.some((share)=>share.id===previous)) {
-      currentTrackerId = 'mine';
+      currentTrackerId = 'mine';rememberTracker('mine');
     }
     select.value = currentTrackerId;
     $('trackerSwitcher').hidden = incomingShares.length === 0;
@@ -310,12 +334,14 @@
     $('csvImportPanel').hidden = readonly;
     if (readonly) window.FitnessCsvImport?.reset?.();
     $('bottomShareBtn').hidden = readonly;
-    $('quickLogBtn').firstChild.textContent = readonly ? 'View day ' : 'Log a meal ';
+    const quick=$('quickLogBtn');
+    if(quick.firstChild)quick.firstChild.textContent = readonly ? 'View day ' : 'Log a meal ';
   }
   async function openTracker(id) {
     if (!user || !db || id === currentTrackerId) return;
     if (id !== 'mine' && !incomingShares.some((share)=>share.id===id)) return;
     currentTrackerId = id;
+    rememberTracker(id);
     entries.clear();
     flex.clear();
     window.FitnessFoodBrowser?.invalidate();
@@ -399,6 +425,10 @@
 
   function setDate(key, scroll = false) {
     if (!key || key < earliestLogDate()) return;
+    if(page!=='logSection'){
+      window.location.assign('/log.html?date='+encodeURIComponent(key));
+      return;
+    }
     selectedDate = key;
     $('entryDate').value = key;
     displayedMonth = firstOfMonth(dateFromKey(key));
@@ -415,12 +445,13 @@
   function renderAll() {
     if (!user) return;
     renderSharingState();
-    renderHero();
-    renderDay();
-    renderStats();
-    renderFlex();
-    renderCalendar();
-    renderSummary();
+    if(page==='todaySection'){
+      renderHero();renderStats();
+    }else if(page==='logSection'){
+      renderDay();renderFlex();
+    }else if(page==='historySection'){
+      renderCalendar();renderSummary();
+    }
   }
   function refreshForNewDay() {
     const currentDate = localDateKey(new Date());
@@ -665,65 +696,20 @@
     setText('summaryMeals', shortNum(rows.filter((r) => r.one_meal).length));
   }
 
-  // Navigation intentionally links to real sections rather than introducing
-  // separate pages or duplicate editable forms.
-  function activateBottomTab(target) {
-    document.querySelectorAll('.bottom-tab').forEach((button) => {
-      const isActive = button.dataset.navTarget === target;
-      button.classList.toggle('is-active', isActive);
-      if (isActive) button.setAttribute('aria-current', 'page');
-      else button.removeAttribute('aria-current');
-    });
-  }
-  function jumpToSection(target, focusMeal = false) {
-    const section = $(target);
-    if (!section || section.hidden) return;
-    spyPausedUntil = performance.now() + 900;
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    activateBottomTab(target);
-    if (focusMeal && !viewingShared()) {
-      // Delay focus without scrolling twice; keeps the keyboard out of the way
-      // until the user actually wants to type.
-      $('meals').focus({ preventScroll: true });
+  // Native anchor links navigate between distinct HTML pages.
+  // This avoids long-page scrolling pretending to be app navigation.
+  function jumpToSection(target,focusMeal=false){
+    const destination=routes[target];
+    if(!destination)return;
+    if(target!==page){
+      window.location.assign(destination);
+      return;
     }
+    const section=document.getElementById(target);
+    if(section)section.scrollIntoView({behavior:'smooth',block:'start'});
+    if(focusMeal && page==='logSection' && !viewingShared())$('meals').focus({preventScroll:true});
   }
-  $('appBottomNav').addEventListener('click', (event) => {
-    const target = event.target.closest('[data-nav-target]');
-    if (!target || target.hidden) return;
-    jumpToSection(target.dataset.navTarget);
-  });
-  $('quickLogBtn').addEventListener('click', () => jumpToSection('logSection', false));
-
-  // Follow the section actually being read, not only the last navigation tap.
-  // Temporarily pause the scroll spy during smooth scrolling after a tab tap.
-  let spyPausedUntil = 0, spyQueued = false;
-  function syncBottomTabToScroll() {
-    spyQueued = false;
-    if ($('appView').hidden || performance.now() < spyPausedUntil) return;
-    const line = window.innerHeight * 0.35;
-    let current = null, currentTop = -Infinity;
-    document.querySelectorAll('.bottom-tab').forEach((button) => {
-      if (button.hidden) return;
-      const section = $(button.dataset.navTarget);
-      if (!section || section.hidden) return;
-      const top = section.getBoundingClientRect().top;
-      if (top <= line && top > currentTop) {
-        current = button.dataset.navTarget;
-        currentTop = top;
-      }
-    });
-    if (!current) current = 'todaySection';
-    if (!document.querySelector('.bottom-tab.is-active[data-nav-target="' + current + '"]')) {
-      activateBottomTab(current);
-    }
-  }
-  function queueScrollSpy() {
-    if (spyQueued) return;
-    spyQueued = true;
-    requestAnimationFrame(syncBottomTabToScroll);
-  }
-  window.addEventListener('scroll', queueScrollSpy, { passive: true });
-  window.addEventListener('resize', queueScrollSpy, { passive: true });
+  $('quickLogBtn').addEventListener('click',()=>jumpToSection('logSection'));
 
   // Keep reference cards open on desktop and collapsible on mobile, including
   // after a screen rotation or viewport resize.
@@ -840,6 +826,9 @@
   });
   // Import reads the CSV locally. All Supabase writes are scoped to the
   // authenticated owner's daily entries; viewers cannot import or overwrite.
+  window.FitnessStory?.mount?.(() => ({
+    userId:user?.id||null,readonly:viewingShared(),entries
+  }));
   window.FitnessCsvImport?.mount?.({
     getContext: () => ({
       db,
@@ -883,7 +872,7 @@
         window.FitnessNotifications?.reset?.();
         window.FitnessCsvImport?.reset?.();
         user = null; entries.clear(); flex.clear();
-        currentTrackerId='mine'; ownedShares=[]; incomingShares=[]; lastInvitedEmail='';
+        currentTrackerId='mine'; rememberTracker('mine'); ownedShares=[]; incomingShares=[]; lastInvitedEmail='';
     window.FitnessFoodBrowser?.clear();
         $('appView').hidden = true; $('authView').hidden = false; $('logoutBtn').hidden = true;
         return;

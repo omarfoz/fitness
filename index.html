@@ -11,6 +11,8 @@
   <title>Fitness Tracker | Today</title>
   <link rel="icon" type="image/svg+xml" href="/fitness-icon.svg">
   <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://pazcqsayftolmjxgqtwj.supabase.co" crossorigin>
   <link rel="apple-touch-icon" href="/fitness-icon.svg">
   <link rel="stylesheet" href="/style.css?v=20261115-ios-theme-sync-v2">
   <link rel="stylesheet" href="/dashboard.css?v=20261115f">
@@ -25,6 +27,7 @@
   <link rel="stylesheet" href="/type-palette.css?v=20261116-typography-v3">
   <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
   <link rel="stylesheet" href="/pages.css?v=20261119-pages-v2">
+  <link rel="stylesheet" href="/page-loading.css?v=20261119-loader-v1">
   <link rel="stylesheet" href="/story-card.css?v=20261119-stories-v2">
 
   <!-- Inline critical layout: prevents giant icons and uneven daily-input cards
@@ -146,6 +149,7 @@
     }
   </style>
   <script>try{const mode=localStorage.getItem('fitness-theme')==='light'?'light':'dark';document.documentElement.dataset.theme=mode;document.querySelector('meta[name="theme-color"]').setAttribute('content',mode==='light'?'#f5f7fb':'#16233d')}catch(e){}</script>
+  <script defer src="/page-loading.js?v=20261119-loader-v1"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script defer src="/config.js"></script>
   <script defer src="/progress-metrics.js?v=20261119-streak-v1"></script>
@@ -364,6 +368,12 @@
       </footer>
     </main>
     </div>
+  </div>
+  <div class="page-load-overlay" id="pageLoadOverlay" hidden role="status" aria-live="polite" aria-atomic="true">
+    <span class="page-load-indicator" aria-hidden="true"></span>
+    <strong>Fitness Tracker</strong>
+    <p id="pageLoadText">Loading your progress…</p>
+    <button id="pageLoadRetry" type="button" onclick="window.location.reload()">Retry loading</button>
   </div>
 </body>
 </html>

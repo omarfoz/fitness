@@ -1,4 +1,4 @@
-/* User-controlled iOS Home Screen Web Push. The private VAPID key is server-side only. */
+/* User-controlled iPhone and Android Web Push. VAPID private key stays server-side. */
 (() => {
   'use strict';
   const conf = window.FITNESS_CONFIG || {};
@@ -6,6 +6,7 @@
   const $ = (id) => document.getElementById(id);
   let db = null, currentUser = null, registration = null, active = false, busy = false, initialized = false;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const deviceName = isIOS ? 'iPhone' : /Android/i.test(navigator.userAgent) ? 'Android' : 'device';
   const installed = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
   const supported = () => window.isSecureContext && 'serviceWorker' in navigator &&
     'PushManager' in window && 'Notification' in window && Boolean(conf.vapidPublicKey);
@@ -34,6 +35,7 @@
   function render() {
     const installNeeded = isIOS && !installed();
     if ($('pushInstallHint')) $('pushInstallHint').hidden = !installNeeded;
+    if ($('pushTitle')) $('pushTitle').textContent = deviceName === 'device' ? 'Device notifications' : deviceName + ' notifications';
     if ($('pushEnableBtn')) {
       $('pushEnableBtn').hidden = active;
       $('pushEnableBtn').disabled = busy || installNeeded || !supported() || Notification.permission === 'denied';
@@ -42,7 +44,7 @@
     if ($('pushTestBtn')) $('pushTestBtn').hidden = !active;
     if (installNeeded) note('To receive iPhone alerts, open Fitness from the Home Screen, not a Safari tab.');
     else if (!supported()) note('Push notifications are not supported in this browser.');
-    else if (Notification.permission === 'denied') note('Notifications are blocked. Allow Fitness in iPhone Settings → Notifications.', 'error');
+    else if (Notification.permission === 'denied') note('Notifications are blocked. Allow notifications for Fitness in your device or browser settings.', 'error');
   }
   function publicKeyBytes(base64url) {
     const raw = atob(base64url.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - base64url.length % 4) % 4));
@@ -75,7 +77,8 @@
       const permission = Notification.permission === 'granted'
         ? 'granted' : await Notification.requestPermission();
       if (permission !== 'granted') throw new Error('Notifications permission was not granted.');
-      const subscription = await registration.pushManager.getSubscription() ||
+      const existingSubscription = await registration.pushManager.getSubscription();
+      const subscription = existingSubscription ||
         await registration.pushManager.subscribe({
           userVisibleOnly: true, applicationServerKey: publicKeyBytes(conf.vapidPublicKey)
         });
@@ -85,7 +88,9 @@
         await savePreferences(true);
         note('Notifications enabled for this device. You can send a test now.', 'success');
       } catch (error) {
-        await subscription.unsubscribe();
+        // Keep an existing browser subscription if the server rejects it:
+        // another attempt can re-register without losing its endpoint.
+        if (!existingSubscription) await subscription.unsubscribe();
         throw error;
       }
     } catch (error) {
@@ -122,14 +127,14 @@
       const subscription = await registration?.pushManager.getSubscription();
       if (!subscription) {
         active = false;
-        note('This iPhone is not registered for daily reminders. Tap Enable notifications again.', 'error');
+        note('This device is not registered for daily reminders. Tap Enable notifications again.', 'error');
         return;
       }
       await saveSubscription(subscription);
       await savePreferences(true);
       const { data, error } = await db.functions.invoke('fitness-push-send', { body: { test: true } });
       if (error || !data?.success) throw new Error(data?.error || error?.message || 'No registered device received the alert.');
-      note('Test sent. Check your iPhone Lock Screen or Notification Center.', 'success');
+      note('Test sent. Check the notifications on your '+deviceName+'.', 'success');
     } catch (error) {
       note('Test failed: ' + (error?.message || 'Unknown error'), 'error');
     } finally { toggleBusy(false); render(); }
@@ -166,7 +171,7 @@
       if (subscription && active) await saveSubscription(subscription);
       if (active) note('Notifications are enabled. Select reminders or send a test.', 'success');
       else if (pref?.enabled && !subscription) {
-        note('Daily reminders are selected, but this iPhone is not registered. Tap Enable notifications to restore scheduled alerts.', 'error');
+        note('Daily reminders are selected, but this device is not registered. Tap Enable notifications to restore scheduled alerts.', 'error');
         // Keep the repair instruction visible rather than hidden in the
         // collapsed mobile notifications panel.
         const panel = $('pushPanel')?.querySelector('details[data-collapse-mobile]');

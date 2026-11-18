@@ -4,10 +4,9 @@
  */
 (() => {
   'use strict';
-  const START = '2026-11-15';
-  const MAX_BYTES = 5 * 1024 * 1024;
-  const MAX_ROWS = 50000;
-  const MAX_DAYS = 500;
+  const MAX_BYTES = 20 * 1024 * 1024;
+  const MAX_ROWS = 300000;
+  const MAX_DAYS = 5000;
   const $ = (id) => document.getElementById(id);
   let context = null;
   let onSaved = null;
@@ -31,66 +30,71 @@
     if (date.getUTCFullYear()!==year || date.getUTCMonth()!==month-1 || date.getUTCDate()!==day) return null;
     return [String(year).padStart(4,'0'),String(month).padStart(2,'0'),String(day).padStart(2,'0')].join('-');
   }
-  function parseRows(source) {
-    const text=String(source).replace(/^\uFEFF/,'');
-    if (text.length > MAX_BYTES) throw new Error('CSV is too large. Use a file smaller than 5 MB.');
-    const rows=[];let row=[],cell='',quoted=false,justClosed=false;
-    for(let i=0;i<text.length;i++){
-      const c=text[i];
+  function parse(text) {
+    // Parse and aggregate as rows arrive rather than holding every sample in
+    // memory. A multi-year export can contain hundreds of thousands of rows.
+    const source=String(text).replace(/^\uFEFF/,'');
+    if(source.length>MAX_BYTES)throw new Error('CSV is too large. Use a file smaller than 20 MB.');
+    const days=new Map();
+    let line=0,readings=0,columns=null,datePos=-1,stepsPos=-1;
+    const normalize=(v)=>String(v).replace(/^\uFEFF/,'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');
+    const today=dateKey(new Date());
+    function acceptRow(row){
+      if(!row.some(x=>String(x).trim()!==''))return;
+      line++;
+      if(line>MAX_ROWS+1)throw new Error('CSV has too many rows (maximum 300,000). Split your export into smaller CSV files.');
+      if(line===1){
+        columns=row.map(normalize);
+        datePos=columns.findIndex(x=>['date','datetime','timestamp','entrydate'].includes(x));
+        stepsPos=columns.findIndex(x=>['steps','stepcount','step'].includes(x));
+        if(datePos<0||stepsPos<0)throw new Error('Use columns Date, Time, Steps or entry_date,steps.');
+        return;
+      }
+      if(row.length!==columns.length)
+        throw new Error('CSV row '+line+' has '+row.length+' columns; expected '+columns.length+'.');
+      const key=normalizedDate(row[datePos]);
+      if(!key)throw new Error('Invalid date on CSV row '+line+'.');
+      // Historical steps are valid even before the 30-day challenge started.
+      // Only future dates are rejected.
+      if(key>today)throw new Error('CSV row '+line+' is dated in the future. Check the date format.');
+      const raw=String(row[stepsPos]).trim();
+      if(!/^(?:0|[1-9]\d*)(?:\.0+)?$/.test(raw))
+        throw new Error('Steps must be a positive whole number or zero (row '+line+').');
+      const steps=Number(raw);
+      if(!Number.isSafeInteger(steps)||steps>100000)
+        throw new Error('Steps are out of range on row '+line+'.');
+      const previous=days.get(key)||{date:key,steps:0,readings:0};
+      previous.steps+=steps;
+      previous.readings++;
+      if(previous.steps>100000)
+        throw new Error('More than 100,000 steps for '+key+'. Check for overlapping step samples.');
+      days.set(key,previous);
+      if(days.size>MAX_DAYS)throw new Error('Too many different dates. Import up to 5,000 days per file.');
+      readings++;
+    }
+    let row=[],cell='',quoted=false,justClosed=false;
+    for(let i=0;i<source.length;i++){
+      const c=source[i];
       if(quoted){
-        if(c==='"' && text[i+1]==='"'){cell+='"';i++;}
+        if(c==='"'&&source[i+1]==='"'){cell+='"';i++;}
         else if(c==='"'){quoted=false;justClosed=true;}
         else cell+=c;
-      }else if(c==='"' && cell.trim()==='' && !justClosed){quoted=true;}
-      else if(c===',' ){row.push(cell);cell='';justClosed=false;}
-      else if(c==='\n' || c==='\r'){
-        row.push(cell);
-        if(row.some(x=>String(x).trim()!==''))rows.push(row);
-        if(rows.length>MAX_ROWS+1)throw new Error('CSV has too many rows (maximum 50,000).');
+      }else if(c==='"'&&cell.trim()===''&&!justClosed){quoted=true;}
+      else if(c===','){row.push(cell);cell='';justClosed=false;}
+      else if(c==='\n'||c==='\r'){
+        row.push(cell);acceptRow(row);
         row=[];cell='';justClosed=false;
-        if(c==='\r' && text[i+1]==='\n')i++;
-      }else if(justClosed && c===' ') { /* ignore spaces immediately after a closing quote */ }
-      else if(justClosed){ throw new Error('Unexpected character after a quoted CSV value.'); }
+        if(c==='\r'&&source[i+1]==='\n')i++;
+      }else if(justClosed&&c===' '){/* spaces after a quoted cell */}
+      else if(justClosed){throw new Error('Unexpected character after a quoted CSV value.');}
       else if(c==='"'){throw new Error('Invalid quote inside an unquoted CSV value.');}
       else cell+=c;
     }
     if(quoted)throw new Error('CSV contains an unclosed quoted value.');
-    if(cell.length || row.length){row.push(cell);if(row.some(x=>String(x).trim()!==''))rows.push(row);}
-    return rows;
-  }
-  function parse(text) {
-    const rows=parseRows(text);
-    if(rows.length<2)throw new Error('CSV needs a header and at least one data row.');
-    const normalize=(v)=>String(v).replace(/^\uFEFF/,'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');
-    const head=rows[0].map(normalize);
-    const datePos=head.findIndex(x=>['date','datetime','timestamp','entrydate'].includes(x));
-    const stepsPos=head.findIndex(x=>['steps','stepcount','step'].includes(x));
-    if(datePos<0 || stepsPos<0)throw new Error('Use columns Date, Time, Steps or entry_date,steps.');
-    const days=new Map();
-    let readings=0;
-    const today=dateKey(new Date());
-    for(let i=1;i<rows.length;i++){
-      const row=rows[i];
-      if(row.length!==head.length)throw new Error('CSV row '+(i+1)+' has '+row.length+' columns; expected '+head.length+'.');
-      const key=normalizedDate(row[datePos]);
-      if(!key)throw new Error('Invalid date on CSV row '+(i+1)+'.');
-      if(key<START)throw new Error('CSV row '+(i+1)+' is before the tracker start date (15 Nov 2026).');
-      if(key>today)throw new Error('CSV row '+(i+1)+' is dated in the future. Check the date format.');
-      const raw=String(row[stepsPos]).trim();
-      if(!/^(?:0|[1-9]\d*)(?:\.0+)?$/.test(raw))throw new Error('Steps must be a positive whole number or zero (row '+(i+1)+').');
-      const steps=Number(raw);
-      if(!Number.isSafeInteger(steps) || steps>100000)throw new Error('Steps are out of range on row '+(i+1)+'.');
-      const previous=days.get(key)||{date:key,steps:0,readings:0};
-      previous.steps+=steps;
-      previous.readings++;
-      if(previous.steps>100000)throw new Error('More than 100,000 steps for '+key+'. Check for overlapping step samples.');
-      days.set(key,previous);
-      if(days.size>MAX_DAYS)throw new Error('Too many different dates. Import up to 500 days per file.');
-      readings++;
-    }
-    if(!readings)throw new Error('There are no valid steps to import.');
-    return {readings,days:[...days.values()].sort((a,b)=>a.date.localeCompare(b.date)),
-      total:[...days.values()].reduce((sum,x)=>sum+x.steps,0)};
+    if(cell.length||row.length){row.push(cell);acceptRow(row);}
+    if(line<2||!readings)throw new Error('CSV needs a header and at least one step reading.');
+    const ordered=[...days.values()].sort((a,b)=>a.date.localeCompare(b.date));
+    return {readings,days:ordered,total:ordered.reduce((sum,x)=>sum+x.steps,0)};
   }
   function message(value,kind=''){
     const el=$('csvImportStatus');
@@ -184,7 +188,7 @@
     redraw();
     message('');
     if(!file)return;
-    if(file.size>MAX_BYTES){message('File is too large (maximum 5 MB).','error');return;}
+    if(file.size>MAX_BYTES){message('File is too large (maximum 20 MB).','error');return;}
     if(!/\.csv$/i.test(file.name)){message('Please select a .csv file.','error');return;}
     if(!context?.()?.userId || context?.()?.readonly){message('Sign in to your own tracker to import steps.','error');return;}
     try{
@@ -213,10 +217,19 @@
       // Re-read live values before applying, rather than trust a cached UI
       // preview that may be stale after another device saved a day.
       const dates=pending.days.map(x=>x.date);
-      const {data:live,error:readError}=await client.from('daily_entries')
-        .select('id,entry_date,steps').eq('user_id',uid).in('entry_date',dates);
-      if(readError)throw readError;
-      const existing=new Map((live||[]).map(x=>[x.entry_date,x]));
+      const live=[];
+      // Supabase URLs and PostgREST IN filters have size limits: fetch
+      // historical dates in small chunks rather than one giant query.
+      for(let offset=0;offset<dates.length;offset+=120){
+        if(context?.()?.userId!==uid||context?.()?.readonly)
+          throw new Error('The active account changed. Stop and sign in again.');
+        const {data:part,error:readError}=await client.from('daily_entries')
+          .select('id,entry_date,steps').eq('user_id',uid)
+          .in('entry_date',dates.slice(offset,offset+120));
+        if(readError)throw readError;
+        live.push(...(part||[]));
+      }
+      const existing=new Map(live.map(x=>[x.entry_date,x]));
       if(context?.()?.userId!==uid || context?.()?.readonly)
         throw new Error('The active account changed. Stop and sign in again.');
       // Confirm replacement based on fresh database rows, not cached preview.

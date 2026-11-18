@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Fitness">
+  <meta name="theme-color" content="#16233d">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="description" content="Private daily wellness tracker for food, steps, fasting and flexible days.">
+  <title>Fitness Tracker | Log</title>
+  <link rel="icon" type="image/svg+xml" href="/fitness-icon.svg">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/fitness-icon.svg">
+  <link rel="stylesheet" href="/style.css?v=20261115-ios-theme-sync-v2">
+  <link rel="stylesheet" href="/dashboard.css?v=20261115f">
+  <link rel="stylesheet" href="/light-mode.css?v=20261115-light-v3">
+  <link rel="stylesheet" href="/colors.css?v=20261115-colors-v1">
+  <link rel="stylesheet" href="/food-browser.css?v=20261115-mobile-v3">
+  <link rel="stylesheet" href="/calendar-metrics.css?v=20261115-cal-v1">
+  <link rel="stylesheet" href="/notifications.css?v=20261115-push-v1">
+  <link rel="stylesheet" href="/ios-app.css?v=20261115-ios-theme-sync-v2">
+  <link rel="stylesheet" href="/mobile-polish.css?v=20261116-polish-v2">
+  <link rel="stylesheet" href="/ux-refine.css?v=20261115-ux-v3">
+  <link rel="stylesheet" href="/type-palette.css?v=20261116-typography-v3">
+  <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
+  <link rel="stylesheet" href="/pages.css?v=20261119-pages-v1">
+
+  <!-- Inline critical layout: prevents giant icons and uneven daily-input cards
+       if GitHub Pages deploys HTML before an external stylesheet update. -->
+  <style id="fitness-critical-log-layout">
+    .logging-card #entryForm .quick-entry-grid {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 10px !important;
+      align-items: stretch !important;
+      min-width: 0;
+      max-width: 100%;
+      margin-top: 8px;
+    }
+    .logging-card #entryForm .quick-entry-field {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      align-items: stretch !important;
+      grid-template-columns: none !important;
+      grid-template-rows: none !important;
+      min-width: 0 !important;
+      min-height: 122px !important;
+      padding: 13px !important;
+      gap: 12px !important;
+      border: 1px solid rgba(151,181,224,.27);
+      border-radius: 15px;
+      overflow: hidden;
+      background: rgba(255,255,255,.045);
+      box-sizing: border-box;
+    }
+    .logging-card #entryForm .quick-entry-steps {
+      background: linear-gradient(150deg,rgba(67,193,152,.14),rgba(67,193,152,.035));
+      border-color: rgba(85,208,164,.28);
+    }
+    .logging-card #entryForm .quick-entry-calories {
+      background: linear-gradient(150deg,rgba(246,130,114,.14),rgba(246,130,114,.035));
+      border-color: rgba(246,148,133,.30);
+    }
+    .logging-card #entryForm .quick-entry-info,
+    .logging-card #entryForm .quick-entry-copy {
+      display: block !important;
+      width: 100%;
+      min-width: 0 !important;
+      max-width: 100%;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .logging-card #entryForm .quick-entry-field label {
+      display: block !important;
+      margin: 0 0 4px !important;
+      padding: 0 !important;
+      color: var(--text);
+      font-size: 15px !important;
+      font-weight: 750 !important;
+      line-height: 1.2 !important;
+    }
+    .logging-card #entryForm .quick-entry-caption {
+      display: block !important;
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px !important;
+      line-height: 1.35 !important;
+      overflow-wrap: break-word;
+    }
+    .logging-card #entryForm .quick-entry-field > input {
+      display: block !important;
+      position: static !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      min-height: 46px !important;
+      height: 46px !important;
+      margin: 0 !important;
+      padding: 9px 10px !important;
+      font-size: 17px !important;
+      font-weight: 650;
+      line-height: 1.3;
+      text-align: left;
+      font-variant-numeric: tabular-nums;
+      box-sizing: border-box;
+    }
+    .logging-card #entryForm .quick-entry-grid > .calorie-mode-row {
+      grid-column: 1 / -1 !important;
+      display: flex !important;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      min-width: 0;
+      margin: 0 !important;
+      padding: 1px 2px !important;
+      gap: 6px;
+    }
+    .logging-card #entryForm .calorie-mode-row .field-help {
+      margin: 0 !important;
+      font-size: 12px !important;
+      line-height: 1.4;
+    }
+    .logging-card #entryForm .calorie-mode-row [hidden],
+    [hidden] { display: none !important; }
+    :root[data-theme="light"] .logging-card #entryForm .quick-entry-steps {
+      background: linear-gradient(150deg,#e6f6ed,#f7fdf9);
+      border-color: #b7e2ca;
+    }
+    :root[data-theme="light"] .logging-card #entryForm .quick-entry-calories {
+      background: linear-gradient(150deg,#fff0e9,#fff9f5);
+      border-color: #f0c7b9;
+    }
+    :root[data-theme="light"] .logging-card #entryForm .quick-entry-field > input {
+      background: #fff;
+    }
+    @media (max-width: 359px) {
+      .logging-card #entryForm .quick-entry-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+      .logging-card #entryForm .quick-entry-field {
+        min-height: 0 !important;
+      }
+    }
+  </style>
+  <script>try{const mode=localStorage.getItem('fitness-theme')==='light'?'light':'dark';document.documentElement.dataset.theme=mode;document.querySelector('meta[name="theme-color"]').setAttribute('content',mode==='light'?'#f5f7fb':'#16233d')}catch(e){}</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script defer src="/config.js"></script>
+  <script defer src="/food-catalog.js?v=20261115-food-v2"></script>
+  <script defer src="/food-browser.js?v=20261115-ux-v2"></script>
+  <script defer src="/app.js?v=20261119-pages-v1"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="layout">
+    <header class="app-header" aria-label="Fitness Tracker">
+      <a class="tracker-identity" href="/" aria-label="Fitness Tracker home">
+        <span class="tracker-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12h4l2.8-5.5 4.4 11 2.7-5.5H21"/>
+          </svg>
+        </span>
+        <span class="tracker-heading"><strong>Fitness</strong><small>Daily wellness tracker</small></span>
+      </a>
+      <div class="tracker-actions">
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode" aria-pressed="false" title="Light mode">
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.8 15.1A8 8 0 0 1 8.9 4.2 8 8 0 1 0 19.8 15.1Z"/></svg>
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.4"/><path d="M12 3v1.8M12 19.2V21M3 12h1.8M19.2 12H21M5.64 5.64l1.27 1.27M17.09 17.09l1.27 1.27M5.64 18.36l1.27-1.27M17.09 6.91l1.27-1.27"/></svg>
+        </button>
+        <button class="button button-small subtle" id="logoutBtn" type="button" hidden>Sign out</button>
+      </div>
+    </header>
+    <div id="main-content">
+    <div id="globalAlert" class="global-alert" role="status" aria-live="polite" hidden></div>
+
+    <section id="authView" class="auth-layout" aria-labelledby="authTitle">
+      <div class="auth-intro">
+        <span class="eyebrow"><span class="live-dot"></span> PRIVATE WELLNESS SPACE</span>
+        <h1>Progress over<br><span class="gradient-text">perfection.</span></h1>
+        <p>Track your meals, 10K daily steps, fasting and weekly flexibility. One day at a time, without obsessing over the scale.</p>
+        <div class="auth-steps">
+          <span>30-day challenge</span>
+          <span>Approximate calories</span>
+          <span>Your data stays yours</span>
+        </div>
+      </div>
+      <div class="glass-card auth-card">
+        <span class="eyebrow">WELCOME BACK</span>
+        <h2 id="authTitle">Sign in to your tracker</h2>
+        <p class="muted auth-description">Secure email and password login, powered by Supabase.</p>
+        <form id="authForm" class="form-stack">
+          <label for="authEmail">Email address</label>
+          <input id="authEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required maxlength="254">
+          <label for="authPassword">Password</label>
+          <input id="authPassword" name="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" minlength="8" required>
+          <button id="authSubmit" class="button primary full" type="submit">Sign in</button>
+        </form>
+        <div class="auth-links">
+          <button class="text-button" id="toggleSignup" type="button">Create an account</button>
+          <button class="text-button" id="forgotPassword" type="button">Forgot password?</button>
+        </div>
+        <div id="resetView" hidden>
+          <p class="muted">Choose a new password for your account.</p>
+          <form id="resetForm" class="form-stack">
+            <label for="newPassword">New password</label>
+            <input id="newPassword" type="password" required minlength="8" autocomplete="new-password">
+            <button class="button primary full" type="submit">Update password</button>
+          </form>
+        </div>
+        <div id="authMessage" class="inline-message" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <main id="appView" data-page="logSection" hidden>
+      <section class="page-intro" aria-labelledby="pageTitle"><div><span class="eyebrow">DAILY CHECK-IN</span><h1 id="pageTitle">Log your day</h1><p>Record steps, meals, fasting and the details that matter. Your entries save privately to your account.</p></div></section>
+      <section id="trackerSwitcher" class="glass-card tracker-switcher" hidden aria-label="Choose a progress tracker">
+        <div><label for="trackerSelect">VIEWING PROGRESS</label><p class="muted small">Choose whose progress to view.</p></div>
+        <select id="trackerSelect" aria-label="Progress tracker"><option value="mine">My progress</option></select>
+        <span class="pill" id="viewOnlyBadge" hidden>View only</span>
+      </section>
+
+      <div class="content-grid page-layout-log">
+        <section class="glass-card logging-card" id="logSection" aria-labelledby="logTitle">
+          <div class="section-heading">
+            <div><span class="eyebrow">DAILY CHECK-IN</span><h2 id="logTitle">Log your day</h2></div>
+            <input id="entryDate" class="date-input" type="date" aria-label="Select date for daily entry">
+          </div>
+          <div class="day-label"><span id="dayKind" class="pill">Standard day</span><span id="dayHint" class="muted small">Your routine, your pace</span></div>
+          <form id="entryForm" class="form-stack">
+            <div class="field-grid quick-entry-grid" aria-label="Daily totals">
+              <div class="quick-entry-field quick-entry-steps">
+                <div class="quick-entry-info">
+                  <div class="quick-entry-copy">
+                    <label for="steps">Steps</label>
+                    <span class="quick-entry-caption">Goal 10,000</span>
+                  </div>
+                </div>
+                <input id="steps" type="number" min="0" max="100000" step="1" inputmode="numeric" placeholder="0" aria-label="Steps walked today">
+              </div>
+              <div class="quick-entry-field quick-entry-calories">
+                <div class="quick-entry-info">
+                  <div class="quick-entry-copy">
+                    <label for="calories">Calories</label>
+                    <span class="quick-entry-caption">Editable estimate</span>
+                  </div>
+                </div>
+                <input id="calories" type="number" min="0" max="15000" step="1" inputmode="numeric" placeholder="0" aria-label="Estimated daily calories">
+              </div>
+              <div class="calorie-mode-row">
+                <span class="field-help" id="calorieModeHint">Add foods or enter a total manually.</span>
+                <button class="text-button" id="useFoodSumBtn" type="button" hidden>Use food total</button>
+              </div>
+            </div>
+            <section class="food-browser" aria-labelledby="foodBrowserTitle">
+              <div class="food-browser-heading">
+                <div><span class="eyebrow">FOOD LIBRARY</span><h3 id="foodBrowserTitle">Find something you ate</h3><p class="field-help">Search, add, and adjust servings or calories.</p></div>
+                <span class="food-browser-tag" id="foodCatalogCount">200+ foods</span>
+              </div>
+              <label for="foodSearch">Search foods <span class="optional">English or Arabic</span></label>
+              <div class="food-search-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.2 4.2"/></svg>
+                <input id="foodSearch" type="search" maxlength="100" autocomplete="off" placeholder="Burrito, taco, شاورما, رز..." aria-controls="foodResults">
+                <button id="clearFoodSearchBtn" type="button" aria-label="Clear food search" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6 18 18M18 6 6 18"/></svg></button>
+              </div>
+              <div id="foodCategories" class="food-categories" role="group" aria-label="Filter food categories"></div>
+              <div id="foodSelectionBar" class="food-selection-bar" hidden>
+                <span id="foodSelectionSummary" aria-live="polite">No foods selected</span>
+                <button id="jumpToSelectedFoods" type="button">Review foods <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+              </div>
+              <div class="food-results-header"><span id="foodResultsMeta" class="muted small">Popular foods</span><span class="muted small">kcal per serving</span></div>
+              <div id="foodResults" class="food-results" role="group" aria-label="Choose foods"></div>
+              <div id="foodNoResults" class="food-empty" hidden>No matching food. Try another word or add your own below.</div>
+              <div class="custom-food">
+                <div class="custom-food-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                  <strong>Add a custom food</strong>
+                </div>
+                <div class="custom-food-fields">
+                  <div><label for="customFoodName">Food name</label><input id="customFoodName" type="text" maxlength="100" placeholder="e.g. Kebab"></div>
+                  <div><label for="customFoodCalories">kcal per serving</label><input id="customFoodCalories" type="number" min="0" max="10000" step="1" inputmode="numeric" placeholder="e.g. 450"></div>
+                  <button class="button secondary" type="button" id="addCustomFoodBtn">Add food</button>
+                </div>
+              </div>
+              <section class="selected-foods" aria-labelledby="selectedFoodsHeading">
+                <div class="selected-foods-header">
+                  <div><h3 id="selectedFoodsHeading">Your food list</h3><p class="field-help">Change quantity or kcal for each serving. Changes update the daily total unless you set it manually.</p></div>
+                  <span class="selected-foods-total"><strong id="foodSum">0</strong> kcal</span>
+                </div>
+                <div id="selectedFoodList" class="selected-food-list"></div>
+                <p class="food-empty" id="selectedFoodEmpty">No foods selected yet. Tap a food above to add it.</p>
+                <div id="foodMessage" class="inline-message" role="status" aria-live="polite"></div>
+              </section>
+            </section>
+            <div class="meal-notes"><label for="meals">Additional food notes <span class="optional">(optional)</span></label><textarea id="meals" rows="2" maxlength="3000" placeholder="Anything else about your meal, sauce, preparation, etc."></textarea></div>
+            <div class="field-grid">
+              <div><label for="fasting">Fasting hours</label><input id="fasting" type="number" min="0" max="24" step="0.5" inputmode="decimal" placeholder="e.g. 18"></div>
+              <div><label for="coffee">Coffee cups</label><input id="coffee" aria-label="Black coffee cups" type="number" min="0" max="30" step="1" inputmode="numeric" placeholder="e.g. 2"></div>
+            </div>
+            <label class="checkline" for="oneMeal"><input id="oneMeal" type="checkbox" class="native-checkbox"><span class="checkbox-visual" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.5 4.5L19 7"/></svg></span><span><strong>One main meal today</strong><small>Record what actually happened, without judgment</small></span></label>
+            <details class="advanced">
+              <summary><svg class="details-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg> More notes <span class="optional">optional</span></summary>
+              <div class="advanced-inner">
+                <label for="waist">Waist measurement (cm)</label>
+                <input id="waist" type="number" min="30" max="300" step="0.5" inputmode="decimal" placeholder="No scale needed">
+                <label for="notes">Day notes</label>
+                <textarea id="notes" rows="2" maxlength="3000" placeholder="Energy, mood, hunger, sleep or anything else..."></textarea>
+              </div>
+            </details>
+            <div class="form-actions">
+              <button class="button primary" id="saveEntryBtn" type="submit">Save today's check-in <svg class="inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+              <button class="button subtle" id="deleteEntryBtn" type="button" hidden>Delete entry</button>
+            </div>
+            <div id="entryMessage" class="inline-message" aria-live="polite"></div>
+          </form>
+          <div id="sharedDaySummary" class="shared-day-summary" hidden>
+            <span class="pill">View-only progress</span>
+            <p id="sharedDayNote" class="muted">Choose a day to view progress shared with you.</p>
+            <div id="sharedDayMetrics" class="shared-day-metrics"></div>
+            <p class="field-help">Private notes, meal descriptions and waist measurements aren't shared.</p>
+          </div>
+        </section>
+
+        <aside class="sidebar">
+          <section class="glass-card flex-card" aria-labelledby="flexTitle">
+            <span class="eyebrow">WEEKLY FLEXIBILITY</span>
+            <h2 id="flexTitle">Two flexible days.</h2>
+            <p class="muted">Friday is always flexible. Choose one other day each week, depending on your schedule.</p>
+            <div class="week-row"><span>THIS SELECTED WEEK</span><strong id="weekRange">—</strong></div>
+            <div class="fixed-flex"><span class="flex-dot"></span><div><strong>Friday</strong><small>Fixed flexible day</small></div><span class="pill neutral">Always</span></div>
+            <div id="flexEditor">
+              <label for="flexSelect">Your second flexible day</label>
+              <select id="flexSelect"><option value="">Not selected</option></select>
+              <button id="saveFlexBtn" type="button" class="button secondary full">Save weekly plan</button>
+              <div id="flexMessage" class="inline-message" aria-live="polite"></div>
+            </div>
+            <p id="flexViewerNote" class="muted small" hidden></p>
+          </section>
+          <section class="glass-card guide-card">
+            <details class="card-collapse" data-collapse-mobile>
+              <summary><span class="card-collapse-head">
+                <span class="eyebrow">THE PLAN</span>
+                <h2>Stay consistent.</h2>
+              </span><svg class="card-collapse-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></summary>
+              <div class="card-collapse-body">
+            <div class="guide-line"><span>Standard days</span><strong>5 per week</strong></div>
+            <div class="guide-line"><span>Flexible days</span><strong>2 per week</strong></div>
+            <div class="guide-line"><span>Daily steps</span><strong>10,000</strong></div>
+            <div class="guide-line"><span>Calorie approach</span><strong>Approximate</strong></div>
+            <p class="guide-footnote">Eat enough to meet your nutrition needs. One-meal fasting can make that difficult. It's okay to split food into more meals when needed; no punishment or compensatory fasting.</p> 
+              </div>
+            </details>
+          </section>
+        </aside>
+      </div>
+      <nav class="app-bottom-nav" id="appBottomNav" aria-label="Tracker navigation">
+        <div class="app-bottom-nav-inner">
+          <a class="bottom-tab" href="/" data-nav-target="todaySection">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z"/></svg><span>Today</span>
+          </a>
+          <a class="bottom-tab is-active" href="/log.html" data-nav-target="logSection" aria-current="page">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Log</span>
+          </a>
+          <a class="bottom-tab" href="/history.html" data-nav-target="historySection">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></svg><span>History</span>
+          </a>
+          <a class="bottom-tab" href="/share.html" id="bottomShareBtn" data-nav-target="sharingPanel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-2a5.5 5.5 0 0 1 11 0v2m3-9h5m-2.5-2.5v5"/></svg><span>Share</span>
+          </a>
+        </div>
+      </nav>
+      <footer class="footer">
+        <span>Built for progress, not perfection.</span>
+        <span>Private wellness tracker · Your progress stays yours</span>
+      </footer>
+    </main>
+    </div>
+  </div>
+</body>
+</html>

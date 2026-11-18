@@ -200,13 +200,13 @@
     $('storyCloseBtn')?.addEventListener('click',()=>$('storyDialog').close());
     $('storyDownloadBtn')?.addEventListener('click',save);
     $('storyShareBtn')?.addEventListener('click',share);
-    // Allow links from the History calendar and Log to open the requested day.
-    const params=new URLSearchParams(window.location.search);
-    if(params.has('story')){
-      window.addEventListener('load',()=>{
-        if(getState?.()?.userId)open();
-      },{once:true});
-    }
   }
-  window.FitnessStory=Object.freeze({mount,compute});
+  let requestedOpened=false;
+  function openRequested(){
+    if(requestedOpened || !getState?.()?.userId)return;
+    if(!new URLSearchParams(window.location.search).has('story'))return;
+    requestedOpened=true;
+    open();
+  }
+  window.FitnessStory=Object.freeze({mount,compute,openRequested});
 })();

@@ -346,8 +346,10 @@
     $('csvImportPanel').hidden = readonly;
     if (readonly) window.FitnessCsvImport?.reset?.();
     $('bottomShareBtn').hidden = readonly;
-    const storySection=document.getElementById('storySection');
-    if(storySection)storySection.hidden=readonly;
+    for (const id of ['storySection','logStoryBtn','historyStoryActions']) {
+      const node=document.getElementById(id);
+      if(node)node.hidden=readonly;
+    }
     const quick=$('quickLogBtn');
     if(quick.firstChild)quick.firstChild.textContent = readonly ? 'View day ' : 'Log a meal ';
   }

@@ -1,5 +1,5 @@
-/* 10K daily goal streaks, computed on-device from saved daily entries.
-   Imported pre-challenge data is excluded from the challenge streak. */
+/* 10K daily goal streaks computed on-device from saved step records.
+   The streak is independent of the 30-day challenge and includes imported history. */
 (() => {
   'use strict';
   const START='2026-11-15',GOAL=10000;
@@ -22,11 +22,12 @@
   function streak(entries,asOf=today()){
     if(!(entries instanceof Map))entries=new Map();
     const selected=parse(asOf)?asOf:today();
-    if(selected<START)return {current:0,best:0,goalDays:0,latest:null,metToday:false,pendingToday:false,asOf:selected};
+    const dates=[...entries.keys()].filter(d=>parse(d)&&d<=selected).sort();
+    const start=dates[0]||selected;
     const succeeded=(date)=>Number(entries.get(date)?.steps)>=GOAL;
     let best=0,chain=0,goalDays=0;
     // Iterate chronologically, so gaps break the chain even with no row.
-    let key=START;
+    let key=start;
     let guard=0;
     while(key<=selected && guard++<20000){
       if(succeeded(key)){chain++;goalDays++;best=Math.max(best,chain);}
@@ -38,7 +39,7 @@
     const metToday=succeeded(selected);
     const anchor=metToday?selected:shift(selected,-1);
     let current=0,walker=anchor;
-    while(walker && walker>=START && succeeded(walker) && current<20000){
+    while(walker && walker>=start && succeeded(walker) && current<20000){
       current++;walker=shift(walker,-1);
     }
     return {current,best,goalDays,latest:current?anchor:null,metToday,

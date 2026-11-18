@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="/mobile-polish.css?v=20261116-polish-v2">
   <link rel="stylesheet" href="/ux-refine.css?v=20261115-ux-v3">
   <link rel="stylesheet" href="/type-palette.css?v=20261116-typography-v3">
-  <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-v2">
+  <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
 
   <!-- Inline critical layout: prevents giant icons and uneven daily-input cards
        if GitHub Pages deploys HTML before an external stylesheet update. -->
@@ -149,8 +149,8 @@
   <script defer src="/food-catalog.js?v=20261115-food-v2"></script>
   <script defer src="/food-browser.js?v=20261115-ux-v2"></script>
   <script defer src="/notifications.js?v=20261117-push-repair-v3"></script>
-  <script defer src="/csv-import.js?v=20261118-csv-v2"></script>
-  <script defer src="/app.js?v=20261118-csv-v1"></script>
+  <script defer src="/csv-import.js?v=20261118-csv-history-v3"></script>
+  <script defer src="/app.js?v=20261118-csv-history-v2"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -500,6 +500,10 @@
             <button id="nextMonth" class="icon-button" type="button" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
           </div>
         </div>
+        <div class="calendar-jump">
+          <label for="calendarJumpMonth">Jump to month</label>
+          <input id="calendarJumpMonth" type="month" aria-label="Jump to a month in your history">
+        </div>
         <div class="calendar-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
         <div id="calendarGrid" class="calendar-grid" role="group" aria-label="Daily tracking calendar"></div>
         <p class="calendar-metrics-legend">
@@ -526,7 +530,7 @@
             </span>
           </summary>
           <div class="csv-import-body">
-            <p class="csv-import-help" id="csvImportHelp">Supports <code>Date,Time,Steps</code> (each row is an additional step sample) or <code>entry_date,steps</code> (one daily total per row). Steps are grouped by date. Files are read on your device; only daily totals are saved to your private tracker. The native Apple Health ZIP/XML export is not supported.</p>
+            <p class="csv-import-help" id="csvImportHelp">Supports <code>Date,Time,Steps</code> (each row is an additional step sample) or <code>entry_date,steps</code> (one daily total per row). Steps are grouped by date. Files are read on your device; only daily totals are saved to your private tracker. Past dates are welcome, even before your 30-day challenge began. The native Apple Health ZIP/XML export is not supported.</p>
             <div class="csv-import-fields">
               <div>
                 <label for="csvStepsFile">Choose a CSV file</label>

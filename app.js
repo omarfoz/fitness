@@ -194,17 +194,29 @@
 
   async function showSignedIn(session) {
     if (!session || !session.user || recovering) return;
-    if (user && user.id === session.user.id && !$('appView').hidden) return;
+    if (user && user.id === session.user.id && !$('appView').hidden) {
+      window.FitnessPageLoading?.hide?.();
+      return;
+    }
     user = session.user;
     $('authView').hidden = true; $('appView').hidden = false; $('logoutBtn').hidden = false;
     window.FitnessNotifications?.mount?.(db, user);
     showMessage('globalAlert', '');
-    await loadShares();
-    if(viewingShared()){
-      const wanted=currentTrackerId;
-      currentTrackerId='mine';
-      await openTracker(wanted);
-    }else await loadData();
+    try {
+      if(viewingShared()){
+        await loadShares();
+        const wanted=currentTrackerId;
+        currentTrackerId='mine';
+        await openTracker(wanted);
+      }else{
+        // Network calls for sharing and entries are independent. Fetch them
+        // concurrently so switching real HTML pages doesn't feel frozen.
+        await Promise.all([loadShares(),loadData()]);
+      }
+      window.FitnessStory?.openRequested?.();
+    }finally{
+      window.FitnessPageLoading?.hide?.();
+    }
   }
 
   async function fetchOwnedHistory(uid) {
@@ -658,6 +670,13 @@
     $('calendarJumpMonth').value=monthKey;
     $('prevMonth').disabled=monthKey<=oldestMonth;
     $('nextMonth').disabled=monthKey>=latestMonth;
+    const historyStory=document.getElementById('historyStoryDate');
+    if(historyStory){
+      historyStory.min=earliestLogDate();
+      historyStory.max=localDateKey(new Date());
+      if(!historyStory.value || historyStory.value>historyStory.max ||
+          historyStory.value<historyStory.min)historyStory.value=selectedDate;
+    }
     const y = displayedMonth.getFullYear(), m = displayedMonth.getMonth();
     const blank = new Date(y, m, 1).getDay();
     const days = new Date(y, m + 1, 0).getDate();
@@ -819,6 +838,17 @@
       } catch (e) { showMessage('flexMessage', errorText(e), 'error'); }
     });
   });
+  $('logStoryBtn').addEventListener('click',()=>{
+    if(!user||viewingShared())return;
+    window.location.assign('/?story='+encodeURIComponent(selectedDate));
+  });
+  $('historyStoryBtn').addEventListener('click',()=>{
+    if(!user||viewingShared())return;
+    const date=$('historyStoryDate').value;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||
+      date>localDateKey(new Date())||date<earliestLogDate())return;
+    window.location.assign('/?story='+encodeURIComponent(date));
+  });
   $('calendarJumpMonth').addEventListener('change', (event) => {
     const month=event.target.value;
     const first=earliestLogDate().slice(0,7);
@@ -878,12 +908,14 @@
     db.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
         recovering = true;
+        window.FitnessPageLoading?.hide?.();
         $('appView').hidden = true; $('authView').hidden = false;
         $('authForm').hidden = true; $('resetView').hidden = false;
         $('authTitle').textContent = 'Reset your password';
         return;
       }
       if (event === 'SIGNED_OUT') {
+        window.FitnessPageLoading?.hide?.();
         window.FitnessNotifications?.reset?.();
         window.FitnessCsvImport?.reset?.();
         user = null; entries.clear(); flex.clear();
@@ -902,6 +934,7 @@
       if (error) throw error;
       if (data.session && !recovering) await showSignedIn(data.session);
     } catch (e) { showMessage('authMessage', errorText(e), 'error'); }
+    finally { window.FitnessPageLoading?.hide?.(); }
   }
   init();
 })();

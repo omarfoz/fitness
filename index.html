@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="/mobile-polish.css?v=20261116-polish-v2">
   <link rel="stylesheet" href="/ux-refine.css?v=20261115-ux-v3">
   <link rel="stylesheet" href="/type-palette.css?v=20261116-typography-v3">
+  <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-v1">
 
   <!-- Inline critical layout: prevents giant icons and uneven daily-input cards
        if GitHub Pages deploys HTML before an external stylesheet update. -->
@@ -148,7 +149,8 @@
   <script defer src="/food-catalog.js?v=20261115-food-v2"></script>
   <script defer src="/food-browser.js?v=20261115-ux-v2"></script>
   <script defer src="/notifications.js?v=20261117-push-repair-v3"></script>
-  <script defer src="/app.js?v=20261115-ux-v2"></script>
+  <script defer src="/csv-import.js?v=20261118-csv-v1"></script>
+  <script defer src="/app.js?v=20261118-csv-v1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -516,6 +518,37 @@
           <span class="muted">No weigh-ins required. Your data is visible only to your account.</span>
           <button id="exportBtn" class="button subtle" type="button">Export my data (CSV)</button>
         </div>
+        <details class="csv-import" id="csvImportPanel">
+          <summary>
+            <span class="csv-import-summary">
+              <strong>Import steps from CSV</strong>
+              <small>Apple Health / Shortcuts exports or daily step totals</small>
+            </span>
+          </summary>
+          <div class="csv-import-body">
+            <p class="csv-import-help" id="csvImportHelp">Supports <code>Date,Time,Steps</code> (each row is an additional step sample) or <code>entry_date,steps</code> (one daily total per row). Steps are grouped by date. Files are read on your device; only daily totals are saved to your private tracker.</p>
+            <div class="csv-import-fields">
+              <div>
+                <label for="csvStepsFile">Choose a CSV file</label>
+                <input id="csvStepsFile" type="file" accept=".csv,text/csv" aria-describedby="csvImportHelp">
+              </div>
+            </div>
+            <div class="csv-import-preview" id="csvImportPreview" hidden>
+              <div class="csv-import-overview">
+                <strong id="csvImportSummary">Ready to review</strong>
+                <span id="csvImportChanges"></span>
+              </div>
+              <label for="csvConflictMode">If a date already has saved steps</label>
+              <select id="csvConflictMode">
+                <option value="skip">Keep existing steps (recommended)</option>
+                <option value="replace">Replace steps only (keep meals &amp; calories)</option>
+              </select>
+              <div class="csv-import-rows" id="csvImportRows" role="list" aria-label="Daily steps preview"></div>
+              <button id="csvImportSave" type="button" class="button primary" disabled>Import steps</button>
+            </div>
+            <p class="csv-import-status" id="csvImportStatus" role="status" aria-live="polite"></p>
+          </div>
+        </details>
       </section>
       <nav class="app-bottom-nav" id="appBottomNav" aria-label="Tracker navigation">
         <div class="app-bottom-nav-inner">

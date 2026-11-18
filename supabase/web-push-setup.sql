@@ -30,12 +30,13 @@ create table public.fitness_push_subscriptions (
     and char_length(auth_secret) between 10 and 250
   ),
   constraint fitness_push_trusted_endpoint check (
-    endpoint ~ '^https://([a-zA-Z0-9-]+\.)*push\.apple\.com/'
-    or endpoint ~ '^https://fcm\.googleapis\.com/'
-    or endpoint ~ '^https://updates\.push\.services\.mozilla\.com/'
-    or endpoint ~ '^https://([a-zA-Z0-9-]+\.)*notify\.windows\.com/'
-  )
-);
+    endpoint ~ '^https://([a-zA-Z0-9-]+[.])*push[.]apple[.]com/'
+    or endpoint ~ '^https://fcm[.]googleapis[.]com/'
+    or endpoint ~ '^https://android[.]googleapis[.]com/gcm/send/'
+    or endpoint ~ '^https://updates[.]push[.]services[.]mozilla[.]com/'
+    or endpoint ~ '^https://([a-zA-Z0-9-]+[.])*notify[.]windows[.]com/'
+    or endpoint ~ '^https://([a-zA-Z0-9-]+[.])*push[.]samsungosp[.]com/'
+  ));
 create index fitness_push_subscriptions_by_owner on public.fitness_push_subscriptions(user_id);
 create table public.fitness_push_delivery_runs (
   user_id uuid not null references auth.users(id) on delete cascade,

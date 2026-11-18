@@ -96,3 +96,7 @@
  .streak-best{min-width:65px;padding-left:10px;}
  .streak-best span{font-size:.6rem;}
 }
+
+.streak-icon { color: var(--type-amber,#f8d69b); }
+.streak-icon svg { display: block; width: 30px; height: 30px; flex: 0 0 auto; }
+@media (max-width:680px) { .streak-icon svg { width: 26px; height: 26px; } }

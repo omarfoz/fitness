@@ -24,6 +24,8 @@
   <link rel="stylesheet" href="/ux-refine.css?v=20261115-ux-v3">
   <link rel="stylesheet" href="/type-palette.css?v=20261116-typography-v3">
   <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
+  <link rel="stylesheet" href="/pages.css?v=20261119-pages-v1">
+  <link rel="stylesheet" href="/story-card.css?v=20261119-stories-v1">
 
   <!-- Inline critical layout: prevents giant icons and uneven daily-input cards
        if GitHub Pages deploys HTML before an external stylesheet update. -->
@@ -146,11 +148,8 @@
   <script>try{const mode=localStorage.getItem('fitness-theme')==='light'?'light':'dark';document.documentElement.dataset.theme=mode;document.querySelector('meta[name="theme-color"]').setAttribute('content',mode==='light'?'#f5f7fb':'#16233d')}catch(e){}</script>
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script defer src="/config.js"></script>
-  <script defer src="/food-catalog.js?v=20261115-food-v2"></script>
-  <script defer src="/food-browser.js?v=20261115-ux-v2"></script>
-  <script defer src="/notifications.js?v=20261117-push-repair-v3"></script>
-  <script defer src="/csv-import.js?v=20261118-csv-history-v3"></script>
-  <script defer src="/app.js?v=20261118-csv-history-v2"></script>
+  <script defer src="/story-card.js?v=20261119-stories-v1"></script>
+  <script defer src="/app.js?v=20261119-pages-v1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -213,7 +212,7 @@
       </div>
     </section>
 
-    <main id="appView" hidden>
+    <main id="appView" data-page="todaySection" hidden>
       <section class="today-header" id="todaySection" aria-labelledby="todayTitle">
         <div class="today-header-copy">
           <span class="eyebrow"><span class="live-dot" aria-hidden="true"></span> YOUR DAILY OVERVIEW</span>
@@ -304,270 +303,35 @@
         </div>
       </section>
 
-      <div class="content-grid">
-        <section class="glass-card logging-card" id="logSection" aria-labelledby="logTitle">
-          <div class="section-heading">
-            <div><span class="eyebrow">DAILY CHECK-IN</span><h2 id="logTitle">Log your day</h2></div>
-            <input id="entryDate" class="date-input" type="date" aria-label="Select date for daily entry">
-          </div>
-          <div class="day-label"><span id="dayKind" class="pill">Standard day</span><span id="dayHint" class="muted small">Your routine, your pace</span></div>
-          <form id="entryForm" class="form-stack">
-            <div class="field-grid quick-entry-grid" aria-label="Daily totals">
-              <div class="quick-entry-field quick-entry-steps">
-                <div class="quick-entry-info">
-                  <div class="quick-entry-copy">
-                    <label for="steps">Steps</label>
-                    <span class="quick-entry-caption">Goal 10,000</span>
-                  </div>
-                </div>
-                <input id="steps" type="number" min="0" max="100000" step="1" inputmode="numeric" placeholder="0" aria-label="Steps walked today">
-              </div>
-              <div class="quick-entry-field quick-entry-calories">
-                <div class="quick-entry-info">
-                  <div class="quick-entry-copy">
-                    <label for="calories">Calories</label>
-                    <span class="quick-entry-caption">Editable estimate</span>
-                  </div>
-                </div>
-                <input id="calories" type="number" min="0" max="15000" step="1" inputmode="numeric" placeholder="0" aria-label="Estimated daily calories">
-              </div>
-              <div class="calorie-mode-row">
-                <span class="field-help" id="calorieModeHint">Add foods or enter a total manually.</span>
-                <button class="text-button" id="useFoodSumBtn" type="button" hidden>Use food total</button>
-              </div>
-            </div>
-            <section class="food-browser" aria-labelledby="foodBrowserTitle">
-              <div class="food-browser-heading">
-                <div><span class="eyebrow">FOOD LIBRARY</span><h3 id="foodBrowserTitle">Find something you ate</h3><p class="field-help">Search, add, and adjust servings or calories.</p></div>
-                <span class="food-browser-tag" id="foodCatalogCount">200+ foods</span>
-              </div>
-              <label for="foodSearch">Search foods <span class="optional">English or Arabic</span></label>
-              <div class="food-search-wrap">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.2 4.2"/></svg>
-                <input id="foodSearch" type="search" maxlength="100" autocomplete="off" placeholder="Burrito, taco, شاورما, رز..." aria-controls="foodResults">
-                <button id="clearFoodSearchBtn" type="button" aria-label="Clear food search" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6 18 18M18 6 6 18"/></svg></button>
-              </div>
-              <div id="foodCategories" class="food-categories" role="group" aria-label="Filter food categories"></div>
-              <div id="foodSelectionBar" class="food-selection-bar" hidden>
-                <span id="foodSelectionSummary" aria-live="polite">No foods selected</span>
-                <button id="jumpToSelectedFoods" type="button">Review foods <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
-              </div>
-              <div class="food-results-header"><span id="foodResultsMeta" class="muted small">Popular foods</span><span class="muted small">kcal per serving</span></div>
-              <div id="foodResults" class="food-results" role="group" aria-label="Choose foods"></div>
-              <div id="foodNoResults" class="food-empty" hidden>No matching food. Try another word or add your own below.</div>
-              <div class="custom-food">
-                <div class="custom-food-title">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-                  <strong>Add a custom food</strong>
-                </div>
-                <div class="custom-food-fields">
-                  <div><label for="customFoodName">Food name</label><input id="customFoodName" type="text" maxlength="100" placeholder="e.g. Kebab"></div>
-                  <div><label for="customFoodCalories">kcal per serving</label><input id="customFoodCalories" type="number" min="0" max="10000" step="1" inputmode="numeric" placeholder="e.g. 450"></div>
-                  <button class="button secondary" type="button" id="addCustomFoodBtn">Add food</button>
-                </div>
-              </div>
-              <section class="selected-foods" aria-labelledby="selectedFoodsHeading">
-                <div class="selected-foods-header">
-                  <div><h3 id="selectedFoodsHeading">Your food list</h3><p class="field-help">Change quantity or kcal for each serving. Changes update the daily total unless you set it manually.</p></div>
-                  <span class="selected-foods-total"><strong id="foodSum">0</strong> kcal</span>
-                </div>
-                <div id="selectedFoodList" class="selected-food-list"></div>
-                <p class="food-empty" id="selectedFoodEmpty">No foods selected yet. Tap a food above to add it.</p>
-                <div id="foodMessage" class="inline-message" role="status" aria-live="polite"></div>
-              </section>
-            </section>
-            <div class="meal-notes"><label for="meals">Additional food notes <span class="optional">(optional)</span></label><textarea id="meals" rows="2" maxlength="3000" placeholder="Anything else about your meal, sauce, preparation, etc."></textarea></div>
-            <div class="field-grid">
-              <div><label for="fasting">Fasting hours</label><input id="fasting" type="number" min="0" max="24" step="0.5" inputmode="decimal" placeholder="e.g. 18"></div>
-              <div><label for="coffee">Coffee cups</label><input id="coffee" aria-label="Black coffee cups" type="number" min="0" max="30" step="1" inputmode="numeric" placeholder="e.g. 2"></div>
-            </div>
-            <label class="checkline" for="oneMeal"><input id="oneMeal" type="checkbox" class="native-checkbox"><span class="checkbox-visual" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.5 4.5L19 7"/></svg></span><span><strong>One main meal today</strong><small>Record what actually happened, without judgment</small></span></label>
-            <details class="advanced">
-              <summary><svg class="details-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg> More notes <span class="optional">optional</span></summary>
-              <div class="advanced-inner">
-                <label for="waist">Waist measurement (cm)</label>
-                <input id="waist" type="number" min="30" max="300" step="0.5" inputmode="decimal" placeholder="No scale needed">
-                <label for="notes">Day notes</label>
-                <textarea id="notes" rows="2" maxlength="3000" placeholder="Energy, mood, hunger, sleep or anything else..."></textarea>
-              </div>
-            </details>
-            <div class="form-actions">
-              <button class="button primary" id="saveEntryBtn" type="submit">Save today's check-in <svg class="inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
-              <button class="button subtle" id="deleteEntryBtn" type="button" hidden>Delete entry</button>
-            </div>
-            <div id="entryMessage" class="inline-message" aria-live="polite"></div>
-          </form>
-          <div id="sharedDaySummary" class="shared-day-summary" hidden>
-            <span class="pill">View-only progress</span>
-            <p id="sharedDayNote" class="muted">Choose a day to view progress shared with you.</p>
-            <div id="sharedDayMetrics" class="shared-day-metrics"></div>
-            <p class="field-help">Private notes, meal descriptions and waist measurements aren't shared.</p>
-          </div>
-        </section>
-
-        <aside class="sidebar">
-          <section class="glass-card flex-card" aria-labelledby="flexTitle">
-            <span class="eyebrow">WEEKLY FLEXIBILITY</span>
-            <h2 id="flexTitle">Two flexible days.</h2>
-            <p class="muted">Friday is always flexible. Choose one other day each week, depending on your schedule.</p>
-            <div class="week-row"><span>THIS SELECTED WEEK</span><strong id="weekRange">—</strong></div>
-            <div class="fixed-flex"><span class="flex-dot"></span><div><strong>Friday</strong><small>Fixed flexible day</small></div><span class="pill neutral">Always</span></div>
-            <div id="flexEditor">
-              <label for="flexSelect">Your second flexible day</label>
-              <select id="flexSelect"><option value="">Not selected</option></select>
-              <button id="saveFlexBtn" type="button" class="button secondary full">Save weekly plan</button>
-              <div id="flexMessage" class="inline-message" aria-live="polite"></div>
-            </div>
-            <p id="flexViewerNote" class="muted small" hidden></p>
-          </section>
-          <section class="glass-card guide-card">
-            <details class="card-collapse" data-collapse-mobile>
-              <summary><span class="card-collapse-head">
-                <span class="eyebrow">THE PLAN</span>
-                <h2>Stay consistent.</h2>
-              </span><svg class="card-collapse-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></summary>
-              <div class="card-collapse-body">
-            <div class="guide-line"><span>Standard days</span><strong>5 per week</strong></div>
-            <div class="guide-line"><span>Flexible days</span><strong>2 per week</strong></div>
-            <div class="guide-line"><span>Daily steps</span><strong>10,000</strong></div>
-            <div class="guide-line"><span>Calorie approach</span><strong>Approximate</strong></div>
-            <p class="guide-footnote">Eat enough to meet your nutrition needs. One-meal fasting can make that difficult. It's okay to split food into more meals when needed; no punishment or compensatory fasting.</p> 
-              </div>
-            </details>
-          </section>
-          <section class="glass-card push-card" id="pushPanel" aria-labelledby="pushTitle">
-            <details class="card-collapse" data-collapse-mobile>
-              <summary><span class="card-collapse-head">
-              <span class="eyebrow">
-                <svg class="heading-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
-                DAILY REMINDERS
-              </span>
-              <h2 id="pushTitle">iPhone notifications</h2>
-              </span><svg class="card-collapse-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></summary>
-              <div class="card-collapse-body">
-            <p class="muted small">A gentle reminder three times a day, even when Fitness is closed. Choose the reminders you want, then allow notifications on your device.</p>
-            <div id="pushInstallHint" class="push-install-hint" hidden>
-              <strong>Install Fitness on your iPhone first</strong>
-              In Safari, tap Share → Add to Home Screen. Open Fitness using the new Home Screen icon, sign in, and tap Enable notifications below.
-            </div>
-            <div class="push-times" aria-label="Daily reminders, Saudi time">
-              <button type="button" class="push-time-toggle is-on" data-time="10:00" aria-pressed="true">
-                <span class="push-time-indicator"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke="currentColor" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></span>
-                <span><strong>10:00 AM</strong><small>Morning motivation</small></span>
-              </button>
-              <button type="button" class="push-time-toggle is-on" data-time="16:00" aria-pressed="true">
-                <span class="push-time-indicator"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke="currentColor" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></span>
-                <span><strong>4:00 PM</strong><small>Steps check-in</small></span>
-              </button>
-              <button type="button" class="push-time-toggle is-on" data-time="21:00" aria-pressed="true">
-                <span class="push-time-indicator"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke="currentColor" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></span>
-                <span><strong>9:00 PM</strong><small>Log your food and progress</small></span>
-              </button>
-            </div>
-            <p class="muted small">Times are in Riyadh (Saudi Arabia), UTC+3.</p>
-            <div class="push-actions">
-              <button id="pushEnableBtn" type="button" class="button primary">Enable notifications</button>
-              <button id="pushDisableBtn" type="button" class="button subtle" hidden>Turn off reminders</button>
-              <button id="pushTestBtn" type="button" class="button secondary" hidden>Send test notification</button>
-            </div>
-            <div id="pushStatus" class="push-message" role="status" aria-live="polite"></div>
-              </div>
-            </details>
-          </section>
-          <section class="glass-card sharing-card" id="sharingPanel" aria-labelledby="sharingTitle">
-            <span class="eyebrow"><svg class="heading-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-2a5.5 5.5 0 0 1 11 0v2M17 9h5m-2.5-2.5v5"/></svg> PRIVATE SHARING</span>
-            <h2 id="sharingTitle">Share your progress</h2>
-            <p class="muted">Invite someone by email. They can view your steps, fasting and calorie estimates, but cannot edit anything. You can remove access at any time.</p>
-            <form id="shareForm" class="form-stack">
-              <label for="viewerEmail">Viewer's email address</label>
-              <input id="viewerEmail" type="email" maxlength="254" autocomplete="off" placeholder="friend@example.com" required>
-              <button id="inviteBtn" type="submit" class="button secondary full">Allow read-only access</button>
-            </form>
-            <div id="sharingMessage" class="inline-message" role="status" aria-live="polite"></div>
-            <div class="share-list-head"><strong>People with access</strong><span id="viewerCount" class="pill neutral">0</span></div>
-            <div id="viewerList" class="viewer-list"><p class="muted small">No one has access yet.</p></div>
-            <button id="copyInviteBtn" type="button" class="button subtle full" hidden>Copy invitation message</button>
-          </section>
-        </aside>
-      </div>
-
-      <section class="glass-card history-card" id="historySection" aria-labelledby="historyTitle">
-        <div class="section-heading history-heading">
-          <div><span class="eyebrow">PROGRESS OVER TIME</span><h2 id="historyTitle">Your calendar</h2></div>
-          <div class="history-actions">
-            <button id="prevMonth" class="icon-button" type="button" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
-            <strong id="monthLabel">November 2026</strong>
-            <button id="nextMonth" class="icon-button" type="button" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
-          </div>
+      <section class="story-cta" aria-labelledby="storyHeading">
+        <div class="story-cta-copy">
+          <span class="story-eyebrow">SHARE THE MOMENT</span>
+          <h2 id="storyHeading">Your progress. Your story.</h2>
+          <p>Create a Snapchat-ready achievement card with your challenge day and logged history.</p>
         </div>
-        <div class="calendar-jump">
-          <label for="calendarJumpMonth">Jump to month</label>
-          <input id="calendarJumpMonth" type="month" aria-label="Jump to a month in your history">
-        </div>
-        <div class="calendar-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
-        <div id="calendarGrid" class="calendar-grid" role="group" aria-label="Daily tracking calendar"></div>
-        <p class="calendar-metrics-legend">
-          <span class="muted">Saved day details:</span>
-          <span><svg class="legend-step" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3c-1.3 0-2.2 1.8-2.2 3.2s.8 2.7 2.2 2.7 2.2-1.3 2.2-2.7S9.3 3 8 3ZM16 12c-1.3 0-2.2 1.8-2.2 3.2s.9 2.8 2.2 2.8 2.2-1.4 2.2-2.8S17.3 12 16 12Z"/><path d="M5.3 11.6c1.8-.9 4.5-.2 5.1 2 1 3.5-2.1 5.9-4.8 4.3-2.1-1.3-2.3-5.1-.3-6.3Zm8.1 6c2.1-1.3 4.6-.2 5.2 1.9.5 1.7-.6 3-2 3.1-2.4.1-5.5-3.6-3.2-5Z"/></svg> Steps</span>
-          <span><svg class="legend-calorie" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22c4.8 0 8-3.3 8-7.7 0-2.6-1.4-4.3-3.8-6.5.2 2-.7 3.3-1.5 4-1.1-4.1-2.2-6.4-5.2-9.8-.2 3.2-1.1 5-3.2 7.4C4.8 11 4 13 4 15.1 4 19.1 7.3 22 12 22Z"/></svg> Est. kcal</span>
-        </p>
-        <div class="calendar-key"><span><i class="key-dot logged"></i> Logged</span><span><i class="key-dot flex"></i> Flexible</span><span><i class="key-dot unlogged"></i> Not logged</span></div>
-        <div class="summary-panel">
-          <div><small>ENTRIES LOGGED</small><strong id="summaryLogged">0</strong></div>
-          <div><small>10K STEP DAYS</small><strong id="summarySteps">0</strong></div>
-          <div><small>AVERAGE STEPS</small><strong id="summaryAvg">—</strong></div>
-          <div><small>ONE-MEAL DAYS</small><strong id="summaryMeals">0</strong></div>
-        </div>
-        <div class="history-footer">
-          <span class="muted">No weigh-ins required. Your data is visible only to your account.</span>
-          <button id="exportBtn" class="button subtle" type="button">Export my data (CSV)</button>
-        </div>
-        <details class="csv-import" id="csvImportPanel">
-          <summary>
-            <span class="csv-import-summary">
-              <strong>Import steps from CSV</strong>
-              <small>Steps CSV from Shortcuts or tracking apps</small>
-            </span>
-          </summary>
-          <div class="csv-import-body">
-            <p class="csv-import-help" id="csvImportHelp">Supports <code>Date,Time,Steps</code> (each row is an additional step sample) or <code>entry_date,steps</code> (one daily total per row). Steps are grouped by date. Files are read on your device; only daily totals are saved to your private tracker. Past dates are welcome, even before your 30-day challenge began. The native Apple Health ZIP/XML export is not supported.</p>
-            <div class="csv-import-fields">
-              <div>
-                <label for="csvStepsFile">Choose a CSV file</label>
-                <input id="csvStepsFile" type="file" accept=".csv,text/csv" aria-describedby="csvImportHelp">
-              </div>
-            </div>
-            <div class="csv-import-preview" id="csvImportPreview" hidden>
-              <div class="csv-import-overview">
-                <strong id="csvImportSummary">Ready to review</strong>
-                <span id="csvImportChanges"></span>
-              </div>
-              <label for="csvConflictMode">If a date already has saved steps</label>
-              <select id="csvConflictMode">
-                <option value="skip">Keep existing steps (recommended)</option>
-                <option value="replace">Replace steps only (keep meals &amp; calories)</option>
-              </select>
-              <div class="csv-import-rows" id="csvImportRows" role="list" aria-label="Daily steps preview"></div>
-              <button id="csvImportSave" type="button" class="button primary" disabled>Import steps</button>
-            </div>
-            <p class="csv-import-status" id="csvImportStatus" role="status" aria-live="polite"></p>
-          </div>
-        </details>
+        <button id="storyOpenBtn" type="button" class="button primary">Create story</button>
       </section>
+      <dialog class="story-dialog" id="storyDialog" aria-labelledby="storyDialogTitle">
+        <div class="story-dialog-header"><h2 id="storyDialogTitle">Your achievement story</h2><button id="storyCloseBtn" type="button" class="story-close" aria-label="Close preview">×</button></div>
+        <div class="story-preview-shell"><img id="storyPreviewImage" alt="Your progress story with challenge day, completed days and step counts" width="1080" height="1920"></div>
+        <p id="storyPreviewCaption" class="story-preview-caption">1080 × 1920 · Ready for Stories</p>
+        <div class="story-dialog-actions"><button id="storyDownloadBtn" type="button" class="button subtle">Save image</button><button id="storyShareBtn" type="button" class="button primary">Share story</button></div>
+        <p id="storyStatus" class="story-status" role="status" aria-live="polite"></p>
+      </dialog>
       <nav class="app-bottom-nav" id="appBottomNav" aria-label="Tracker navigation">
         <div class="app-bottom-nav-inner">
-          <button class="bottom-tab is-active" type="button" data-nav-target="todaySection" aria-current="page">
+          <a class="bottom-tab is-active" href="/" data-nav-target="todaySection" aria-current="page">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z"/></svg><span>Today</span>
-          </button>
-          <button class="bottom-tab" type="button" data-nav-target="logSection">
+          </a>
+          <a class="bottom-tab" href="/log.html" data-nav-target="logSection">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Log</span>
-          </button>
-          <button class="bottom-tab" type="button" data-nav-target="historySection">
+          </a>
+          <a class="bottom-tab" href="/history.html" data-nav-target="historySection">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></svg><span>History</span>
-          </button>
-          <button class="bottom-tab" id="bottomShareBtn" type="button" data-nav-target="sharingPanel">
+          </a>
+          <a class="bottom-tab" href="/share.html" id="bottomShareBtn" data-nav-target="sharingPanel">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-2a5.5 5.5 0 0 1 11 0v2m3-9h5m-2.5-2.5v5"/></svg><span>Share</span>
-          </button>
+          </a>
         </div>
       </nav>
       <footer class="footer">

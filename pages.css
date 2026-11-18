@@ -63,3 +63,29 @@
  .page-nav-link{flex:1}
 }
 @media(max-width:680px){.desktop-page-nav{display:none!important}}
+
+/* Compact actions for generating a dated story from Log or History. */
+.log-story-shortcut{display:flex;justify-content:flex-end;margin:0 0 12px;}
+.log-story-shortcut .button{min-height:44px;}
+.history-story-actions{
+ display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:9px;
+ margin:0 0 14px;padding:13px 14px;border:1px solid var(--border);
+ border-radius:16px;background:var(--input);
+}
+.history-story-actions label{font-size:.78rem;font-weight:660;color:var(--muted);}
+#historyStoryDate{
+ min-height:44px;min-width:150px;padding:7px 11px;max-width:100%;
+ border:1px solid var(--field-border);background:var(--bg-panel);
+ border-radius:11px;color:var(--text);font-size:16px;color-scheme:dark;
+}
+:root[data-theme="light"] #historyStoryDate{color-scheme:light;}
+.history-story-actions .button{min-height:44px;}
+@media(max-width:680px){
+ .history-story-actions{justify-content:space-between;gap:10px;}
+ .history-story-actions label{width:100%;}
+ #historyStoryDate{flex:1 1 148px;min-width:0;}
+ .history-story-actions .button{flex:1 1 130px;}
+}
+@media(max-width:360px){
+ .history-story-actions .button{flex-basis:100%;}
+}

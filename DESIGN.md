@@ -173,3 +173,33 @@ Validated by parser tests (including 2016 dates and quoted CSVs), JavaScript
 syntax, stylesheet structure, and checking all new DOM IDs and JS references.
 Visual confirmation and first-hand import of the user's full CSV on their
 device are still pending.
+
+
+### November 2026: liquid-glass monthly story card
+
+The `Create story` button on Today renders a fully local **1080 × 1920 PNG**
+for Snapchat, retaining the chosen date and any saved historical data. It uses
+the real tracker records, not a static AI-generated graphic.
+
+- The composition borrows only the idea of a monthly streak heatmap from sports
+  tracking products. Visual language is original Fitness Tracker navy liquid
+  glass with blue glass edges, mint step values, coral calorie values, and warm
+  orange highlights.
+- Monday-first calendar, correct month length, correctly positioned days,
+  supports months spanning 4–6 weeks and historical dates before the challenge.
+- All logged days show the **recorded** steps and estimated kcal inside the
+  corresponding tile; missing fields are shown as dashes, not invented zeros.
+- Dates with at least **10,000 steps** receive a hand-drawn Canvas vector
+  flame icon. This is not an emoji, external icon or copyrighted asset.
+- Selected day displays its full step and estimated calorie numbers. The
+  heading displays the challenge day when applicable, and a past-days strip
+  shows the most recent earlier logged dates within that month.
+- Streak, monthly goal-day count and best streak are calculated as of the
+  chosen date; records from later dates do not leak into historical cards.
+- Only the signed-in owner's own records can be shared; image generation,
+  preview and download run locally in the browser.
+
+Validation: parser/source syntax and mocked Canvas tests (including a 6-week
+month and February 2024 leap year), date selection, 10K flames, and the full
+recorded step/calorie values. Live visual QA in Safari/Samsung Internet remains
+to be done on the user's devices.

@@ -25,21 +25,35 @@
     const at=parse(selected);
     if(!at||selected>key(new Date()))throw new Error('Choose a valid date up to today.');
     const archived=selected<START,day=archived?null:dayNumber(selected);
-    // Retain original 30-day challenge boundaries for contemporary stories;
-    // old historical stories show old history rather than future check-ins.
-    const days=[...entries].filter(([date])=>date<=selected&&(archived||date>=START))
-      .sort((a,b)=>b[0].localeCompare(a[0]));
-    const history=days.filter(([date])=>date!==selected).slice(0,7)
-      .map(([date,entry])=>({date,entry,current:false}));
-    const current={date:selected,entry:entries.get(selected)||null,current:true};
-    const cards=[current,...history];
-    const logged=days.length;
-    const stepRows=days.filter(([,value])=>Number.isFinite(value?.steps));
-    const steps=stepRows.reduce((total,[,value])=>total+value.steps,0);
-    const goals=stepRows.filter(([,value])=>value.steps>=GOAL).length;
-    const streak=window.FitnessProgress?.streak(entries,selected)||
-      {current:0,best:0,goalDays:goals};
-    return {date:selected,archived,day,cards,entry:current.entry,logged,steps,goals,streak};
+    const monthStart=new Date(at.getFullYear(),at.getMonth(),1,12);
+    const daysInMonth=new Date(at.getFullYear(),at.getMonth()+1,0).getDate();
+    const offset=(monthStart.getDay()+6)%7; // Monday first, like a real calendar
+    const weeks=Math.ceil((offset+daysInMonth)/7);
+    const monthDays=Array.from({length:daysInMonth},(_,i)=>{
+      const d=new Date(at.getFullYear(),at.getMonth(),i+1,12);
+      const date=key(d);
+      const entry=date<=selected?entries.get(date)||null:null;
+      return {date,day:i+1,entry,selected:date===selected,
+        future:date>selected,
+        steps:Number.isFinite(entry?.steps)?entry.steps:null,
+        kcal:Number.isFinite(entry?.calories_estimate)?entry.calories_estimate:null,
+        goal:Number.isFinite(entry?.steps)&&entry.steps>=GOAL};
+    });
+    const monthEntries=monthDays.filter(d=>d.entry);
+    const goalDays=monthDays.filter(d=>d.goal).length;
+    const past=monthDays.filter(d=>d.entry && d.date<selected).reverse().slice(0,4);
+    const rawStreak=window.FitnessProgress?.streak(entries,selected)||
+      {current:0,best:0,goalDays:goalDays};
+    // For a completed historical day, a missed goal breaks the streak.
+    // Today remains eligible to extend yesterday's streak during the day.
+    const streak={
+      ...rawStreak,
+      current:selected<key(new Date()) && !monthDays.some(d=>d.selected && d.goal)
+        ?0:rawStreak.current
+    };
+    return {date:selected,archived,day,entry:entries.get(selected)||null,
+      monthLabel:at.toLocaleDateString('en-US',{month:'long',year:'numeric'}),
+      offset,weeks,daysInMonth,monthDays,monthEntries,goalDays,past,streak};
   }
   function rr(ctx,x,y,w,h,r=24){
     const q=Math.min(r,w/2,h/2);
@@ -59,70 +73,208 @@
     c.fillText(s,x,y);
   }
   function display(value){return value==null||!Number.isFinite(Number(value))?'—':number(value);}
+  function flame(c,x,y,size=32,glow=false){
+    // Hand-drawn vector flame, not an emoji, font glyph or external image.
+    c.save();c.translate(x,y);c.scale(size/100,size/100);
+    if(glow){c.shadowColor='rgba(255,121,53,.85)';c.shadowBlur=30;}
+    const fire=c.createLinearGradient(0,4,95,96);
+    fire.addColorStop(0,'#FFF1BA');fire.addColorStop(.38,'#FFA65A');
+    fire.addColorStop(1,'#F25D43');
+    c.beginPath();
+    c.moveTo(51,96);
+    c.bezierCurveTo(18,93,13,69,28,43);
+    c.bezierCurveTo(33,59,43,59,44,44);
+    c.bezierCurveTo(49,27,51,17,46,5);
+    c.bezierCurveTo(78,25,92,50,89,69);
+    c.bezierCurveTo(88,87,73,96,51,96);
+    c.closePath();
+    c.fillStyle=fire;c.fill();
+    c.shadowBlur=0;
+    c.beginPath();c.moveTo(55,88);
+    c.bezierCurveTo(38,83,37,67,49,54);
+    c.bezierCurveTo(49,69,59,69,63,57);
+    c.bezierCurveTo(78,75,70,88,55,88);
+    c.closePath();c.fillStyle='#FFE6AF';c.fill();c.restore();
+  }
+  function shoe(c,x,y,size=27,color='#9DBADB'){
+    // A tiny original line-art running shoe for step days.
+    c.save();c.translate(x,y);c.scale(size/40,size/40);
+    c.lineWidth=3;c.strokeStyle=color;c.lineJoin='round';c.lineCap='round';
+    c.beginPath();
+    c.moveTo(4,27);c.bezierCurveTo(10,26,11,17,15,10);
+    c.lineTo(22,16);c.lineTo(27,18);
+    c.bezierCurveTo(28,23,34,25,37,26);
+    c.lineTo(37,32);c.quadraticCurveTo(19,35,4,32);c.closePath();c.stroke();
+    c.beginPath();c.moveTo(16,17);c.lineTo(21,21);c.moveTo(21,14);c.lineTo(26,19);
+    c.moveTo(7,30);c.lineTo(36,30);c.stroke();c.restore();
+  }
+  function compact(v){
+    if(v==null)return '—';
+    if(v>=10000)return (v/1000).toFixed(1).replace(/\.0$/,'')+'k';
+    if(v>=1000)return (v/1000).toFixed(1).replace(/\.0$/,'')+'k';
+    return String(Math.round(v));
+  }
   function draw(data){
     const canvas=document.createElement('canvas');
     canvas.width=1080;canvas.height=1920;
     const c=canvas.getContext('2d',{alpha:false});
     if(!c)throw new Error('Could not render the story on this device.');
-    const bg=c.createLinearGradient(0,0,1080,1920);
-    bg.addColorStop(0,'#172F57');bg.addColorStop(.5,'#101E38');bg.addColorStop(1,'#0B162C');
+    const bg=c.createLinearGradient(0,0,1040,1920);
+    bg.addColorStop(0,'#07172E');bg.addColorStop(.53,'#122650');bg.addColorStop(1,'#09132C');
     c.fillStyle=bg;c.fillRect(0,0,1080,1920);
-    const glow=c.createRadialGradient(850,230,30,850,230,650);
-    glow.addColorStop(0,'rgba(43,149,254,.21)');glow.addColorStop(1,'rgba(43,149,254,0)');
-    c.fillStyle=glow;c.fillRect(0,0,1080,950);
-    c.lineWidth=2;c.strokeStyle='rgba(157,197,242,.12)';
-    rr(c,43,54,994,1817,49);c.stroke();
+    const halo=c.createRadialGradient(960,290,20,960,290,850);
+    halo.addColorStop(0,'rgba(38,136,251,.35)');halo.addColorStop(1,'rgba(38,136,251,0)');
+    c.fillStyle=halo;c.fillRect(0,0,1080,1300);
+    const orange=c.createRadialGradient(85,1670,20,85,1670,650);
+    orange.addColorStop(0,'rgba(232,100,61,.22)');orange.addColorStop(1,'rgba(232,100,61,0)');
+    c.fillStyle=orange;c.fillRect(0,970,950,950);
+    // Dynamic electric-blue ribbons behind the floating calendar.
+    c.save();
+    c.beginPath();c.moveTo(0,0);c.lineTo(570,0);
+    c.bezierCurveTo(425,135,325,240,0,330);c.closePath();
+    c.fillStyle='rgba(37,130,235,.22)';c.fill();
+    c.beginPath();c.moveTo(1080,1630);c.bezierCurveTo(820,1750,660,1830,385,1920);
+    c.lineTo(1080,1920);c.closePath();
+    c.fillStyle='rgba(44,124,227,.16)';c.fill();
+    c.restore();
 
-    panel(c,86,105,909,122,'rgba(255,255,255,.055)',undefined,25);
-    panel(c,119,129,70,70,'rgba(98,171,255,.28)','rgba(160,211,255,.4)',18);
-    c.strokeStyle=K.white;c.lineWidth=6;c.beginPath();
-    c.moveTo(130,167);c.lineTo(146,167);c.lineTo(155,145);
-    c.lineTo(167,186);c.lineTo(178,165);c.stroke();
-    text(c,'FITNESS',215,167,38,K.white,true);
-    text(c,'A day worth celebrating',215,201,24,K.muted);
-    text(c,'PRIVATE PROGRESS • MADE TO SHARE',989,172,19,K.muted,false,'right');
+    // Brand line-art, deliberately no emoji or user-specific information.
+    panel(c,63,76,67,67,'rgba(107,181,255,.16)','rgba(135,204,255,.42)',18);
+    shoe(c,77,94,43,'#D5EAFF');
+    text(c,'FITNESS',153,121,41,K.white,true);
+    text(c,'YOUR MOVEMENT. YOUR MOMENT.',154,151,19,K.muted,true);
+    text(c,'oalfawzan.sa',1010,123,23,K.muted,false,'right');
 
-    text(c,data.archived?'MY FITNESS HISTORY':'MY 30-DAY CHALLENGE',88,310,30,K.blue,true);
-    text(c,data.archived?'A DAY IN MY JOURNEY':'DAY '+data.day+' / 30',85,374,62,K.white,true);
-    text(c,dateText(data.date),90,417,27,K.muted);
+    // Frosted navy calendar panel with a cyan rim.
+    panel(c,50,204,980,1352,'rgba(13,35,70,.88)','rgba(136,200,255,.40)',49);
+    const topGlow=c.createLinearGradient(70,210,1006,1530);
+    topGlow.addColorStop(0,'rgba(170,218,255,.12)');
+    topGlow.addColorStop(.55,'rgba(46,108,201,.025)');
+    topGlow.addColorStop(1,'rgba(252,146,94,.12)');
+    c.save();rr(c,52,206,976,1348,46);c.clip();
+    c.fillStyle=topGlow;c.fillRect(52,206,976,1348);c.restore();
 
-    panel(c,86,458,909,306,'rgba(34,83,131,.36)','rgba(131,194,255,.28)',34);
-    text(c,'THIS DAY',122,512,28,K.muted,true);
-    c.strokeStyle='rgba(189,216,249,.22)';c.lineWidth=2;
-    c.beginPath();c.moveTo(548,555);c.lineTo(548,723);c.stroke();
-    const steps=data.entry?.steps??null,calories=data.entry?.calories_estimate??null;
-    text(c,display(steps),122,636,steps===null?100:76,K.mint,true);
-    text(c,'STEPS',126,695,27,K.mint,true);
-    text(c,display(calories),580,636,calories===null?100:76,K.coral,true);
-    text(c,'KCAL • ESTIMATED',584,695,25,K.coral,true);
+    text(c,data.monthLabel.toUpperCase(),93,282,44,K.white,true);
+    text(c,data.archived?'HISTORICAL STEPS':'CONSISTENCY, ONE DAY AT A TIME',95,322,24,K.muted);
+    panel(c,786,244,209,49,'rgba(80,152,225,.12)','rgba(141,197,255,.27)',20);
+    text(c,'AS OF '+short(data.date).toUpperCase(),887,275,22,K.blue,true,'center');
 
-    panel(c,86,792,909,127,'rgba(254,184,96,.095)','rgba(255,222,170,.22)',27);
-    text(c,'10K DAILY STREAK',120,840,25,K.gold,true);
-    text(c,number(data.streak.current),122,893,53,K.white,true);
-    text(c,data.streak.current===1?'DAY':'DAYS',178,892,24,K.muted,true);
-    text(c,'GOAL DAYS '+number(data.goals),956,849,22,K.muted,true,'right');
-    text(c,'BEST STREAK '+number(data.streak.best),956,889,22,K.muted,true,'right');
+    // Three strong stats. All values are computed from actual saved entries.
+    const statX=[90,395,700],statWidth=288;
+    for(let i=0;i<3;i++)panel(c,statX[i],362,statWidth,177,
+      i===0?'rgba(255,155,96,.12)':'rgba(153,207,255,.075)',
+      i===0?'rgba(255,173,119,.30)':'rgba(158,210,255,.17)',24);
+    text(c,'10K STREAK',115,410,23,K.gold,true);
+    flame(c,322,385,37,true);
+    text(c,number(data.streak.current),114,487,71,K.white,true);
+    text(c,data.streak.current===1?'DAY':'DAYS',114,519,19,K.muted,true);
 
-    text(c,'THIS DAY & PREVIOUS LOGS',90,981,30,K.white,true);
-    text(c,'Steps / estimated kcal',988,981,21,K.muted,false,'right');
-    const width=440,height=166,gapX=27,gapY=18;
-    const left=86,top=1014;
-    for(let i=0;i<8;i++){
-      const col=i%2,row=Math.floor(i/2),x=left+col*(width+gapX),y=top+row*(height+gapY);
-      const entry=data.cards[i];
-      panel(c,x,y,width,height,entry?.current?'rgba(55,126,188,.22)':entry?'rgba(255,255,255,.055)':'rgba(255,255,255,.028)',
-        entry?.current?'rgba(146,205,255,.48)':'rgba(205,224,255,.17)',25);
-      if(!entry)continue;
-      text(c,short(entry.date),x+23,y+39,27,entry.current?K.blue:K.white,true);
-      if(entry.current)text(c,'SELECTED',x+width-23,y+38,20,K.blue,true,'right');
-      const step=entry.entry?.steps??null,cal=entry.entry?.calories_estimate??null;
-      text(c,'STEPS',x+24,y+82,19,K.mint,true);
-      text(c,display(step),x+width-25,y+91,38,step==null?K.muted:K.white,true,'right');
-      text(c,'KCAL',x+24,y+133,19,K.coral,true);
-      text(c,display(cal),x+width-25,y+143,35,cal==null?K.muted:K.white,true,'right');
+    text(c,'10K DAYS',420,410,23,K.mint,true);
+    text(c,number(data.goalDays),419,489,71,K.white,true);
+    text(c,'THIS MONTH',419,519,19,K.muted,true);
+
+    text(c,'BEST STREAK',727,410,23,K.blue,true);
+    text(c,number(data.streak.best),725,489,71,K.white,true);
+    text(c,'DAYS TO DATE',725,519,19,K.muted,true);
+
+    text(c,'YOUR MONTH',96,623,31,K.white,true);
+    const achieved=data.monthDays.filter(d=>d.goal).length;
+    text(c,achieved+' / '+data.daysInMonth+' DAYS REACHED 10K',
+      991,621,20,K.muted,true,'right');
+    const weekdays=['M','T','W','T','F','S','S'];
+    const x0=99,colStep=124;
+    for(let i=0;i<7;i++)text(c,weekdays[i],x0+i*colStep+50,687,24,
+      i===6?'#FFCCA4':K.muted,true,'center');
+
+    const stride=data.weeks===6?97:data.weeks===5?107:118;
+    const cellH=data.weeks===6?87:data.weeks===5?94:104;
+    const y0=712;
+    let lastTileBottom=y0;
+    for(const d of data.monthDays){
+      const index=data.offset+d.day-1;
+      const col=index%7,row=Math.floor(index/7);
+      const x=x0+col*colStep,y=y0+row*stride,w=103,h=cellH;
+      lastTileBottom=Math.max(lastTileBottom,y+h);
+      const isLogged=Boolean(d.entry);
+      const fill=d.goal?'rgba(229,117,62,.16)':
+        d.selected?'rgba(74,146,239,.20)':
+        isLogged?'rgba(82,158,215,.15)':'rgba(255,255,255,.035)';
+      const stroke=d.selected?'#94CBFF':d.goal?'rgba(255,168,97,.62)':
+        isLogged?'rgba(149,205,255,.27)':'rgba(172,205,248,.10)';
+      c.save();
+      if(d.selected){c.shadowColor='rgba(68,152,255,.60)';c.shadowBlur=18;}
+      panel(c,x,y,w,h,fill,stroke,20);
+      c.restore();
+      text(c,String(d.day),x+12,y+27,24,
+        d.future?'#7185A4':d.goal?K.gold:d.selected?K.white:'#DAE5F5',true);
+      if(d.goal){
+        flame(c,x+69,y+5,29,d.selected);
+      }else if(isLogged){
+        shoe(c,x+77,y+7,21,K.blue);
+      }
+      if(isLogged){
+        // Step and kcal figures are abbreviated to fit in each calendar tile.
+        // The selected-day panel below shows the exact numbers.
+        text(c,compact(d.steps)+' st',x+12,y+h-30,18,d.goal?K.gold:K.mint,true);
+        text(c,compact(d.kcal)+' cal',x+12,y+h-9,16,K.coral,false);
+      }else if(d.selected){
+        text(c,'NO LOG',x+12,y+h-14,15,K.muted,true);
+      }
     }
-    text(c,'Small steps. Real progress.',88,1850,25,K.white,true);
-    text(c,'fitness.oalfawzan.sa',990,1850,21,K.muted,false,'right');
+
+    // Slim streak connector, borrowed as a concept from sports heatmaps.
+    // Position reflects how many actual 10K days were logged in this month.
+    const railX=973,railTop=720,railBottom=lastTileBottom;
+    panel(c,965,railTop,22,Math.max(45,railBottom-railTop),
+      'rgba(255,179,101,.12)','rgba(255,164,91,.18)',11);
+    const ratio=data.daysInMonth?achieved/data.daysInMonth:0;
+    if(ratio>0){
+      const height=(railBottom-railTop-8)*ratio;
+      const g=c.createLinearGradient(0,railBottom-height,0,railBottom);
+      g.addColorStop(0,'#FFCE84');g.addColorStop(1,'#FA6C48');
+      rr(c,970,railBottom-height-4,12,height,6);c.fillStyle=g;c.fill();
+      flame(c,953,Math.max(railTop,railBottom-height-26),39,true);
+    }
+
+    // Key to the heatmap, colors are descriptive and never a fabricated score.
+    panel(c,91,1350,892,52,'rgba(255,255,255,.038)','rgba(185,218,255,.12)',19);
+    c.beginPath();c.arc(124,1376,9,0,Math.PI*2);c.fillStyle=K.blue;c.fill();
+    text(c,'LOGGED',144,1383,19,K.muted,true);
+    flame(c,344,1359,24,false);
+    text(c,'10K REACHED',381,1383,19,K.gold,true);
+    c.beginPath();c.arc(620,1376,10,0,Math.PI*2);c.strokeStyle=K.blue;
+    c.lineWidth=3;c.stroke();
+    text(c,'SELECTED DAY',643,1383,19,K.muted,true);
+
+    // Selected day always gets generous real-number typography.
+    panel(c,89,1417,895,118,'rgba(77,135,192,.16)','rgba(157,202,252,.25)',25);
+    text(c,'SELECTED DAY',119,1451,20,K.muted,true);
+    c.strokeStyle='rgba(205,226,255,.18)';c.lineWidth=2;
+    c.beginPath();c.moveTo(544,1443);c.lineTo(544,1514);c.stroke();
+    text(c,display(data.entry?.steps),116,1504,53,K.mint,true);
+    text(c,'STEPS',407,1504,20,K.muted,true);
+    text(c,display(data.entry?.calories_estimate),571,1504,50,K.coral,true);
+    text(c,'KCAL',864,1504,20,K.muted,true);
+
+    // Actual previously logged days as-of the selected date.
+    text(c,'THE DAYS BEFORE',70,1634,31,K.white,true);
+    text(c,'RECORDED, NEVER ESTIMATED',1015,1632,19,K.muted,true,'right');
+    const recentX=[70,312,554,796];
+    for(let i=0;i<4;i++){
+      const x=recentX[i],d=data.past[i];
+      panel(c,x,1660,218,138,
+        d?'rgba(51,94,144,.35)':'rgba(255,255,255,.035)',
+        d?'rgba(160,203,247,.24)':'rgba(160,203,247,.09)',22);
+      if(!d)continue;
+      text(c,short(d.date).toUpperCase(),x+17,1696,21,d.goal?K.gold:K.white,true);
+      if(d.goal)flame(c,x+178,1672,27,false);
+      text(c,compact(d.steps)+' STEPS',x+17,1738,27,K.mint,true);
+      text(c,compact(d.kcal)+' KCAL',x+17,1773,22,K.coral);
+    }
+    if(!data.past.length)text(c,'Your first saved day is where it all begins.',82,1741,27,K.muted);
+
+    text(c,'PROGRESS, NOT PERFECTION.',70,1868,25,K.white,true);
+    text(c,'fitness.oalfawzan.sa',1012,1868,23,K.muted,false,'right');
     return canvas;
   }
   function status(s,type=''){

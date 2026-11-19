@@ -155,7 +155,10 @@
     c.fillStyle=topGlow;c.fillRect(52,206,976,1348);c.restore();
 
     text(c,data.monthLabel.toUpperCase(),93,282,44,K.white,true);
-    text(c,data.archived?'HISTORICAL STEPS':'CONSISTENCY, ONE DAY AT A TIME',95,322,24,K.muted);
+    const chapter=data.archived?'HISTORICAL STEPS':
+      data.day<=30?'DAY '+data.day+' OF 30 · THE 10K CHALLENGE':
+        'DAY '+data.day+' · KEEP GOING';
+    text(c,chapter,95,322,24,K.muted);
     panel(c,786,244,209,49,'rgba(80,152,225,.12)','rgba(141,197,255,.27)',20);
     text(c,'AS OF '+short(data.date).toUpperCase(),887,275,22,K.blue,true,'center');
 

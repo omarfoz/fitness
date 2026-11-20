@@ -1,14 +1,48 @@
 /* Private 1080 × 1920 Snapchat-ready story.
  * Any past day can be selected. Steps and estimated calories are only shown
  * when recorded, with no invented zeroes. All drawing happens locally.
+ *
+ * Composition: a sentence headline, then one liquid-glass month sheet in
+ * which consecutive 10K days fuse into a continuous ember "streak bar".
  */
 (() => {
   'use strict';
   const START='2026-11-15',GOAL=10000;
   const $=id=>document.getElementById(id);
   let getState=null,blob=null,previewURL=null,currentDate=null,busy=false,serial=0,queued=false;
-  const K={white:'#F9FBFF',muted:'#B7CAE5',blue:'#8DC8FF',
-    mint:'#90E8C7',coral:'#FFBAAE',gold:'#FFDC9A'};
+  const K={ink:'#F4F7FF',mist:'#A9BCD8',dim:'#56688A',glass:'#8DC8FF',
+    mint:'#90E8C7',coral:'#FFBAAE',
+    emberDeep:'#7A2610',ember:'#C4461C',cream:'#FFF3E1',peach:'#FFD7C6',flameDay:'#FFD3A1'};
+  // Story-only typefaces, registered under private names so the app UI's
+  // own font stack is untouched. System fonts are the offline fallback.
+  const DISPLAY='"Story Display","Arial Narrow","Helvetica Neue",Arial,sans-serif';
+  const BODY='"Story Body",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif';
+  const FONT_CSS='https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900'+
+    '&family=DM+Sans:wght@400;500;600&display=swap';
+  let fontsPromise=null;
+  function ready(){
+    if(fontsPromise)return fontsPromise;
+    const load=(async()=>{
+      if(!window.FontFace||!document.fonts)return;
+      const css=await (await fetch(FONT_CSS)).text();
+      const faces=[];
+      for(const block of css.split('@font-face').slice(1)){
+        // Latin subset only: every glyph the story draws lives there.
+        if(/unicode-range/i.test(block)&&!/U\+0000-00FF/i.test(block))continue;
+        const fam=/font-family:\s*'([^']+)'/.exec(block)?.[1];
+        const weight=/font-weight:\s*(\d+)/.exec(block)?.[1]||'400';
+        const url=/src:\s*url\(([^)]+)\)/.exec(block)?.[1];
+        if(!fam||!url)continue;
+        const alias=fam==='DM Sans'?'Story Body':'Story Display';
+        const face=new FontFace(alias,'url('+url+')',{weight});
+        document.fonts.add(face);faces.push(face.load());
+      }
+      await Promise.all(faces);
+    })().catch(()=>{});
+    // Never hold the story hostage to a slow network.
+    fontsPromise=Promise.race([load,new Promise(r=>setTimeout(r,2500))]);
+    return fontsPromise;
+  }
   const number=v=>Number(v).toLocaleString('en-US');
   function key(d){return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');}
   function parse(k){
@@ -18,7 +52,7 @@
     return val.getFullYear()===y&&val.getMonth()===m-1&&val.getDate()===d?val:null;
   }
   function dateText(k){return parse(k).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});}
-  function short(k){return parse(k).toLocaleDateString('en-US',{day:'numeric',month:'short'});}
+  function short(k){return parse(k).toLocaleDateString('en-GB',{day:'numeric',month:'short'});}
   function dayNumber(k){const base=parse(START),to=parse(k);return Math.round((to-base)/86400000)+1;}
   function compute(entries,selected){
     if(!(entries instanceof Map))entries=new Map();
@@ -51,32 +85,57 @@
       current:selected<key(new Date()) && !monthDays.some(d=>d.selected && d.goal)
         ?0:rawStreak.current
     };
+    // A day before the 1st (from the previous month) feeds the bar on day 1.
+    const prev=new Date(at.getFullYear(),at.getMonth(),0,12);
+    const prevGoal=Number(entries.get(key(prev))?.steps)>=GOAL;
     return {date:selected,archived,day,entry:entries.get(selected)||null,
       monthLabel:at.toLocaleDateString('en-US',{month:'long',year:'numeric'}),
+      monthName:at.toLocaleDateString('en-US',{month:'long'}),
+      elapsed:at.getDate(),prevGoal,
       offset,weeks,daysInMonth,monthDays,monthEntries,goalDays,past,streak};
   }
+
+  /* ---------- drawing primitives ---------- */
   function rr(ctx,x,y,w,h,r=24){
-    const q=Math.min(r,w/2,h/2);
-    ctx.beginPath();ctx.moveTo(x+q,y);ctx.lineTo(x+w-q,y);
-    ctx.quadraticCurveTo(x+w,y,x+w,y+q);ctx.lineTo(x+w,y+h-q);
-    ctx.quadraticCurveTo(x+w,y+h,x+w-q,y+h);ctx.lineTo(x+q,y+h);
-    ctx.quadraticCurveTo(x,y+h,x,y+h-q);ctx.lineTo(x,y+q);
-    ctx.quadraticCurveTo(x,y,x+q,y);ctx.closePath();
+    const q=Array.isArray(r)?r:[r,r,r,r];
+    const [tl,tr,br,bl]=q.map(v=>Math.min(v,w/2,h/2));
+    ctx.beginPath();ctx.moveTo(x+tl,y);ctx.lineTo(x+w-tr,y);
+    ctx.quadraticCurveTo(x+w,y,x+w,y+tr);ctx.lineTo(x+w,y+h-br);
+    ctx.quadraticCurveTo(x+w,y+h,x+w-br,y+h);ctx.lineTo(x+bl,y+h);
+    ctx.quadraticCurveTo(x,y+h,x,y+h-bl);ctx.lineTo(x,y+tl);
+    ctx.quadraticCurveTo(x,y,x+tl,y);ctx.closePath();
   }
-  function panel(c,x,y,w,h,fill='rgba(255,255,255,.065)',stroke='rgba(202,222,255,.18)',r=27){
-    c.save();rr(c,x,y,w,h,r);c.fillStyle=fill;c.fill();
-    c.lineWidth=2;c.strokeStyle=stroke;c.stroke();c.restore();
+  function font(c,size,weight=500,fam=BODY){c.font=weight+' '+size+'px '+fam;}
+  function text(c,s,x,y,size,color,weight=500,fam=BODY,align='left'){
+    font(c,size,weight,fam);c.fillStyle=color;c.textAlign=align;c.fillText(s,x,y);
+    return c.measureText(s).width;
   }
-  function text(c,s,x,y,size=30,color=K.white,bold=false,align='left'){
-    c.fillStyle=color;c.textAlign=align;
-    c.font=(bold?'700 ':'500 ')+size+'px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
-    c.fillText(s,x,y);
+  function fit(c,s,maxW,size,weight,fam){
+    font(c,size,weight,fam);
+    while(size>40&&c.measureText(s).width>maxW){size-=4;font(c,size,weight,fam);}
+    return size;
+  }
+  function wrap(c,s,maxW,size,weight=500,fam=BODY){
+    font(c,size,weight,fam);
+    const lines=[];let line='';
+    for(const word of s.split(' ')){
+      const next=line?line+' '+word:word;
+      if(line&&c.measureText(next).width>maxW){lines.push(line);line=word;}
+      else line=next;
+    }
+    if(line)lines.push(line);
+    return lines;
   }
   function display(value){return value==null||!Number.isFinite(Number(value))?'—':number(value);}
+  function compact(v){
+    if(v==null||!Number.isFinite(Number(v)))return '—';
+    if(v>=1000)return (v/1000).toFixed(1).replace(/\.0$/,'')+'k';
+    return String(Math.round(v));
+  }
   function flame(c,x,y,size=32,glow=false){
     // Hand-drawn vector flame, not an emoji, font glyph or external image.
     c.save();c.translate(x,y);c.scale(size/100,size/100);
-    if(glow){c.shadowColor='rgba(255,121,53,.85)';c.shadowBlur=30;}
+    if(glow){c.shadowColor='rgba(255,121,53,.9)';c.shadowBlur=34;}
     const fire=c.createLinearGradient(0,4,95,96);
     fire.addColorStop(0,'#FFF1BA');fire.addColorStop(.38,'#FFA65A');
     fire.addColorStop(1,'#F25D43');
@@ -97,7 +156,7 @@
     c.closePath();c.fillStyle='#FFE6AF';c.fill();c.restore();
   }
   function shoe(c,x,y,size=27,color='#9DBADB'){
-    // A tiny original line-art running shoe for step days.
+    // A tiny original line-art running shoe: the Fitness brand mark.
     c.save();c.translate(x,y);c.scale(size/40,size/40);
     c.lineWidth=3;c.strokeStyle=color;c.lineJoin='round';c.lineCap='round';
     c.beginPath();
@@ -108,176 +167,171 @@
     c.beginPath();c.moveTo(16,17);c.lineTo(21,21);c.moveTo(21,14);c.lineTo(26,19);
     c.moveTo(7,30);c.lineTo(36,30);c.stroke();c.restore();
   }
-  function compact(v){
-    if(v==null)return '—';
-    if(v>=10000)return (v/1000).toFixed(1).replace(/\.0$/,'')+'k';
-    if(v>=1000)return (v/1000).toFixed(1).replace(/\.0$/,'')+'k';
-    return String(Math.round(v));
+
+  /* ---------- copy ---------- */
+  function headline(d){
+    const n=d.streak.current;
+    if(n>=2)return n+' days in a row';
+    if(n===1)return '1-day streak';
+    if(d.goalDays)return d.goalDays+(d.goalDays===1?' day':' days')+' at 10K';
+    if(d.monthEntries.length)return d.monthEntries.length+
+      (d.monthEntries.length===1?' day logged':' days logged');
+    return 'No days logged yet';
   }
+  function facts(d){
+    const days=v=>v+(v===1?' day':' days');
+    const parts=[];
+    if(d.streak.current>=1)parts.push('10,000 steps or more each day.');
+    parts.push(d.goalDays+' of '+d.elapsed+' days in '+d.monthName+' reached 10K.');
+    if(d.streak.best)parts.push('Longest streak: '+days(d.streak.best)+'.');
+    return parts.join(' ');
+  }
+
+  /* ---------- composition ---------- */
   function draw(data){
+    const W=1080,H=1920,M=64;
     const canvas=document.createElement('canvas');
-    canvas.width=1080;canvas.height=1920;
+    canvas.width=W;canvas.height=H;
     const c=canvas.getContext('2d',{alpha:false});
     if(!c)throw new Error('Could not render the story on this device.');
-    const bg=c.createLinearGradient(0,0,1040,1920);
-    bg.addColorStop(0,'#07172E');bg.addColorStop(.53,'#122650');bg.addColorStop(1,'#09132C');
-    c.fillStyle=bg;c.fillRect(0,0,1080,1920);
-    const halo=c.createRadialGradient(960,290,20,960,290,850);
-    halo.addColorStop(0,'rgba(38,136,251,.35)');halo.addColorStop(1,'rgba(38,136,251,0)');
-    c.fillStyle=halo;c.fillRect(0,0,1080,1300);
-    const orange=c.createRadialGradient(85,1670,20,85,1670,650);
-    orange.addColorStop(0,'rgba(232,100,61,.22)');orange.addColorStop(1,'rgba(232,100,61,0)');
-    c.fillStyle=orange;c.fillRect(0,970,950,950);
-    // Dynamic electric-blue ribbons behind the floating calendar.
+
+    // Night-navy ground with one cool and one warm light source.
+    const bg=c.createLinearGradient(0,0,0,H);
+    bg.addColorStop(0,'#0E2147');bg.addColorStop(.55,'#0A1A3B');bg.addColorStop(1,'#071330');
+    c.fillStyle=bg;c.fillRect(0,0,W,H);
+    const cool=c.createRadialGradient(980,180,10,980,180,760);
+    cool.addColorStop(0,'rgba(64,150,255,.30)');cool.addColorStop(1,'rgba(64,150,255,0)');
+    c.fillStyle=cool;c.fillRect(0,0,W,1100);
+    const warm=c.createRadialGradient(120,1180,10,120,1180,700);
+    warm.addColorStop(0,'rgba(232,96,48,.16)');warm.addColorStop(1,'rgba(232,96,48,0)');
+    c.fillStyle=warm;c.fillRect(0,520,W,1300);
+
+    // Brand row.
+    shoe(c,M,110,48,K.glass);
+    text(c,'Fitness',M+64,148,36,K.ink,600);
+    text(c,data.monthLabel,W-M,148,34,K.mist,500,BODY,'right');
+
+    // Headline: the streak said as a sentence, not a stat card.
+    const head=headline(data);
+    const hs=fit(c,head,W-M*2,168,900,DISPLAY);
+    text(c,head,M-4,330,hs,K.ink,900,DISPLAY);
+    const lines=wrap(c,facts(data),W-M*2-40,38,500).slice(0,2);
+    lines.forEach((l,i)=>text(c,l,M,402+i*52,38,K.mist,500));
+
+    // Liquid-glass month sheet.
+    const sx=40,sw=W-80,sy=lines.length>1?500:450;
+    const pad=26,gap=10,cols=7;
+    const tw=(sw-pad*2-gap*(cols-1))/cols;
+    const gy=sy+92;
+    const gridH=Math.min(1318-gy,data.weeks*150+(data.weeks-1)*gap);
+    const th=Math.min(150,(gridH-gap*(data.weeks-1))/data.weeks);
+    const sh=(gy-sy)+data.weeks*th+(data.weeks-1)*gap+pad;
     c.save();
-    c.beginPath();c.moveTo(0,0);c.lineTo(570,0);
-    c.bezierCurveTo(425,135,325,240,0,330);c.closePath();
-    c.fillStyle='rgba(37,130,235,.22)';c.fill();
-    c.beginPath();c.moveTo(1080,1630);c.bezierCurveTo(820,1750,660,1830,385,1920);
-    c.lineTo(1080,1920);c.closePath();
-    c.fillStyle='rgba(44,124,227,.16)';c.fill();
-    c.restore();
+    c.shadowColor='rgba(0,8,30,.55)';c.shadowBlur=60;c.shadowOffsetY=24;
+    rr(c,sx,sy,sw,sh,46);
+    const glass=c.createLinearGradient(0,sy,0,sy+sh);
+    glass.addColorStop(0,'rgba(150,200,255,.13)');glass.addColorStop(1,'rgba(120,170,240,.05)');
+    c.fillStyle=glass;c.fill();c.restore();
+    c.save();rr(c,sx,sy,sw,sh,46);c.lineWidth=2;c.strokeStyle='rgba(170,212,255,.24)';c.stroke();
+    // Specular rim along the top edge, the liquid-glass signature.
+    const rim=c.createLinearGradient(sx,0,sx+sw,0);
+    rim.addColorStop(0,'rgba(255,255,255,0)');rim.addColorStop(.3,'rgba(220,240,255,.75)');
+    rim.addColorStop(.7,'rgba(220,240,255,.35)');rim.addColorStop(1,'rgba(255,255,255,0)');
+    c.beginPath();c.moveTo(sx+46,sy+1.5);c.lineTo(sx+sw-46,sy+1.5);
+    c.lineWidth=3;c.strokeStyle=rim;c.stroke();c.restore();
 
-    // Brand line-art, deliberately no emoji or user-specific information.
-    panel(c,63,76,67,67,'rgba(107,181,255,.16)','rgba(135,204,255,.42)',18);
-    shoe(c,77,94,43,'#D5EAFF');
-    text(c,'FITNESS',153,121,41,K.white,true);
-    text(c,'YOUR MOVEMENT. YOUR MOMENT.',154,151,19,K.muted,true);
-    text(c,'oalfawzan.sa',1010,123,23,K.muted,false,'right');
+    const colX=i=>sx+pad+i*(tw+gap);
+    const rowY=r=>gy+r*(th+gap);
+    ['M','T','W','T','F','S','S'].forEach((d,i)=>
+      text(c,d,colX(i)+16,sy+66,30,K.mist,800,DISPLAY));
 
-    // Frosted navy calendar panel with a cyan rim.
-    panel(c,50,204,980,1352,'rgba(13,35,70,.88)','rgba(136,200,255,.40)',49);
-    const topGlow=c.createLinearGradient(70,210,1006,1530);
-    topGlow.addColorStop(0,'rgba(170,218,255,.12)');
-    topGlow.addColorStop(.55,'rgba(46,108,201,.025)');
-    topGlow.addColorStop(1,'rgba(252,146,94,.12)');
-    c.save();rr(c,52,206,976,1348,46);c.clip();
-    c.fillStyle=topGlow;c.fillRect(52,206,976,1348);c.restore();
+    const cell=d=>{const i=data.offset+d.day-1;return {col:i%7,row:Math.floor(i/7)};};
 
-    text(c,data.monthLabel.toUpperCase(),93,282,44,K.white,true);
-    const chapter=data.archived?'HISTORICAL STEPS':
-      data.day<=30?'DAY '+data.day+' OF 30 · THE 10K CHALLENGE':
-        'DAY '+data.day+' · KEEP GOING';
-    text(c,chapter,95,322,24,K.muted);
-    panel(c,786,244,209,49,'rgba(80,152,225,.12)','rgba(141,197,255,.27)',20);
-    text(c,'AS OF '+short(data.date).toUpperCase(),887,275,22,K.blue,true,'center');
-
-    // Three strong stats. All values are computed from actual saved entries.
-    const statX=[90,395,700],statWidth=288;
-    for(let i=0;i<3;i++)panel(c,statX[i],362,statWidth,177,
-      i===0?'rgba(255,155,96,.12)':'rgba(153,207,255,.075)',
-      i===0?'rgba(255,173,119,.30)':'rgba(158,210,255,.17)',24);
-    text(c,'10K STREAK',115,410,23,K.gold,true);
-    flame(c,322,385,37,true);
-    text(c,number(data.streak.current),114,487,71,K.white,true);
-    text(c,data.streak.current===1?'DAY':'DAYS',114,519,19,K.muted,true);
-
-    text(c,'10K DAYS',420,410,23,K.mint,true);
-    text(c,number(data.goalDays),419,489,71,K.white,true);
-    text(c,'THIS MONTH',419,519,19,K.muted,true);
-
-    text(c,'BEST STREAK',727,410,23,K.blue,true);
-    text(c,number(data.streak.best),725,489,71,K.white,true);
-    text(c,'DAYS TO DATE',725,519,19,K.muted,true);
-
-    text(c,'YOUR MONTH',96,623,31,K.white,true);
-    const achieved=data.monthDays.filter(d=>d.goal).length;
-    text(c,achieved+' / '+data.daysInMonth+' DAYS REACHED 10K',
-      991,621,20,K.muted,true,'right');
-    const weekdays=['M','T','W','T','F','S','S'];
-    const x0=99,colStep=124;
-    for(let i=0;i<7;i++)text(c,weekdays[i],x0+i*colStep+50,687,24,
-      i===6?'#FFCCA4':K.muted,true,'center');
-
-    const stride=data.weeks===6?97:data.weeks===5?107:118;
-    const cellH=data.weeks===6?87:data.weeks===5?94:104;
-    const y0=712;
-    let lastTileBottom=y0;
-    for(const d of data.monthDays){
-      const index=data.offset+d.day-1;
-      const col=index%7,row=Math.floor(index/7);
-      const x=x0+col*colStep,y=y0+row*stride,w=103,h=cellH;
-      lastTileBottom=Math.max(lastTileBottom,y+h);
-      const isLogged=Boolean(d.entry);
-      const fill=d.goal?'rgba(229,117,62,.16)':
-        d.selected?'rgba(74,146,239,.20)':
-        isLogged?'rgba(82,158,215,.15)':'rgba(255,255,255,.035)';
-      const stroke=d.selected?'#94CBFF':d.goal?'rgba(255,168,97,.62)':
-        isLogged?'rgba(149,205,255,.27)':'rgba(172,205,248,.10)';
+    // Streak bars: consecutive 10K days fuse into one ember bar per week row.
+    // A bar that runs on into the next week keeps a square edge to say so.
+    const days=data.monthDays;
+    for(let i=0;i<days.length;i++){
+      if(!days[i].goal||(i>0&&days[i-1].goal&&cell(days[i]).col!==0))continue;
+      let j=i;
+      while(j+1<days.length&&days[j+1].goal&&cell(days[j+1]).col!==0)j++;
+      const a=cell(days[i]),b=cell(days[j]);
+      const fromBefore=a.col===0&&(i>0?days[i-1].goal:data.prevGoal);
+      const intoAfter=b.col===6&&j+1<days.length&&days[j+1].goal;
+      const x=colX(a.col),y=rowY(a.row),w=colX(b.col)+tw-x;
+      const R=26,r=[fromBefore?6:R,intoAfter?6:R,intoAfter?6:R,fromBefore?6:R];
       c.save();
-      if(d.selected){c.shadowColor='rgba(68,152,255,.60)';c.shadowBlur=18;}
-      panel(c,x,y,w,h,fill,stroke,20);
+      c.shadowColor='rgba(255,104,44,.42)';c.shadowBlur=28;
+      rr(c,x,y,w,th,r);
+      const fire=c.createLinearGradient(0,y,0,y+th);
+      fire.addColorStop(0,K.ember);fire.addColorStop(1,K.emberDeep);
+      c.fillStyle=fire;c.fill();c.restore();
+      c.save();rr(c,x,y,w,th,r);c.clip();
+      c.fillStyle='rgba(255,214,170,.32)';c.fillRect(x,y,w,2);
+      // Faint seams keep each day readable inside one continuous bar.
+      c.fillStyle='rgba(40,8,0,.22)';
+      for(let k=a.col+1;k<=b.col;k++)c.fillRect(colX(k)-gap/2-1,y+18,2,th-36);
       c.restore();
-      text(c,String(d.day),x+12,y+27,24,
-        d.future?'#7185A4':d.goal?K.gold:d.selected?K.white:'#DAE5F5',true);
-      if(d.goal){
-        flame(c,x+69,y+5,29,d.selected);
-      }else if(isLogged){
-        shoe(c,x+77,y+7,21,K.blue);
+    }
+
+    for(const d of days){
+      const {col,row}=cell(d);
+      const x=colX(col),y=rowY(row),w=tw,h=th;
+      const logged=Boolean(d.entry);
+      if(!d.goal){
+        if(logged){rr(c,x,y,w,h,24);c.fillStyle='rgba(141,200,255,.12)';c.fill();}
+        else if(!d.future){
+          rr(c,x+1,y+1,w-2,h-2,24);c.lineWidth=2;c.strokeStyle='rgba(169,188,216,.12)';c.stroke();
+        }
       }
-      if(isLogged){
-        // Step and kcal figures are abbreviated to fit in each calendar tile.
-        // The selected-day panel below shows the exact numbers.
-        text(c,compact(d.steps)+' st',x+12,y+h-30,18,d.goal?K.gold:K.mint,true);
-        text(c,compact(d.kcal)+' cal',x+12,y+h-9,16,K.coral,false);
-      }else if(d.selected){
-        text(c,'NO LOG',x+12,y+h-14,15,K.muted,true);
+      if(d.selected){
+        c.save();c.shadowColor='rgba(141,200,255,.85)';c.shadowBlur=22;
+        rr(c,x-6,y-6,w+12,h+12,30);c.lineWidth=4;c.strokeStyle=K.glass;c.stroke();c.restore();
+      }
+      const dayColor=d.future?K.dim:d.goal?K.flameDay:K.ink;
+      text(c,String(d.day),x+14,y+38,34,dayColor,800,DISPLAY);
+      if(d.goal)flame(c,x+w-42,y+10,32,d.selected);
+      if(logged){
+        // Abbreviated to fit the tile; the selected-day numbers below are exact.
+        const big=h>=120;
+        text(c,compact(d.steps),x+14,y+h-(big?40:34),big?40:34,d.goal?K.cream:K.mint,800,DISPLAY);
+        text(c,compact(d.kcal)+' kcal',x+14,y+h-(big?14:11),big?21:19,d.goal?K.peach:K.coral,500);
       }
     }
 
-    // Slim streak connector, borrowed as a concept from sports heatmaps.
-    // Position reflects how many actual 10K days were logged in this month.
-    const railX=973,railTop=720,railBottom=lastTileBottom;
-    panel(c,965,railTop,22,Math.max(45,railBottom-railTop),
-      'rgba(255,179,101,.12)','rgba(255,164,91,.18)',11);
-    const ratio=data.daysInMonth?achieved/data.daysInMonth:0;
-    if(ratio>0){
-      const height=(railBottom-railTop-8)*ratio;
-      const g=c.createLinearGradient(0,railBottom-height,0,railBottom);
-      g.addColorStop(0,'#FFCE84');g.addColorStop(1,'#FA6C48');
-      rr(c,970,railBottom-height-4,12,height,6);c.fillStyle=g;c.fill();
-      flame(c,953,Math.max(railTop,railBottom-height-26),39,true);
+    // Selected day: exact recorded numbers.
+    let y=sy+sh+86;
+    const when=parse(data.date).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+    text(c,when,M,y,40,K.ink,600);
+    if(!data.archived)text(c,'Challenge day '+data.day+(data.day<=30?' of 30':''),W-M,y,34,K.glass,500,BODY,'right');
+    y+=146;
+    // A missing value says so in words; it is never drawn as a zero.
+    const figure=(v,unit,x,color)=>{
+      if(v==null||!Number.isFinite(Number(v))){text(c,'No '+unit+' logged',x,y-12,40,K.mist,500);return;}
+      const w=text(c,number(v),x-3,y,150,color,900,DISPLAY);
+      text(c,unit,x+w+14,y,36,K.mist,500);
+    };
+    if(data.entry){
+      figure(data.entry.steps,'steps',M,K.mint);
+      figure(data.entry.calories_estimate,'kcal',W/2+40,K.coral);
+    }else text(c,'Nothing logged on this day.',M,y-12,44,K.mist,500);
+
+    // Earlier logged days in this month, as of the selected date.
+    y+=82;
+    if(data.past.length||data.entry){c.fillStyle='rgba(169,188,216,.22)';c.fillRect(M,y-46,W-M*2,2);}
+    if(data.past.length){
+      const colW=(W-M*2)/4;
+      data.past.forEach((d,i)=>{
+        const x=M+i*colW;
+        const dw=text(c,short(d.date),x,y,28,K.mist,500);
+        if(d.goal)flame(c,x+dw+10,y-26,28);
+        text(c,compact(d.steps),x,y+56,52,K.mint,800,DISPLAY);
+        text(c,compact(d.kcal)+' kcal',x,y+92,26,K.coral,500);
+      });
+    }else if(data.entry){
+      text(c,'The first logged day of '+data.monthName+'.',M,y+20,32,K.mist,500);
     }
 
-    // Key to the heatmap, colors are descriptive and never a fabricated score.
-    panel(c,91,1350,892,52,'rgba(255,255,255,.038)','rgba(185,218,255,.12)',19);
-    c.beginPath();c.arc(124,1376,9,0,Math.PI*2);c.fillStyle=K.blue;c.fill();
-    text(c,'LOGGED',144,1383,19,K.muted,true);
-    flame(c,344,1359,24,false);
-    text(c,'10K REACHED',381,1383,19,K.gold,true);
-    c.beginPath();c.arc(620,1376,10,0,Math.PI*2);c.strokeStyle=K.blue;
-    c.lineWidth=3;c.stroke();
-    text(c,'SELECTED DAY',643,1383,19,K.muted,true);
-
-    // Selected day always gets generous real-number typography.
-    panel(c,89,1417,895,118,'rgba(77,135,192,.16)','rgba(157,202,252,.25)',25);
-    text(c,'SELECTED DAY',119,1451,20,K.muted,true);
-    c.strokeStyle='rgba(205,226,255,.18)';c.lineWidth=2;
-    c.beginPath();c.moveTo(544,1443);c.lineTo(544,1514);c.stroke();
-    text(c,display(data.entry?.steps),116,1504,53,K.mint,true);
-    text(c,'STEPS',407,1504,20,K.muted,true);
-    text(c,display(data.entry?.calories_estimate),571,1504,50,K.coral,true);
-    text(c,'KCAL',864,1504,20,K.muted,true);
-
-    // Actual previously logged days as-of the selected date.
-    text(c,'THE DAYS BEFORE',70,1634,31,K.white,true);
-    text(c,'RECORDED, NEVER ESTIMATED',1015,1632,19,K.muted,true,'right');
-    const recentX=[70,312,554,796];
-    for(let i=0;i<4;i++){
-      const x=recentX[i],d=data.past[i];
-      panel(c,x,1660,218,138,
-        d?'rgba(51,94,144,.35)':'rgba(255,255,255,.035)',
-        d?'rgba(160,203,247,.24)':'rgba(160,203,247,.09)',22);
-      if(!d)continue;
-      text(c,short(d.date).toUpperCase(),x+17,1696,21,d.goal?K.gold:K.white,true);
-      if(d.goal)flame(c,x+178,1672,27,false);
-      text(c,compact(d.steps)+' STEPS',x+17,1738,27,K.mint,true);
-      text(c,compact(d.kcal)+' KCAL',x+17,1773,22,K.coral);
-    }
-    if(!data.past.length)text(c,'Your first saved day is where it all begins.',82,1741,27,K.muted);
-
-    text(c,'PROGRESS, NOT PERFECTION.',70,1868,25,K.white,true);
-    text(c,'fitness.oalfawzan.sa',1012,1868,23,K.muted,false,'right');
+    text(c,'fitness.oalfawzan.sa',M,H-62,28,K.mist,500);
     return canvas;
   }
   function status(s,type=''){
@@ -298,6 +352,7 @@
     busy=true;
     blob=null;status('Generating the image…');
     try{
+      await ready();
       const info=compute(state.entries||new Map(),selected),canvas=draw(info);
       const image=await new Promise((resolve,reject)=>canvas.toBlob(
         value=>value?resolve(value):reject(new Error('Image export failed.')),'image/png'));
@@ -306,10 +361,10 @@
       currentDate=selected;
       blob=image;previewURL=URL.createObjectURL(image);
       $('storyPreviewImage').src=previewURL;
-      const label=info.archived?'Historical day':('Day '+info.day);
-      $('storyPreviewCaption').textContent=label+' · '+dateText(info.date)+' · '+
-        display(info.entry?.steps)+' steps · '+display(info.entry?.calories_estimate)+' kcal';
-      status('Image ready. Share it or save to your photos.','success');
+      const label=info.archived?'Before the challenge':('Challenge day '+info.day);
+      $('storyPreviewCaption').textContent=label+', '+dateText(info.date)+': '+
+        display(info.entry?.steps)+' steps, '+display(info.entry?.calories_estimate)+' kcal';
+      status('Image ready. Share it or save it to your photos.','success');
     }finally{
       busy=false;
       // On iOS the PNG encoding may still be running as the user picks a
@@ -325,6 +380,7 @@
     if(!getState||!dlg)return;
     const state=getState();
     if(!state?.userId||state.readonly)return;
+    ready();
     const input=$('storySelectedDate');
     const dates=[...state.entries.keys()].sort();
     input.min=dates[0]||START;input.max=key(new Date());

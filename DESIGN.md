@@ -203,3 +203,35 @@ Validation: parser/source syntax and mocked Canvas tests (including a 6-week
 month and February 2024 leap year), date selection, 10K flames, and the full
 recorded step/calorie values. Live visual QA in Safari/Samsung Internet remains
 to be done on the user's devices.
+
+
+### 20 Nov 2026: ember streak story redesign
+
+The first story looked like an app dashboard shrunk into a photo: three stat
+cards, ALL-CAPS labels, a legend, and 16–18px tile text that nobody could read
+at story size. The redesign keeps every data rule above and changes the
+hierarchy so the story reads in a few seconds.
+
+- **Headline as a sentence.** The current 10K streak ("3 days in a row") in a
+  large condensed display face replaces the three stat cards. A plain sentence
+  under it gives the month's 10K days (as of the chosen day) and the longest
+  streak.
+- **Streak bars.** On one liquid-glass month sheet, consecutive 10K days merge
+  into a continuous ember bar per week row. A bar that carries on into the
+  next week, or follows a 10K day at the end of the previous month, keeps a
+  square edge. Each 10K day still gets its own vector flame.
+- **Readable tiles.** Day, compact steps and kcal are set 2–3× larger. Logged
+  days below 10K are glass blue, missed days are faint outlines, and future
+  days are just dim numbers.
+- **Selected day.** Exact steps (mint) and kcal (coral). A missing value reads
+  "No steps logged" / "Nothing logged on this day", never a dash or a zero.
+- **Earlier days** in the month are one quiet row with no boxes. The legend and
+  slogan were removed.
+- **Type.** Big Shoulders Display (numerals and headline; condensed, so 5-digit
+  step counts fit 7 columns) and DM Sans (text). They are loaded only for the
+  canvas under private names, so the app UI's fonts don't change. If Google
+  Fonts is unreachable within 2.5 s, the story falls back to system fonts.
+
+Checked in a desktop browser with mock data: a 6-week month, a 4-week month,
+a day with nothing logged, a pre-challenge day and the in-app dialog flow.
+Real-device Safari and Snapchat checks are still pending.

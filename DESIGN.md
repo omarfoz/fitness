@@ -235,3 +235,26 @@ hierarchy so the story reads in a few seconds.
 Checked in a desktop browser with mock data: a 6-week month, a 4-week month,
 a day with nothing logged, a pre-challenge day and the in-app dialog flow.
 Real-device Safari and Snapchat checks are still pending.
+
+
+### 21 Nov 2026: story and card formats
+
+The share dialog now offers two images built from the same month card:
+
+- **Story 9:16** (1080 × 1920): the card is centred on the night-navy ground,
+  with one broad ember arc behind it and empty edges. The brand sits under the
+  card.
+- **Card only** (1080 wide, transparent corners): just the card, for use as a
+  sticker or a post.
+
+The card follows a simple monthly streak-calendar layout: month, three stats
+(current 10K streak, 10K days of elapsed days, best streak), and one circle per
+day. 10K days are ember circles with the vector flame, logged days below 10K are
+glass-blue with the shoe mark, and missed days are outlined numbers. A small
+badge gives the recorded steps (compact). A weekly column on the right shows a
+check for weeks with a 10K day and the current streak inside a flame on the
+selected week. The previous data rules (no invented zeros, no leakage from later
+dates) are unchanged.
+
+Checked in desktop Chrome with mock data: a 5-week month, a 6-week month, a leap
+February, an empty month and both formats. Real-device Safari still pending.

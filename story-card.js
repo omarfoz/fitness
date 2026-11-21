@@ -1,15 +1,15 @@
-/* Private 1080 × 1920 Snapchat-ready story.
+/* Private monthly image in two formats: a 1080 × 1920 story with the
+ * month card centred on a quiet background, or the card alone (1080 wide,
+ * transparent corners).
  * Any past day can be selected. Steps and estimated calories are only shown
  * when recorded, with no invented zeroes. All drawing happens locally.
  *
- * Composition: a sentence headline, then one liquid-glass month sheet in
- * which consecutive 10K days fuse into a continuous ember "streak bar".
  */
 (() => {
   'use strict';
   const START='2026-11-15',GOAL=10000;
   const $=id=>document.getElementById(id);
-  let getState=null,blob=null,previewURL=null,currentDate=null,busy=false,serial=0,queued=false;
+  let mode='story',getState=null,blob=null,previewURL=null,currentDate=null,busy=false,serial=0,queued=false;
   const K={ink:'#F4F7FF',mist:'#A9BCD8',dim:'#56688A',glass:'#8DC8FF',
     mint:'#90E8C7',coral:'#FFBAAE',
     emberDeep:'#7A2610',ember:'#C4461C',cream:'#FFF3E1',peach:'#FFD7C6',flameDay:'#FFD3A1'};
@@ -110,22 +110,6 @@
     font(c,size,weight,fam);c.fillStyle=color;c.textAlign=align;c.fillText(s,x,y);
     return c.measureText(s).width;
   }
-  function fit(c,s,maxW,size,weight,fam){
-    font(c,size,weight,fam);
-    while(size>40&&c.measureText(s).width>maxW){size-=4;font(c,size,weight,fam);}
-    return size;
-  }
-  function wrap(c,s,maxW,size,weight=500,fam=BODY){
-    font(c,size,weight,fam);
-    const lines=[];let line='';
-    for(const word of s.split(' ')){
-      const next=line?line+' '+word:word;
-      if(line&&c.measureText(next).width>maxW){lines.push(line);line=word;}
-      else line=next;
-    }
-    if(line)lines.push(line);
-    return lines;
-  }
   function display(value){return value==null||!Number.isFinite(Number(value))?'—':number(value);}
   function compact(v){
     if(v==null||!Number.isFinite(Number(v)))return '—';
@@ -168,172 +152,155 @@
     c.moveTo(7,30);c.lineTo(36,30);c.stroke();c.restore();
   }
 
-  /* ---------- copy ---------- */
-  function headline(d){
-    const n=d.streak.current;
-    if(n>=2)return n+' days in a row';
-    if(n===1)return '1-day streak';
-    if(d.goalDays)return d.goalDays+(d.goalDays===1?' day':' days')+' at 10K';
-    if(d.monthEntries.length)return d.monthEntries.length+
-      (d.monthEntries.length===1?' day logged':' days logged');
-    return 'No days logged yet';
-  }
-  function facts(d){
-    const days=v=>v+(v===1?' day':' days');
-    const parts=[];
-    if(d.streak.current>=1)parts.push('10,000 steps or more each day.');
-    parts.push(d.goalDays+' of '+d.elapsed+' days in '+d.monthName+' reached 10K.');
-    if(d.streak.best)parts.push('Longest streak: '+days(d.streak.best)+'.');
-    return parts.join(' ');
-  }
-
   /* ---------- composition ---------- */
-  function draw(data){
-    const W=1080,H=1920,M=64;
-    const canvas=document.createElement('canvas');
-    canvas.width=W;canvas.height=H;
+  // One month card, used two ways: centred on a quiet 9:16 story
+  // background, or exported alone with transparent corners.
+  const CARD_W=920;
+  function cardHeight(w,weeks){return (w/CARD_W)*(408+weeks*108);}
+  function steps(v){
+    if(v==null||!Number.isFinite(Number(v)))return null;
+    if(v>=10000)return Math.round(v/1000)+'k';
+    if(v>=1000)return (v/1000).toFixed(1).replace(/\.0$/,'')+'k';
+    return String(Math.round(v));
+  }
+  function check(c,cx,cy,size,color){
+    c.save();c.lineWidth=size*.16;c.lineCap='round';c.lineJoin='round';c.strokeStyle=color;
+    c.beginPath();c.moveTo(cx-size*.32,cy+size*.02);c.lineTo(cx-size*.08,cy+size*.26);
+    c.lineTo(cx+size*.34,cy-size*.22);c.stroke();c.restore();
+  }
+  function drawCard(c,data,X,Y,w,shadow=true){
+    const s=w/CARD_W,h=cardHeight(w,data.weeks);
+    c.save();c.translate(X,Y);c.scale(s,s);
+    const W=CARD_W,H=h/s,P=56;
+
+    // Navy liquid-glass card.
+    c.save();if(shadow){c.shadowColor='rgba(0,6,24,.6)';c.shadowBlur=70;c.shadowOffsetY=26;}
+    rr(c,0,0,W,H,52);
+    const g=c.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#1A2F57');g.addColorStop(1,'#0F1F42');
+    c.fillStyle=g;c.fill();c.restore();
+    c.save();rr(c,0,0,W,H,52);c.lineWidth=2;c.strokeStyle='rgba(170,212,255,.26)';c.stroke();
+    const rim=c.createLinearGradient(0,0,W,0);
+    rim.addColorStop(0,'rgba(255,255,255,0)');rim.addColorStop(.3,'rgba(220,240,255,.7)');
+    rim.addColorStop(.7,'rgba(220,240,255,.3)');rim.addColorStop(1,'rgba(255,255,255,0)');
+    c.beginPath();c.moveTo(52,1.5);c.lineTo(W-52,1.5);c.lineWidth=3;c.strokeStyle=rim;c.stroke();
+    c.restore();
+
+    // Month + brand mark.
+    text(c,data.monthLabel,P,112,54,K.ink,600);
+    shoe(c,W-P-54,64,54,K.glass);
+
+    // Three quiet stats along the top of the card.
+    const n=data.streak.current;
+    const stats=[
+      ['10K streak',n+(n===1?' day':' days')],
+      ['10K days',data.goalDays+' / '+data.elapsed],
+      ['Best streak',data.streak.best+(data.streak.best===1?' day':' days')]
+    ];
+    stats.forEach(([label,value],i)=>{
+      const x=P+i*262;
+      text(c,label,x,186,27,K.mist,500);
+      text(c,value,x-2,254,68,i===0&&n>0?'#FFB27A':K.ink,900,DISPLAY);
+    });
+
+    // Calendar grid with a weekly column on the right.
+    const right=104,gridW=W-P*2-right-16,pitch=gridW/7,y0=354,R=41;
+    ['M','T','W','T','F','S','S'].forEach((d,i)=>
+      text(c,d,P+pitch*(i+.5),326,28,K.mist,600,BODY,'center'));
+    const pos=d=>{const i=data.offset+d.day-1;
+      return {cx:P+pitch*(i%7+.5),cy:y0+Math.floor(i/7)*108+54,row:Math.floor(i/7)};};
+
+    for(const d of data.monthDays){
+      const {cx,cy}=pos(d),logged=Boolean(d.entry);
+      if(d.future){text(c,String(d.day),cx,cy+11,30,K.dim,500,BODY,'center');continue;}
+      if(d.selected){
+        c.save();c.shadowColor='rgba(141,200,255,.8)';c.shadowBlur=18;
+        c.beginPath();c.arc(cx,cy,R+8,0,Math.PI*2);c.lineWidth=4;c.strokeStyle=K.glass;c.stroke();c.restore();
+      }
+      c.beginPath();c.arc(cx,cy,R,0,Math.PI*2);
+      if(d.goal){
+        const f=c.createLinearGradient(cx,cy-R,cx,cy+R);
+        f.addColorStop(0,'#E0592A');f.addColorStop(1,K.emberDeep);
+        c.save();c.shadowColor='rgba(255,104,44,.45)';c.shadowBlur=20;c.fillStyle=f;c.fill();c.restore();
+        flame(c,cx-24,cy-27,48);
+      }else if(logged){
+        c.fillStyle='rgba(141,200,255,.15)';c.fill();
+        c.lineWidth=2;c.strokeStyle='rgba(141,200,255,.42)';c.stroke();
+        shoe(c,cx-21,cy-23,42,K.glass);
+      }else{
+        c.lineWidth=2;c.strokeStyle='rgba(169,188,216,.22)';c.stroke();
+        text(c,String(d.day),cx,cy+11,30,K.mist,500,BODY,'center');
+      }
+      const label=logged?steps(d.steps):null;
+      if(label){
+        font(c,19,700);const bw=Math.max(34,c.measureText(label).width+16),bx=cx+R*.62,by=cy-R*.78;
+        rr(c,bx-bw/2,by-16,bw,32,16);c.fillStyle='#0B1733';c.fill();
+        c.lineWidth=2;c.strokeStyle=d.goal?'#FF9A5C':'rgba(141,200,255,.55)';c.stroke();
+        text(c,label,bx,by+7,19,K.ink,700,BODY,'center');
+      }
+    }
+
+    // Weekly column: a check for every finished week with a 10K day; the
+    // selected week carries the current streak inside a flame.
+    const colX=W-P-right/2;
+    rr(c,colX-46,y0+4,92,data.weeks*108-8,46);
+    const col=c.createLinearGradient(0,y0,0,y0+data.weeks*108);
+    col.addColorStop(0,'rgba(255,128,64,.24)');col.addColorStop(1,'rgba(255,128,64,.08)');
+    c.fillStyle=col;c.fill();
+    const selRow=pos(data.monthDays.find(d=>d.selected)).row;
+    for(let r=0;r<data.weeks;r++){
+      const cy=y0+r*108+54;
+      const week=data.monthDays.filter(d=>pos(d).row===r);
+      if(r===selRow&&n>0){
+        flame(c,colX-50,cy-62,100,true);
+        text(c,String(n),colX,cy+30,n>99?36:42,'#5A1A06',900,DISPLAY,'center');
+        continue;
+      }
+      if(week.every(d=>d.future))continue;
+      c.beginPath();c.arc(colX,cy,25,0,Math.PI*2);
+      if(week.some(d=>d.goal)){c.fillStyle=K.ember;c.fill();check(c,colX,cy,26,K.cream);}
+      else{c.lineWidth=2;c.strokeStyle='rgba(169,188,216,.3)';c.stroke();}
+    }
+    c.restore();
+    return h;
+  }
+  function drawStory(data){
+    const W=1080,H=1920;
+    const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
     const c=canvas.getContext('2d',{alpha:false});
     if(!c)throw new Error('Could not render the story on this device.');
-
-    // Night-navy ground with one cool and one warm light source.
     const bg=c.createLinearGradient(0,0,0,H);
     bg.addColorStop(0,'#0E2147');bg.addColorStop(.55,'#0A1A3B');bg.addColorStop(1,'#071330');
     c.fillStyle=bg;c.fillRect(0,0,W,H);
-    const cool=c.createRadialGradient(980,180,10,980,180,760);
-    cool.addColorStop(0,'rgba(64,150,255,.30)');cool.addColorStop(1,'rgba(64,150,255,0)');
-    c.fillStyle=cool;c.fillRect(0,0,W,1100);
-    const warm=c.createRadialGradient(120,1180,10,120,1180,700);
-    warm.addColorStop(0,'rgba(232,96,48,.16)');warm.addColorStop(1,'rgba(232,96,48,0)');
-    c.fillStyle=warm;c.fillRect(0,520,W,1300);
-
-    // Brand row.
-    shoe(c,M,110,48,K.glass);
-    text(c,'Fitness',M+64,148,36,K.ink,600);
-    text(c,data.monthLabel,W-M,148,34,K.mist,500,BODY,'right');
-
-    // Headline: the streak said as a sentence, not a stat card.
-    const head=headline(data);
-    const hs=fit(c,head,W-M*2,168,900,DISPLAY);
-    text(c,head,M-4,330,hs,K.ink,900,DISPLAY);
-    const lines=wrap(c,facts(data),W-M*2-40,38,500).slice(0,2);
-    lines.forEach((l,i)=>text(c,l,M,402+i*52,38,K.mist,500));
-
-    // Liquid-glass month sheet.
-    const sx=40,sw=W-80,sy=lines.length>1?500:450;
-    const pad=26,gap=10,cols=7;
-    const tw=(sw-pad*2-gap*(cols-1))/cols;
-    const gy=sy+92;
-    const gridH=Math.min(1318-gy,data.weeks*150+(data.weeks-1)*gap);
-    const th=Math.min(150,(gridH-gap*(data.weeks-1))/data.weeks);
-    const sh=(gy-sy)+data.weeks*th+(data.weeks-1)*gap+pad;
+    // One broad ember arc swept behind the card; the edges stay empty.
     c.save();
-    c.shadowColor='rgba(0,8,30,.55)';c.shadowBlur=60;c.shadowOffsetY=24;
-    rr(c,sx,sy,sw,sh,46);
-    const glass=c.createLinearGradient(0,sy,0,sy+sh);
-    glass.addColorStop(0,'rgba(150,200,255,.13)');glass.addColorStop(1,'rgba(120,170,240,.05)');
-    c.fillStyle=glass;c.fill();c.restore();
-    c.save();rr(c,sx,sy,sw,sh,46);c.lineWidth=2;c.strokeStyle='rgba(170,212,255,.24)';c.stroke();
-    // Specular rim along the top edge, the liquid-glass signature.
-    const rim=c.createLinearGradient(sx,0,sx+sw,0);
-    rim.addColorStop(0,'rgba(255,255,255,0)');rim.addColorStop(.3,'rgba(220,240,255,.75)');
-    rim.addColorStop(.7,'rgba(220,240,255,.35)');rim.addColorStop(1,'rgba(255,255,255,0)');
-    c.beginPath();c.moveTo(sx+46,sy+1.5);c.lineTo(sx+sw-46,sy+1.5);
-    c.lineWidth=3;c.strokeStyle=rim;c.stroke();c.restore();
+    const arc=c.createLinearGradient(1000,0,0,1400);
+    arc.addColorStop(0,'rgba(255,150,80,.95)');arc.addColorStop(1,'rgba(196,70,28,.75)');
+    c.beginPath();c.arc(640,560,560,-Math.PI*.45,Math.PI*.82);
+    c.lineWidth=150;c.lineCap='butt';c.strokeStyle=arc;c.stroke();c.restore();
+    const cool=c.createRadialGradient(160,1700,10,160,1700,700);
+    cool.addColorStop(0,'rgba(64,150,255,.18)');cool.addColorStop(1,'rgba(64,150,255,0)');
+    c.fillStyle=cool;c.fillRect(0,1000,W,920);
 
-    const colX=i=>sx+pad+i*(tw+gap);
-    const rowY=r=>gy+r*(th+gap);
-    ['M','T','W','T','F','S','S'].forEach((d,i)=>
-      text(c,d,colX(i)+16,sy+66,30,K.mist,800,DISPLAY));
-
-    const cell=d=>{const i=data.offset+d.day-1;return {col:i%7,row:Math.floor(i/7)};};
-
-    // Streak bars: consecutive 10K days fuse into one ember bar per week row.
-    // A bar that runs on into the next week keeps a square edge to say so.
-    const days=data.monthDays;
-    for(let i=0;i<days.length;i++){
-      if(!days[i].goal||(i>0&&days[i-1].goal&&cell(days[i]).col!==0))continue;
-      let j=i;
-      while(j+1<days.length&&days[j+1].goal&&cell(days[j+1]).col!==0)j++;
-      const a=cell(days[i]),b=cell(days[j]);
-      const fromBefore=a.col===0&&(i>0?days[i-1].goal:data.prevGoal);
-      const intoAfter=b.col===6&&j+1<days.length&&days[j+1].goal;
-      const x=colX(a.col),y=rowY(a.row),w=colX(b.col)+tw-x;
-      const R=26,r=[fromBefore?6:R,intoAfter?6:R,intoAfter?6:R,fromBefore?6:R];
-      c.save();
-      c.shadowColor='rgba(255,104,44,.42)';c.shadowBlur=28;
-      rr(c,x,y,w,th,r);
-      const fire=c.createLinearGradient(0,y,0,y+th);
-      fire.addColorStop(0,K.ember);fire.addColorStop(1,K.emberDeep);
-      c.fillStyle=fire;c.fill();c.restore();
-      c.save();rr(c,x,y,w,th,r);c.clip();
-      c.fillStyle='rgba(255,214,170,.32)';c.fillRect(x,y,w,2);
-      // Faint seams keep each day readable inside one continuous bar.
-      c.fillStyle='rgba(40,8,0,.22)';
-      for(let k=a.col+1;k<=b.col;k++)c.fillRect(colX(k)-gap/2-1,y+18,2,th-36);
-      c.restore();
-    }
-
-    for(const d of days){
-      const {col,row}=cell(d);
-      const x=colX(col),y=rowY(row),w=tw,h=th;
-      const logged=Boolean(d.entry);
-      if(!d.goal){
-        if(logged){rr(c,x,y,w,h,24);c.fillStyle='rgba(141,200,255,.12)';c.fill();}
-        else if(!d.future){
-          rr(c,x+1,y+1,w-2,h-2,24);c.lineWidth=2;c.strokeStyle='rgba(169,188,216,.12)';c.stroke();
-        }
-      }
-      if(d.selected){
-        c.save();c.shadowColor='rgba(141,200,255,.85)';c.shadowBlur=22;
-        rr(c,x-6,y-6,w+12,h+12,30);c.lineWidth=4;c.strokeStyle=K.glass;c.stroke();c.restore();
-      }
-      const dayColor=d.future?K.dim:d.goal?K.flameDay:K.ink;
-      text(c,String(d.day),x+14,y+38,34,dayColor,800,DISPLAY);
-      if(d.goal)flame(c,x+w-42,y+10,32,d.selected);
-      if(logged){
-        // Abbreviated to fit the tile; the selected-day numbers below are exact.
-        const big=h>=120;
-        text(c,compact(d.steps),x+14,y+h-(big?40:34),big?40:34,d.goal?K.cream:K.mint,800,DISPLAY);
-        text(c,compact(d.kcal)+' kcal',x+14,y+h-(big?14:11),big?21:19,d.goal?K.peach:K.coral,500);
-      }
-    }
-
-    // Selected day: exact recorded numbers.
-    let y=sy+sh+86;
-    const when=parse(data.date).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-    text(c,when,M,y,40,K.ink,600);
-    if(!data.archived)text(c,'Challenge day '+data.day+(data.day<=30?' of 30':''),W-M,y,34,K.glass,500,BODY,'right');
-    y+=146;
-    // A missing value says so in words; it is never drawn as a zero.
-    const figure=(v,unit,x,color)=>{
-      if(v==null||!Number.isFinite(Number(v))){text(c,'No '+unit+' logged',x,y-12,40,K.mist,500);return;}
-      const w=text(c,number(v),x-3,y,150,color,900,DISPLAY);
-      text(c,unit,x+w+14,y,36,K.mist,500);
-    };
-    if(data.entry){
-      figure(data.entry.steps,'steps',M,K.mint);
-      figure(data.entry.calories_estimate,'kcal',W/2+40,K.coral);
-    }else text(c,'Nothing logged on this day.',M,y-12,44,K.mist,500);
-
-    // Earlier logged days in this month, as of the selected date.
-    y+=82;
-    if(data.past.length||data.entry){c.fillStyle='rgba(169,188,216,.22)';c.fillRect(M,y-46,W-M*2,2);}
-    if(data.past.length){
-      const colW=(W-M*2)/4;
-      data.past.forEach((d,i)=>{
-        const x=M+i*colW;
-        const dw=text(c,short(d.date),x,y,28,K.mist,500);
-        if(d.goal)flame(c,x+dw+10,y-26,28);
-        text(c,compact(d.steps),x,y+56,52,K.mint,800,DISPLAY);
-        text(c,compact(d.kcal)+' kcal',x,y+92,26,K.coral,500);
-      });
-    }else if(data.entry){
-      text(c,'The first logged day of '+data.monthName+'.',M,y+20,32,K.mist,500);
-    }
-
-    text(c,'fitness.oalfawzan.sa',M,H-62,28,K.mist,500);
+    const w=CARD_W,h=cardHeight(w,data.weeks),x=(W-w)/2,y=Math.round((H-h)/2-50);
+    drawCard(c,data,x,y,w);
+    // Brand under the card.
+    const by=y+h+120;
+    font(c,46,600);const tw=c.measureText('Fitness').width,total=58+14+tw;
+    shoe(c,W/2-total/2,by-46,58,K.ink);
+    text(c,'Fitness',W/2-total/2+72,by,46,K.ink,600);
+    text(c,'fitness.oalfawzan.sa',W/2,H-80,28,K.mist,500,BODY,'center');
     return canvas;
   }
+  function drawCardOnly(data){
+    const w=1080,h=Math.ceil(cardHeight(w,data.weeks)),pad=0;
+    const canvas=document.createElement('canvas');canvas.width=w+pad*2;canvas.height=h+pad*2;
+    const c=canvas.getContext('2d');
+    if(!c)throw new Error('Could not render the card on this device.');
+    drawCard(c,data,pad,pad,w,false);
+    return canvas;
+  }
+  function draw(data,mode){return mode==='card'?drawCardOnly(data):drawStory(data);}
   function status(s,type=''){
     const target=$('storyStatus');
     if(target){target.textContent=s;target.className='story-status'+(type?' is-'+type:'');}
@@ -353,14 +320,15 @@
     blob=null;status('Generating the image…');
     try{
       await ready();
-      const info=compute(state.entries||new Map(),selected),canvas=draw(info);
+      const info=compute(state.entries||new Map(),selected),canvas=draw(info,mode);
       const image=await new Promise((resolve,reject)=>canvas.toBlob(
         value=>value?resolve(value):reject(new Error('Image export failed.')),'image/png'));
       if(request!==serial)return;
       if(previewURL)URL.revokeObjectURL(previewURL);
       currentDate=selected;
       blob=image;previewURL=URL.createObjectURL(image);
-      $('storyPreviewImage').src=previewURL;
+      const img=$('storyPreviewImage');
+      img.width=canvas.width;img.height=canvas.height;img.src=previewURL;
       const label=info.archived?'Before the challenge':('Challenge day '+info.day);
       $('storyPreviewCaption').textContent=label+', '+dateText(info.date)+': '+
         display(info.entry?.steps)+' steps, '+display(info.entry?.calories_estimate)+' kcal';
@@ -390,7 +358,7 @@
     if(!dlg.open)dlg.showModal();
     try{await prepare()}catch(e){status(e.message||'Could not create a story.','error');}
   }
-  function filename(){return 'fitness-story-'+(currentDate||key(new Date()))+'.png';}
+  function filename(){return 'fitness-'+mode+'-'+(currentDate||key(new Date()))+'.png';}
   function save(){
     if(!blob){status('Select a day and wait for the image.','error');return;}
     const url=URL.createObjectURL(blob),a=document.createElement('a');
@@ -419,6 +387,13 @@
     $('storyCloseBtn')?.addEventListener('click',()=>$('storyDialog').close());
     $('storyDownloadBtn')?.addEventListener('click',save);
     $('storyShareBtn')?.addEventListener('click',share);
+    document.querySelectorAll('[data-story-format]').forEach(btn=>btn.addEventListener('click',()=>{
+      if(mode===btn.dataset.storyFormat)return;
+      mode=btn.dataset.storyFormat;
+      document.querySelectorAll('[data-story-format]').forEach(b=>
+        b.setAttribute('aria-checked',String(b===btn)));
+      if($('storyDialog')?.open)prepare().catch(e=>status(e.message||'Could not update the image.','error'));
+    }));
   }
   let requestedOpened=false;
   function openRequested(){

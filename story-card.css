@@ -38,7 +38,7 @@
 }
 #storyPreviewImage {
   display:block;width:auto;max-width:100%;height:auto;
-  max-height:calc(100dvh - 258px);aspect-ratio:9 / 16;
+  max-height:calc(100dvh - 300px);
   object-fit:contain;border-radius:13px;box-shadow:0 8px 28px #0005;
   background:linear-gradient(165deg,#142c52,#0b1630);
 }
@@ -100,3 +100,12 @@
 .streak-icon { color: var(--type-amber,#f8d69b); }
 .streak-icon svg { display: block; width: 30px; height: 30px; flex: 0 0 auto; }
 @media (max-width:680px) { .streak-icon svg { width: 26px; height: 26px; } }
+
+/* Story / card format switch. */
+.story-format{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0 16px 10px;padding:4px;
+  border:1px solid rgba(205,224,255,.16);border-radius:13px;background:rgba(255,255,255,.045);}
+.story-format button{min-height:40px;border:0;border-radius:10px;background:transparent;
+  color:#c4d4ea;font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;}
+.story-format button[aria-checked="true"]{background:rgba(141,200,255,.2);color:#f6f8ff;
+  box-shadow:inset 0 0 0 1px rgba(141,200,255,.45);}
+.story-format button:focus-visible{outline:2px solid #8DC8FF;outline-offset:2px;}

@@ -272,12 +272,13 @@
     const bg=c.createLinearGradient(0,0,0,H);
     bg.addColorStop(0,'#0E2147');bg.addColorStop(.55,'#0A1A3B');bg.addColorStop(1,'#071330');
     c.fillStyle=bg;c.fillRect(0,0,W,H);
-    // One broad ember arc swept behind the card; the edges stay empty.
+    // One ember ring behind the card. It is a full circle, so its ends are
+    // always hidden by the canvas edges or the card and never look cut off.
     c.save();
-    const arc=c.createLinearGradient(1000,0,0,1400);
-    arc.addColorStop(0,'rgba(255,150,80,.95)');arc.addColorStop(1,'rgba(196,70,28,.75)');
-    c.beginPath();c.arc(640,560,560,-Math.PI*.45,Math.PI*.82);
-    c.lineWidth=150;c.lineCap='butt';c.strokeStyle=arc;c.stroke();c.restore();
+    const arc=c.createLinearGradient(400,0,1080,1100);
+    arc.addColorStop(0,'#E0592A');arc.addColorStop(.6,K.ember);arc.addColorStop(1,K.emberDeep);
+    c.globalAlpha=.9;c.beginPath();c.arc(860,520,560,0,Math.PI*2);
+    c.lineWidth=140;c.strokeStyle=arc;c.stroke();c.restore();
     const cool=c.createRadialGradient(160,1700,10,160,1700,700);
     cool.addColorStop(0,'rgba(64,150,255,.18)');cool.addColorStop(1,'rgba(64,150,255,0)');
     c.fillStyle=cool;c.fillRect(0,1000,W,920);

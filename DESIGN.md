@@ -242,7 +242,7 @@ Real-device Safari and Snapchat checks are still pending.
 The share dialog now offers two images built from the same month card:
 
 - **Story 9:16** (1080 × 1920): the card is centred on the night-navy ground,
-  with one broad ember arc behind it and empty edges. The brand sits under the
+  with one ember ring behind it (a full circle, so no cut ends; same ember gradient as the 10K days) and empty edges. The brand sits under the
   card.
 - **Card only** (1080 wide, transparent corners): just the card, for use as a
   sticker or a post.

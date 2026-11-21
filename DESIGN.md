@@ -258,3 +258,31 @@ dates) are unchanged.
 
 Checked in desktop Chrome with mock data: a 5-week month, a 6-week month, a leap
 February, an empty month and both formats. Real-device Safari still pending.
+
+
+### 21 Nov 2026: ready for colleagues (declutter pass)
+
+The tracker was built around one person's plan. Before sharing it with
+colleagues, everything personal or repeated was removed:
+
+- **30-day challenge removed.** The 10K streak is the challenge. Check-ins are
+  allowed for the last 60 days (or any older day that already has data), not
+  from a fixed 15 Nov 2026 start.
+- **No calorie target.** The fixed 1,900–2,200 kcal reference range is gone;
+  Today shows the logged estimate and how many foods were added.
+- **Flexible days hidden.** Forced Friday, the weekly flex picker and "The
+  plan" card are no longer shown. The `weekly_flex` table is untouched, so the
+  feature can come back as an opt-in setting.
+- **Today:** Calories, Steps, one fasting row, the streak card, and a one-line
+  story prompt. Consistency and challenge cards removed.
+- **Check-in:** page title once, story button removed, fasting, coffee,
+  one-meal, food notes, waist and notes inside "More details", delete moved
+  away from Save.
+- **Calendar:** Monday-first (matches the story card), story picker and Flex
+  legend removed, "One-meal days" replaced by best streak, plain-language CSV
+  import.
+- **Share:** shorter copy, numbered iPhone install steps, Android help folded.
+- Sign-in no longer mentions Supabase; slogan not repeated in the footer.
+
+Checked in desktop Chrome at iPhone width with a mocked Supabase session: all
+four pages render with no console errors. Live account and iPhone checks pending.

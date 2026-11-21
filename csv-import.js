@@ -54,7 +54,7 @@
         throw new Error('CSV row '+line+' has '+row.length+' columns; expected '+columns.length+'.');
       const key=normalizedDate(row[datePos]);
       if(!key)throw new Error('Invalid date on CSV row '+line+'.');
-      // Historical steps are valid even before the 30-day challenge started.
+      // Historical steps of any past date are valid.
       // Only future dates are rejected.
       if(key>today)throw new Error('CSV row '+line+' is dated in the future. Check the date format.');
       const raw=String(row[stepsPos]).trim();

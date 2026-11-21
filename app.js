@@ -3,9 +3,10 @@
  */
 (() => {
   'use strict';
-  const START_DATE = '2026-11-15';
-  const CHALLENGE_DAYS = 30;
   const STEP_GOAL = 10000;
+  // Anyone can check in for the last few weeks, or any older day they
+  // already have data for (e.g. imported steps).
+  const BACKFILL_DAYS = 60;
   // The four routes are real HTML documents; absent page-specific controls
   // use detached elements so shared authentication code never needs to copy
   // forms or metrics into the other pages.
@@ -53,20 +54,8 @@
     return localDateKey(d);
   }
   function firstOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1, 12); }
-  function mondayFreeWeekStart(key) {
-    // Saudi-style week for this tracker: Sunday through Saturday.
-    const d = dateFromKey(key);
-    d.setDate(d.getDate() - d.getDay());
-    return localDateKey(d);
-  }
-  function isFriday(key) { return dateFromKey(key).getDay() === 5; }
-  function isFlexDay(key) {
-    // The flexible-day challenge starts 15 Nov 2026. Imported historical
-    // steps may be older, but should not become challenge/flex days.
-    return key >= START_DATE && (isFriday(key) || flex.get(mondayFreeWeekStart(key)) === key);
-  }
   function earliestLogDate() {
-    let first=START_DATE;
+    let first=addDays(localDateKey(new Date()),-BACKFILL_DAYS);
     for(const date of entries.keys())if(date<first)first=date;
     return first;
   }
@@ -339,19 +328,17 @@
     $('viewOnlyBadge').hidden = !readonly;
     $('entryForm').hidden = readonly;
     $('sharedDaySummary').hidden = !readonly;
-    $('flexEditor').hidden = readonly;
-    $('flexViewerNote').hidden = !readonly;
     $('sharingPanel').hidden = readonly;
     $('exportBtn').hidden = readonly;
     $('csvImportPanel').hidden = readonly;
     if (readonly) window.FitnessCsvImport?.reset?.();
     $('bottomShareBtn').hidden = readonly;
-    for (const id of ['storySection','logStoryBtn','historyStoryActions']) {
+    for (const id of ['storySection']) {
       const node=document.getElementById(id);
       if(node)node.hidden=readonly;
     }
     const quick=$('quickLogBtn');
-    if(quick.firstChild)quick.firstChild.textContent = readonly ? 'View day ' : 'Add a meal ';
+    if(quick.firstChild)quick.firstChild.textContent = readonly ? 'View day ' : 'Check in today ';
   }
   async function openTracker(id) {
     if (!user || !db || id === currentTrackerId) return;
@@ -449,13 +436,11 @@
     $('entryDate').value = key;
     displayedMonth = firstOfMonth(dateFromKey(key));
     showMessage('entryMessage', '');
-    showMessage('flexMessage', '');
     renderAll();
     if (scroll) $('logTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
-  $('entryDate').min = START_DATE;
-  $('entryDate').value = selectedDate < START_DATE ? START_DATE : selectedDate;
-  if (selectedDate < START_DATE) selectedDate = START_DATE;
+  $('entryDate').min = earliestLogDate();
+  $('entryDate').value = selectedDate;
   $('entryDate').addEventListener('change', (e) => setDate(e.target.value));
 
   function renderAll() {
@@ -464,7 +449,7 @@
     if(page==='todaySection'){
       renderHero();renderStats();renderStreak();
     }else if(page==='logSection'){
-      renderDay();renderFlex();
+      renderDay();
     }else if(page==='historySection'){
       renderCalendar();renderSummary();
     }
@@ -477,7 +462,7 @@
     // Follow the new day only when the user was viewing the previous today.
     // Keep a manually selected historical date untouched.
     if (selectedDate === previousDate) {
-      selectedDate = currentDate < START_DATE ? START_DATE : currentDate;
+      selectedDate = currentDate;
       displayedMonth = firstOfMonth(dateFromKey(selectedDate));
     }
     renderAll();
@@ -505,11 +490,6 @@
 
   function renderHero() {
     const today = localDateKey(new Date());
-    const elapsed = Math.floor((dateFromKey(today) - dateFromKey(START_DATE)) / 86400000);
-    const day = Math.max(0, elapsed + 1);
-    setText('challengeDay', day > CHALLENGE_DAYS ? 'Keep it going!' : 'Day ' + day + ' / ' + CHALLENGE_DAYS);
-    $('challengeProgress').style.width = Math.min(100, Math.max(0, day / CHALLENGE_DAYS * 100)) + '%';
-    setText('challengeDates', 'Nov 15 – Dec 14, 2026 · Continue afterward');
     setText('overviewDay', fmtDay(selectedDate, { weekday: 'short', month: 'short', day: 'numeric' }));
     const currentShare = incomingShares.find((share)=>share.id===currentTrackerId);
     const dayText = fmtDay(selectedDate, { weekday: 'long', month: 'long', day: 'numeric' });
@@ -556,12 +536,6 @@
         }
       }
     }
-    const flexible = isFlexDay(selectedDate);
-    $('dayKind').textContent = flexible ? 'Flexible day' : 'Standard day';
-    $('dayKind').classList.toggle('flexible', flexible);
-    setText('dayHint', flexible
-      ? (isFriday(selectedDate) ? 'Friday · flexible meals' : 'Your selected second flexible day')
-      : 'Prioritize enough nutrition.');
     setText('logTitle', viewingShared()
       ? 'Shared day: '+fmtDay(selectedDate,{month:'short',day:'numeric'})
       : (selectedDate === localDateKey(new Date()) ? 'Today’s check-in' : 'Check-in · ' + fmtDay(selectedDate, { month: 'short', day: 'numeric' })));
@@ -581,59 +555,28 @@
   }
   function renderStats() {
     const entry = entries.get(selectedDate);
-    const flexible = isFlexDay(selectedDate);
     const calories = entry?.calories_estimate;
     const hasCalories = calories != null;
-    // These are deliberately broad user-selected reference ranges, not exact
-    // medical or diet targets. Never invent remaining calorie precision.
-    const referenceLow = flexible ? 2300 : 1900;
-    const referenceHigh = flexible ? 2600 : 2200;
-    const ratio = hasCalories ? Math.min(100, Math.max(0, calories / referenceHigh * 100)) : 0;
+    // No calorie target: needs differ from person to person. The ring simply
+    // fills once a rough estimate is logged.
     const ring = $('calorieRing');
-    ring.style.setProperty('--ring-degrees', (ratio * 3.6).toFixed(2) + 'deg');
+    ring.style.setProperty('--ring-degrees', hasCalories ? '360deg' : '0deg');
     ring.setAttribute('aria-valuetext', hasCalories
-      ? 'Roughly ' + shortNum(calories) + ' calories logged, compared with a flexible reference range of ' + shortNum(referenceLow) + ' to ' + shortNum(referenceHigh)
+      ? 'Roughly ' + shortNum(calories) + ' calories logged'
       : 'No estimated calories logged yet');
-    if (hasCalories) ring.setAttribute('aria-valuenow', String(Math.round(ratio)));
-    else ring.removeAttribute('aria-valuenow');
-    setText('calorieRange', shortNum(referenceLow) + '–' + shortNum(referenceHigh));
     setText('calValue', hasCalories ? shortNum(calories) : '—');
-    setText('calMeta', flexible
-      ? 'Flexible day. Approximate reference only, not a limit.'
-      : 'Estimate only. Your nutritional needs may differ.');
+    const foods = Array.isArray(entry?.meal_items) ? entry.meal_items.length : 0;
+    setText('foodCount', shortNum(foods));
+    setText('foodCountLabel', foods === 1 ? 'food added' : 'foods added');
     setText('calorieState', hasCalories ? 'Logged' : 'Not logged');
     $('calorieState').classList.toggle('is-saved', hasCalories);
-    $('calorieRangeFill').style.width = ratio.toFixed(1) + '%';
     setText('stepValue', entry?.steps == null ? '—' : shortNum(entry.steps));
     $('stepProgress').style.width = Math.min(100, Math.max(0, (entry?.steps || 0) / STEP_GOAL * 100)) + '%';
     setText('stepMeta', entry?.steps == null ? '10,000 steps is your daily aim' : entry.steps >= STEP_GOAL
       ? 'Your daily walking goal is complete'
       : shortNum(STEP_GOAL - entry.steps) + ' steps until your goal');
     setText('fastValue', entry?.fasting_hours == null ? '—' : entry.fasting_hours + 'h');
-    $('daysValue').innerHTML = String([...entries.keys()].filter(date=>date>=START_DATE).length) + '<span class="stat-unit"> days</span>';
-  }
-  function renderFlex() {
-    const week = mondayFreeWeekStart(selectedDate);
-    const end = addDays(week, 6);
-    setText('weekRange', fmtDay(week) + ' – ' + fmtDay(end));
-    const value = flex.get(week) || '';
-    const select = $('flexSelect');
-    select.replaceChildren();
-    const defaultOption = document.createElement('option');
-    defaultOption.value = ''; defaultOption.textContent = 'Not selected yet';
-    select.append(defaultOption);
-    for (let i = 0; i < 7; i++) {
-      const key = addDays(week, i);
-      if (isFriday(key) || key < START_DATE) continue;
-      const option = document.createElement('option');
-      option.value = key;
-      option.textContent = fmtDay(key, { weekday: 'long', month: 'short', day: 'numeric' });
-      select.append(option);
-    }
-    select.value = value;
-    setText('flexViewerNote',value
-      ? 'Extra flexible day: '+fmtDay(value,{weekday:'long',month:'short',day:'numeric'})
-      : 'Friday is the only flexible day selected for this week.');
+    setText('fastMeta', entry?.fasting_hours == null ? 'Not logged today' : 'today');
   }
   // Fit two values into narrow seven-column iPhone calendar cells.
   // Full, unrounded numbers remain available in the button's accessible label.
@@ -672,15 +615,8 @@
     $('calendarJumpMonth').value=monthKey;
     $('prevMonth').disabled=monthKey<=oldestMonth;
     $('nextMonth').disabled=monthKey>=latestMonth;
-    const historyStory=document.getElementById('historyStoryDate');
-    if(historyStory){
-      historyStory.min=earliestLogDate();
-      historyStory.max=localDateKey(new Date());
-      if(!historyStory.value || historyStory.value>historyStory.max ||
-          historyStory.value<historyStory.min)historyStory.value=selectedDate;
-    }
     const y = displayedMonth.getFullYear(), m = displayedMonth.getMonth();
-    const blank = new Date(y, m, 1).getDay();
+    const blank = (new Date(y, m, 1).getDay() + 6) % 7; // Monday first
     const days = new Date(y, m + 1, 0).getDate();
     for (let i = 0; i < blank; i++) {
       const el = document.createElement('span'); el.className = 'calendar-day empty'; grid.append(el);
@@ -689,15 +625,13 @@
       const key = localDateKey(new Date(y, m, day, 12));
       const entry = entries.get(key);
       const logged = entries.has(key);
-      const flexible = isFlexDay(key);
       const btn = document.createElement('button'); btn.type = 'button';
-      btn.className = 'calendar-day' + (logged ? ' is-logged' : '') + (flexible ? ' is-flex' : '') +
+      btn.className = 'calendar-day' + (logged ? ' is-logged' : '') + (entry?.steps >= STEP_GOAL ? ' is-goal' : '') +
         (key === selectedDate ? ' is-selected' : '') + (key === localDateKey(new Date()) ? ' is-today' : '');
       btn.disabled = key < earliestLogDate();
       const description = [fmtDay(key, { weekday: 'long', month: 'long', day: 'numeric' }), logged ? 'Entry saved' : 'No entry'];
       if (entry?.steps != null) description.push(shortNum(entry.steps) + ' steps');
       if (entry?.calories_estimate != null) description.push('approximately ' + shortNum(entry.calories_estimate) + ' kcal');
-      if (flexible) description.push('Flexible day');
       btn.title = description.join(' · ');
       btn.setAttribute('aria-label', description.join(', '));
       const number = document.createElement('span');
@@ -705,7 +639,7 @@
       number.textContent = String(day);
       const status = document.createElement('span');
       status.className = 'day-status';
-      status.textContent = logged ? 'Saved' : (flexible ? 'Flex' : '·');
+      status.textContent = logged ? 'Saved' : '·';
       btn.append(number);
       // Show only metrics the user actually logged; missing values are not zeros.
       if (logged && (entry?.steps != null || entry?.calories_estimate != null)) {
@@ -729,7 +663,7 @@
     setText('summaryAvg', stepRows.length
       ? shortNum(Math.round(stepRows.reduce((sum, r) => sum + r.steps, 0) / stepRows.length))
       : '—');
-    setText('summaryMeals', shortNum(rows.filter((r) => r.one_meal).length));
+    setText('summaryBest', shortNum(window.FitnessProgress?.streak(entries,localDateKey(new Date())).best || 0));
   }
 
   // Native anchor links navigate between distinct HTML pages.
@@ -812,44 +746,6 @@
       renderAll();
       showMessage('entryMessage', 'Entry deleted.', 'success');
     } catch (e) { showMessage('entryMessage', errorText(e), 'error'); }
-  });
-  $('saveFlexBtn').addEventListener('click', () => {
-    if (!user || viewingShared()) return;
-    callWithButton($('saveFlexBtn'), async () => {
-      const week = mondayFreeWeekStart(selectedDate);
-      const chosen = $('flexSelect').value;
-      if (chosen && (chosen < week || chosen > addDays(week, 6) || chosen < START_DATE || isFriday(chosen))) {
-        showMessage('flexMessage', 'Select a valid extra day in the current week.', 'error'); return;
-      }
-      try {
-        if (chosen) {
-          const { error } = await db.from('weekly_flex').upsert(
-            { user_id: user.id, week_start: week, flex_date: chosen },
-            { onConflict: 'user_id,week_start' }
-          );
-          if (error) throw error;
-          flex.set(week, chosen);
-        } else if (flex.has(week)) {
-          const { error } = await db.from('weekly_flex').delete()
-            .eq('user_id', user.id).eq('week_start', week);
-          if (error) throw error;
-          flex.delete(week);
-        }
-        renderAll();
-        showMessage('flexMessage', chosen ? 'Your second flexible day is saved.' : 'Extra flexible day cleared.', 'success');
-      } catch (e) { showMessage('flexMessage', errorText(e), 'error'); }
-    });
-  });
-  $('logStoryBtn').addEventListener('click',()=>{
-    if(!user||viewingShared())return;
-    window.location.assign('/?story='+encodeURIComponent(selectedDate));
-  });
-  $('historyStoryBtn').addEventListener('click',()=>{
-    if(!user||viewingShared())return;
-    const date=$('historyStoryDate').value;
-    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||
-      date>localDateKey(new Date())||date<earliestLogDate())return;
-    window.location.assign('/?story='+encodeURIComponent(date));
   });
   $('calendarJumpMonth').addEventListener('change', (event) => {
     const month=event.target.value;

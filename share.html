@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#16233d">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="description" content="Private daily wellness tracker for food, steps, fasting and flexible days.">
-  <title>Fitness Tracker | Share</title>
+  <title>Fitness | Share</title>
   <link rel="icon" type="image/svg+xml" href="/fitness-icon.svg">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="/ux-refine.css?v=20261115-ux-v3">
   <link rel="stylesheet" href="/type-palette.css?v=20261116-typography-v3">
   <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
-  <link rel="stylesheet" href="/pages.css?v=20261119-routes-v4">
+  <link rel="stylesheet" href="/pages.css?v=20261121-declutter-v3">
 
   <!-- Inline critical layout: prevents giant icons and uneven daily-input cards
        if GitHub Pages deploys HTML before an external stylesheet update. -->
@@ -150,8 +150,8 @@
   <script defer src="/page-loading.js?v=20261119-background-v2"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script defer src="/config.js"></script>
-  <script defer src="/notifications.js?v=20261119-samsung-v3"></script>
-  <script defer src="/app.js?v=20261121-checkin-v1"></script>
+  <script defer src="/notifications.js?v=20261121-declutter-v1"></script>
+  <script defer src="/app.js?v=20261121-declutter-v1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -163,7 +163,7 @@
             <path d="M3 12h4l2.8-5.5 4.4 11 2.7-5.5H21"/>
           </svg>
         </span>
-        <span class="tracker-heading"><strong>Fitness</strong><small>Daily wellness tracker</small></span>
+        <span class="tracker-heading"><strong>Fitness</strong><small>Steps · food · streaks</small></span>
       </a>
       <nav class="desktop-page-nav" aria-label="Tracker pages">
         <a href="/" class="page-nav-link">Today</a>
@@ -186,9 +186,9 @@
       <div class="auth-intro">
         <span class="eyebrow"><span class="live-dot"></span> PRIVATE WELLNESS SPACE</span>
         <h1>Progress over<br><span class="gradient-text">perfection.</span></h1>
-        <p>Track your meals, 10K daily steps, fasting and weekly flexibility. One day at a time, without obsessing over the scale.</p>
+        <p>Check in with your daily steps and a rough calorie estimate. Hit 10,000 steps a day to build a streak. No scale, no strict diet.</p>
         <div class="auth-steps">
-          <span>30-day challenge</span>
+          <span>10K step streaks</span>
           <span>Approximate calories</span>
           <span>Your data stays yours</span>
         </div>
@@ -196,7 +196,7 @@
       <div class="glass-card auth-card">
         <span class="eyebrow">WELCOME BACK</span>
         <h2 id="authTitle">Sign in to your tracker</h2>
-        <p class="muted auth-description">Secure email and password login, powered by Supabase.</p>
+        <p class="muted auth-description">Sign in with your email and password.</p>
         <form id="authForm" class="form-stack">
           <label for="authEmail">Email address</label>
           <input id="authEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required maxlength="254">
@@ -221,7 +221,7 @@
     </section>
 
     <main id="appView" data-page="sharingPanel" hidden>
-      <section class="page-intro" aria-labelledby="pageTitle"><div><span class="eyebrow">REMINDERS & SHARING</span><h1 id="pageTitle">Stay connected</h1><p>Manage private sharing and daily reminders for your devices.</p></div></section>
+      <section class="page-intro" aria-labelledby="pageTitle"><div><h1 id="pageTitle">Share &amp; reminders</h1><p>Let a friend follow your progress, and get daily reminders on your phone.</p></div></section>
       <section id="trackerSwitcher" class="glass-card tracker-switcher" hidden aria-label="Choose a progress tracker">
         <div><label for="trackerSelect">VIEWING PROGRESS</label><p class="muted small">Choose whose progress to view.</p></div>
         <select id="trackerSelect" aria-label="Progress tracker"><option value="mine">My progress</option></select>
@@ -232,17 +232,17 @@
           <section class="glass-card push-card" id="pushPanel" aria-labelledby="pushTitle">
             <details class="card-collapse" data-collapse-mobile>
               <summary><span class="card-collapse-head">
-              <span class="eyebrow">
-                <svg class="heading-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
-                DAILY REMINDERS
-              </span>
-              <h2 id="pushTitle">Device notifications</h2>
+              <h2 id="pushTitle">Daily reminders</h2>
               </span><svg class="card-collapse-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></summary>
               <div class="card-collapse-body">
-            <p class="muted small">A gentle reminder three times a day, even when Fitness is closed. Choose the reminders you want, then allow notifications on your device.</p>
+            <p class="muted small">Up to three reminders a day, even when Fitness is closed. Pick the ones you want, then tap Enable notifications.</p>
             <div id="pushInstallHint" class="push-install-hint" hidden>
-              <strong>Install Fitness on your iPhone first</strong>
-              In Safari, tap Share → Add to Home Screen. Open Fitness using the new Home Screen icon, sign in, and tap Enable notifications below.
+              <strong>On iPhone, add Fitness to your Home Screen first</strong>
+              <ol>
+                <li>In Safari, tap Share, then Add to Home Screen.</li>
+                <li>Open Fitness from the new Home Screen icon and sign in.</li>
+                <li>Come back here and tap Enable notifications.</li>
+              </ol>
             </div>
             <div class="push-times" aria-label="Daily reminders, Saudi time">
               <button type="button" class="push-time-toggle is-on" data-time="10:00" aria-pressed="true">
@@ -255,10 +255,10 @@
               </button>
               <button type="button" class="push-time-toggle is-on" data-time="21:00" aria-pressed="true">
                 <span class="push-time-indicator"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke="currentColor" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></span>
-                <span><strong>9:00 PM</strong><small>Check in with your food and progress</small></span>
+                <span><strong>9:00 PM</strong><small>Evening check-in</small></span>
               </button>
             </div>
-            <p class="muted small">Times are in Riyadh (Saudi Arabia), UTC+3.</p>
+            <p class="muted small">Times are Riyadh time.</p>
             <div class="push-actions">
               <button id="pushEnableBtn" type="button" class="button primary">Enable notifications</button>
               <button id="pushDisableBtn" type="button" class="button subtle" hidden>Turn off reminders</button>
@@ -266,18 +266,24 @@
               <button id="pushVerifyBtn" type="button" class="button subtle" hidden>Check registration</button>
             </div>
             <div id="pushStatus" class="push-message" role="status" aria-live="polite"></div>
-            <p class="muted small">Samsung/Android: if a test is accepted but nothing appears, check Android Settings → Apps → Fitness, Samsung Internet or Chrome → Notifications, then check Do Not Disturb and battery restrictions.</p>
+            <details class="push-help">
+              <summary>Not getting notifications on Android?</summary>
+              <ol>
+                <li>Open Settings → Apps → Fitness (or Chrome / Samsung Internet) → Notifications, and turn them on.</li>
+                <li>Check that Do Not Disturb is off.</li>
+                <li>Turn off battery saving for the app.</li>
+              </ol>
+            </details>
               </div>
             </details>
           </section>
           <section class="glass-card sharing-card" id="sharingPanel" aria-labelledby="sharingTitle">
-            <span class="eyebrow"><svg class="heading-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-2a5.5 5.5 0 0 1 11 0v2M17 9h5m-2.5-2.5v5"/></svg> PRIVATE SHARING</span>
             <h2 id="sharingTitle">Share your progress</h2>
-            <p class="muted">Invite someone by email. They can view your steps, fasting and calorie estimates, but cannot edit anything. You can remove access at any time.</p>
+            <p class="muted">Add someone’s email. They’ll see your steps, calories and fasting, but can’t change anything. You can remove them any time.</p>
             <form id="shareForm" class="form-stack">
               <label for="viewerEmail">Viewer's email address</label>
               <input id="viewerEmail" type="email" maxlength="254" autocomplete="off" placeholder="friend@example.com" required>
-              <button id="inviteBtn" type="submit" class="button secondary full">Allow read-only access</button>
+              <button id="inviteBtn" type="submit" class="button secondary full">Give view access</button>
             </form>
             <div id="sharingMessage" class="inline-message" role="status" aria-live="polite"></div>
             <div class="share-list-head"><strong>People with access</strong><span id="viewerCount" class="pill neutral">0</span></div>
@@ -302,7 +308,6 @@
         </div>
       </nav>
       <footer class="footer">
-        <span>Built for progress, not perfection.</span>
         <span>Private wellness tracker · Your progress stays yours</span>
       </footer>
     </main>

@@ -35,7 +35,7 @@
   function render() {
     const installNeeded = isIOS && !installed();
     if ($('pushInstallHint')) $('pushInstallHint').hidden = !installNeeded;
-    if ($('pushTitle')) $('pushTitle').textContent = deviceName === 'device' ? 'Device notifications' : deviceName + ' notifications';
+    if ($('pushTitle')) $('pushTitle').textContent = 'Daily reminders';
     if ($('pushEnableBtn')) {
       $('pushEnableBtn').hidden = active;
       $('pushEnableBtn').disabled = busy || installNeeded || !supported() || Notification.permission === 'denied';

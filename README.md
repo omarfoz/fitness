@@ -13,8 +13,7 @@ Built with HTML, CSS and JavaScript, with the Liquid Glass styling of oalfawzan.
 - Daily calorie total automatically calculated from selected foods, with a manual override for more accurate restaurant or nutrition-label numbers
 - Itemized selected foods saved privately to Supabase in `daily_entries.meal_items` and restored when you reopen any saved day
 - One-meal checkbox to record the day's actual pattern (not a medical recommendation)
-- Friday as the fixed flexible day, plus **one selectable extra flexible day per Sunday-to-Saturday week**
-- Calendar of saved entries, 30-day progress, averages and CSV export
+- Monday-first calendar of saved entries, 10K streak, best streak, averages and CSV export
 - Dark/light mode, responsive layouts and Add to Home Screen manifest
 - Per-user PostgreSQL Row Level Security (RLS); no diet logs stored in the public repository or browser local storage
 - No analytics scripts on the tracker
@@ -37,7 +36,7 @@ If you want to invite someone who does **not** already have an account, keep Sup
 
 ## Food library
 
-1. Go to **Log → Find something you ate**.
+1. Go to **Check-in → Find something you ate**.
 2. Search in **English or Arabic** (e.g., `burrito`, `taco`, `شاورما`, or `رز`) or browse one of the **14 categories**. Tap **All** to browse the full 202-item library.
 3. Tap any food to add it. Tap it again to increase its quantity, or type a precise quantity in increments of 0.5 servings.
 4. Change **Kcal / serving** for that food if your restaurant or product label gives a better number.

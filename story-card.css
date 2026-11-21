@@ -109,3 +109,7 @@
 .story-format button[aria-checked="true"]{background:rgba(141,200,255,.2);color:#f6f8ff;
   box-shadow:inset 0 0 0 1px rgba(141,200,255,.45);}
 .story-format button:focus-visible{outline:2px solid #8DC8FF;outline-offset:2px;}
+/* Compact one-line share prompt on Today. */
+.story-cta{padding:14px 18px;margin:12px 0;}
+.story-cta h2{font-size:.98rem;}
+@media(max-width:680px){.story-cta{flex-direction:row;align-items:center;padding:14px 16px;}.story-cta .button{width:auto;}}

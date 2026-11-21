@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#16233d">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="description" content="Private daily wellness tracker for food, steps, fasting and flexible days.">
-  <title>Fitness Tracker | Calendar</title>
+  <title>Fitness | Calendar</title>
   <link rel="icon" type="image/svg+xml" href="/fitness-icon.svg">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="/ux-refine.css?v=20261115-ux-v3">
   <link rel="stylesheet" href="/type-palette.css?v=20261116-typography-v3">
   <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
-  <link rel="stylesheet" href="/pages.css?v=20261119-routes-v4">
+  <link rel="stylesheet" href="/pages.css?v=20261121-declutter-v3">
 
   <!-- Inline critical layout: prevents giant icons and uneven daily-input cards
        if GitHub Pages deploys HTML before an external stylesheet update. -->
@@ -150,8 +150,9 @@
   <script defer src="/page-loading.js?v=20261119-background-v2"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script defer src="/config.js"></script>
+  <script defer src="/progress-metrics.js?v=20261121-declutter-v1"></script>
   <script defer src="/csv-import.js?v=20261118-csv-history-v3"></script>
-  <script defer src="/app.js?v=20261121-checkin-v1"></script>
+  <script defer src="/app.js?v=20261121-declutter-v1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -163,7 +164,7 @@
             <path d="M3 12h4l2.8-5.5 4.4 11 2.7-5.5H21"/>
           </svg>
         </span>
-        <span class="tracker-heading"><strong>Fitness</strong><small>Daily wellness tracker</small></span>
+        <span class="tracker-heading"><strong>Fitness</strong><small>Steps · food · streaks</small></span>
       </a>
       <nav class="desktop-page-nav" aria-label="Tracker pages">
         <a href="/" class="page-nav-link">Today</a>
@@ -186,9 +187,9 @@
       <div class="auth-intro">
         <span class="eyebrow"><span class="live-dot"></span> PRIVATE WELLNESS SPACE</span>
         <h1>Progress over<br><span class="gradient-text">perfection.</span></h1>
-        <p>Track your meals, 10K daily steps, fasting and weekly flexibility. One day at a time, without obsessing over the scale.</p>
+        <p>Check in with your daily steps and a rough calorie estimate. Hit 10,000 steps a day to build a streak. No scale, no strict diet.</p>
         <div class="auth-steps">
-          <span>30-day challenge</span>
+          <span>10K step streaks</span>
           <span>Approximate calories</span>
           <span>Your data stays yours</span>
         </div>
@@ -196,7 +197,7 @@
       <div class="glass-card auth-card">
         <span class="eyebrow">WELCOME BACK</span>
         <h2 id="authTitle">Sign in to your tracker</h2>
-        <p class="muted auth-description">Secure email and password login, powered by Supabase.</p>
+        <p class="muted auth-description">Sign in with your email and password.</p>
         <form id="authForm" class="form-stack">
           <label for="authEmail">Email address</label>
           <input id="authEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required maxlength="254">
@@ -221,7 +222,7 @@
     </section>
 
     <main id="appView" data-page="historySection" hidden>
-      <section class="page-intro" aria-labelledby="pageTitle"><div><span class="eyebrow">PROGRESS OVER TIME</span><h1 id="pageTitle">Your calendar</h1><p>Browse saved days, explore step trends, and import or export your own CSV records.</p></div></section>
+      <section class="page-intro" aria-labelledby="pageTitle"><div><h1 id="pageTitle">Calendar</h1><p>Tap any day to see or edit it.</p></div></section>
       <section id="trackerSwitcher" class="glass-card tracker-switcher" hidden aria-label="Choose a progress tracker">
         <div><label for="trackerSelect">VIEWING PROGRESS</label><p class="muted small">Choose whose progress to view.</p></div>
         <select id="trackerSelect" aria-label="Progress tracker"><option value="mine">My progress</option></select>
@@ -231,7 +232,7 @@
       <div class="page-layout-history">
       <section class="glass-card history-card" id="historySection" aria-labelledby="historyTitle">
         <div class="section-heading history-heading">
-          <div><span class="eyebrow">PROGRESS OVER TIME</span><h2 id="historyTitle">Every saved day</h2></div>
+          <div><h2 id="historyTitle" class="visually-hidden">Your month</h2></div>
           <div class="history-actions">
             <button id="prevMonth" class="icon-button" type="button" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
             <strong id="monthLabel">November 2026</strong>
@@ -242,38 +243,33 @@
           <label for="calendarJumpMonth">Jump to month</label>
           <input id="calendarJumpMonth" type="month" aria-label="Jump to a month in your history">
         </div>
-        <div class="history-story-actions" id="historyStoryActions">
-          <label for="historyStoryDate">Story for date</label>
-          <input type="date" id="historyStoryDate" aria-label="Select date to create a story">
-          <button type="button" class="button subtle" id="historyStoryBtn">Create story</button>
-        </div>
-        <div class="calendar-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+        <div class="calendar-weekdays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
         <div id="calendarGrid" class="calendar-grid" role="group" aria-label="Daily tracking calendar"></div>
         <p class="calendar-metrics-legend">
-          <span class="muted">Saved day details:</span>
+          
           <span><svg class="legend-step" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3c-1.3 0-2.2 1.8-2.2 3.2s.8 2.7 2.2 2.7 2.2-1.3 2.2-2.7S9.3 3 8 3ZM16 12c-1.3 0-2.2 1.8-2.2 3.2s.9 2.8 2.2 2.8 2.2-1.4 2.2-2.8S17.3 12 16 12Z"/><path d="M5.3 11.6c1.8-.9 4.5-.2 5.1 2 1 3.5-2.1 5.9-4.8 4.3-2.1-1.3-2.3-5.1-.3-6.3Zm8.1 6c2.1-1.3 4.6-.2 5.2 1.9.5 1.7-.6 3-2 3.1-2.4.1-5.5-3.6-3.2-5Z"/></svg> Steps</span>
           <span><svg class="legend-calorie" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22c4.8 0 8-3.3 8-7.7 0-2.6-1.4-4.3-3.8-6.5.2 2-.7 3.3-1.5 4-1.1-4.1-2.2-6.4-5.2-9.8-.2 3.2-1.1 5-3.2 7.4C4.8 11 4 13 4 15.1 4 19.1 7.3 22 12 22Z"/></svg> Est. kcal</span>
         </p>
-        <div class="calendar-key"><span><i class="key-dot logged"></i> Logged</span><span><i class="key-dot flex"></i> Flexible</span><span><i class="key-dot unlogged"></i> Not logged</span></div>
+        <div class="calendar-key"><span><i class="key-dot logged"></i> Logged</span><span><i class="key-dot unlogged"></i> Not logged</span></div>
         <div class="summary-panel">
-          <div><small>ENTRIES LOGGED</small><strong id="summaryLogged">0</strong></div>
+          <div><small>DAYS LOGGED</small><strong id="summaryLogged">0</strong></div>
           <div><small>10K STEP DAYS</small><strong id="summarySteps">0</strong></div>
           <div><small>AVERAGE STEPS</small><strong id="summaryAvg">—</strong></div>
-          <div><small>ONE-MEAL DAYS</small><strong id="summaryMeals">0</strong></div>
+          <div><small>BEST STREAK</small><strong id="summaryBest">0</strong></div>
         </div>
         <div class="history-footer">
-          <span class="muted">No weigh-ins required. Your data is visible only to your account.</span>
+          <span class="muted">Only you can see your data.</span>
           <button id="exportBtn" class="button subtle" type="button">Export my data (CSV)</button>
         </div>
         <details class="csv-import" id="csvImportPanel">
           <summary>
             <span class="csv-import-summary">
-              <strong>Import steps from CSV</strong>
-              <small>Steps CSV from Shortcuts or tracking apps</small>
+              <strong>Import steps from your phone</strong>
+              <small>Bring in past steps from a CSV file</small>
             </span>
           </summary>
           <div class="csv-import-body">
-            <p class="csv-import-help" id="csvImportHelp">Supports <code>Date,Time,Steps</code> (each row is an additional step sample) or <code>entry_date,steps</code> (one daily total per row). Steps are grouped by date. Files are read on your device; only daily totals are saved to your private tracker. Past dates are welcome, even before your 30-day challenge began. The native Apple Health ZIP/XML export is not supported.</p>
+            <p class="csv-import-help" id="csvImportHelp">Export your steps as a CSV file (for example with an Apple Shortcut or a step-tracking app), then choose it here. You’ll see a preview before anything is saved. Only daily step totals are saved. <span class="csv-import-tech">Columns: <code>Date,Time,Steps</code> or <code>entry_date,steps</code>. The Apple Health ZIP export isn’t supported.</span></p>
             <div class="csv-import-fields">
               <div>
                 <label for="csvStepsFile">Choose a CSV file</label>
@@ -315,7 +311,6 @@
         </div>
       </nav>
       <footer class="footer">
-        <span>Built for progress, not perfection.</span>
         <span>Private wellness tracker · Your progress stays yours</span>
       </footer>
     </main>

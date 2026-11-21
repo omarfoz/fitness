@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#16233d">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="description" content="Private daily wellness tracker for food, steps, fasting and flexible days.">
-  <title>Fitness Tracker | Check-in</title>
+  <title>Fitness | Check-in</title>
   <link rel="icon" type="image/svg+xml" href="/fitness-icon.svg">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="/ux-refine.css?v=20261115-ux-v3">
   <link rel="stylesheet" href="/type-palette.css?v=20261116-typography-v3">
   <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
-  <link rel="stylesheet" href="/pages.css?v=20261119-routes-v4">
+  <link rel="stylesheet" href="/pages.css?v=20261121-declutter-v3">
 
   <!-- Inline critical layout: prevents giant icons and uneven daily-input cards
        if GitHub Pages deploys HTML before an external stylesheet update. -->
@@ -152,7 +152,7 @@
   <script defer src="/config.js"></script>
   <script defer src="/food-catalog.js?v=20261115-food-v2"></script>
   <script defer src="/food-browser.js?v=20261115-ux-v2"></script>
-  <script defer src="/app.js?v=20261121-checkin-v1"></script>
+  <script defer src="/app.js?v=20261121-declutter-v1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -164,7 +164,7 @@
             <path d="M3 12h4l2.8-5.5 4.4 11 2.7-5.5H21"/>
           </svg>
         </span>
-        <span class="tracker-heading"><strong>Fitness</strong><small>Daily wellness tracker</small></span>
+        <span class="tracker-heading"><strong>Fitness</strong><small>Steps · food · streaks</small></span>
       </a>
       <nav class="desktop-page-nav" aria-label="Tracker pages">
         <a href="/" class="page-nav-link">Today</a>
@@ -187,9 +187,9 @@
       <div class="auth-intro">
         <span class="eyebrow"><span class="live-dot"></span> PRIVATE WELLNESS SPACE</span>
         <h1>Progress over<br><span class="gradient-text">perfection.</span></h1>
-        <p>Track your meals, 10K daily steps, fasting and weekly flexibility. One day at a time, without obsessing over the scale.</p>
+        <p>Check in with your daily steps and a rough calorie estimate. Hit 10,000 steps a day to build a streak. No scale, no strict diet.</p>
         <div class="auth-steps">
-          <span>30-day challenge</span>
+          <span>10K step streaks</span>
           <span>Approximate calories</span>
           <span>Your data stays yours</span>
         </div>
@@ -197,7 +197,7 @@
       <div class="glass-card auth-card">
         <span class="eyebrow">WELCOME BACK</span>
         <h2 id="authTitle">Sign in to your tracker</h2>
-        <p class="muted auth-description">Secure email and password login, powered by Supabase.</p>
+        <p class="muted auth-description">Sign in with your email and password.</p>
         <form id="authForm" class="form-stack">
           <label for="authEmail">Email address</label>
           <input id="authEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required maxlength="254">
@@ -222,7 +222,7 @@
     </section>
 
     <main id="appView" data-page="logSection" hidden>
-      <section class="page-intro" aria-labelledby="pageTitle"><div><span class="eyebrow">DAILY CHECK-IN</span><h1 id="pageTitle">Check in for today</h1><p>Record steps, meals, fasting and the details that matter. Your entries save privately to your account.</p></div></section>
+      <section class="page-intro" aria-labelledby="pageTitle"><div><h1 id="pageTitle">Check-in</h1><p>Steps and food are all you need. Everything else is optional.</p></div></section>
       <section id="trackerSwitcher" class="glass-card tracker-switcher" hidden aria-label="Choose a progress tracker">
         <div><label for="trackerSelect">VIEWING PROGRESS</label><p class="muted small">Choose whose progress to view.</p></div>
         <select id="trackerSelect" aria-label="Progress tracker"><option value="mine">My progress</option></select>
@@ -232,11 +232,9 @@
       <div class="content-grid page-layout-log">
         <section class="glass-card logging-card" id="logSection" aria-labelledby="logTitle">
           <div class="section-heading">
-            <div><span class="eyebrow">DAILY CHECK-IN</span><h2 id="logTitle">Today’s check-in</h2></div>
+            <div><h2 id="logTitle">Today’s check-in</h2></div>
             <input id="entryDate" class="date-input" type="date" aria-label="Select date for daily entry">
           </div>
-          <div class="log-story-shortcut"><button type="button" id="logStoryBtn" class="button subtle">Create story for this day</button></div>
-          <div class="day-label"><span id="dayKind" class="pill">Standard day</span><span id="dayHint" class="muted small">Your routine, your pace</span></div>
           <form id="entryForm" class="form-stack">
             <div class="field-grid quick-entry-grid" aria-label="Daily totals">
               <div class="quick-entry-field quick-entry-steps">
@@ -264,7 +262,7 @@
             </div>
             <section class="food-browser" aria-labelledby="foodBrowserTitle">
               <div class="food-browser-heading">
-                <div><span class="eyebrow">FOOD LIBRARY</span><h3 id="foodBrowserTitle">Find something you ate</h3><p class="field-help">Search, add, and adjust servings or calories.</p></div>
+                <div><h3 id="foodBrowserTitle">Find something you ate</h3><p class="field-help">Search, add, and adjust servings or calories.</p></div>
                 <span class="food-browser-tag" id="foodCatalogCount">200+ foods</span>
               </div>
               <label for="foodSearch">Search foods <span class="optional">English or Arabic</span></label>
@@ -302,15 +300,15 @@
                 <div id="foodMessage" class="inline-message" role="status" aria-live="polite"></div>
               </section>
             </section>
-            <div class="meal-notes"><label for="meals">Additional food notes <span class="optional">(optional)</span></label><textarea id="meals" rows="2" maxlength="3000" placeholder="Anything else about your meal, sauce, preparation, etc."></textarea></div>
+            <details class="advanced">
+              <summary><svg class="details-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg> More details <span class="optional">fasting, coffee, notes</span></summary>
+              <div class="advanced-inner">
+            <div class="meal-notes"><label for="meals">Food notes</label><textarea id="meals" rows="2" maxlength="3000" placeholder="Anything else about your meal, sauce, preparation, etc."></textarea></div>
             <div class="field-grid">
               <div><label for="fasting">Fasting hours</label><input id="fasting" type="number" min="0" max="24" step="0.5" inputmode="decimal" placeholder="e.g. 18"></div>
               <div><label for="coffee">Coffee cups</label><input id="coffee" aria-label="Black coffee cups" type="number" min="0" max="30" step="1" inputmode="numeric" placeholder="e.g. 2"></div>
             </div>
-            <label class="checkline" for="oneMeal"><input id="oneMeal" type="checkbox" class="native-checkbox"><span class="checkbox-visual" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.5 4.5L19 7"/></svg></span><span><strong>One main meal today</strong><small>Record what actually happened, without judgment</small></span></label>
-            <details class="advanced">
-              <summary><svg class="details-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg> More notes <span class="optional">optional</span></summary>
-              <div class="advanced-inner">
+            <label class="checkline" for="oneMeal"><input id="oneMeal" type="checkbox" class="native-checkbox"><span class="checkbox-visual" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.5 4.5L19 7"/></svg></span><span><strong>One main meal today</strong></span></label>
                 <label for="waist">Waist measurement (cm)</label>
                 <input id="waist" type="number" min="30" max="300" step="0.5" inputmode="decimal" placeholder="No scale needed">
                 <label for="notes">Day notes</label>
@@ -318,10 +316,10 @@
               </div>
             </details>
             <div class="form-actions">
-              <button class="button primary" id="saveEntryBtn" type="submit">Save today's check-in <svg class="inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
-              <button class="button subtle" id="deleteEntryBtn" type="button" hidden>Delete entry</button>
+              <button class="button primary" id="saveEntryBtn" type="submit">Save check-in <svg class="inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
             </div>
             <div id="entryMessage" class="inline-message" aria-live="polite"></div>
+            <div class="delete-zone"><button class="text-button danger-text" id="deleteEntryBtn" type="button" hidden>Delete this day’s entry</button></div>
           </form>
           <div id="sharedDaySummary" class="shared-day-summary" hidden>
             <span class="pill">View-only progress</span>
@@ -331,37 +329,6 @@
           </div>
         </section>
 
-        <aside class="sidebar">
-          <section class="glass-card flex-card" aria-labelledby="flexTitle">
-            <span class="eyebrow">WEEKLY FLEXIBILITY</span>
-            <h2 id="flexTitle">Two flexible days.</h2>
-            <p class="muted">Friday is always flexible. Choose one other day each week, depending on your schedule.</p>
-            <div class="week-row"><span>THIS SELECTED WEEK</span><strong id="weekRange">—</strong></div>
-            <div class="fixed-flex"><span class="flex-dot"></span><div><strong>Friday</strong><small>Fixed flexible day</small></div><span class="pill neutral">Always</span></div>
-            <div id="flexEditor">
-              <label for="flexSelect">Your second flexible day</label>
-              <select id="flexSelect"><option value="">Not selected</option></select>
-              <button id="saveFlexBtn" type="button" class="button secondary full">Save weekly plan</button>
-              <div id="flexMessage" class="inline-message" aria-live="polite"></div>
-            </div>
-            <p id="flexViewerNote" class="muted small" hidden></p>
-          </section>
-          <section class="glass-card guide-card">
-            <details class="card-collapse" data-collapse-mobile>
-              <summary><span class="card-collapse-head">
-                <span class="eyebrow">THE PLAN</span>
-                <h2>Stay consistent.</h2>
-              </span><svg class="card-collapse-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></summary>
-              <div class="card-collapse-body">
-            <div class="guide-line"><span>Standard days</span><strong>5 per week</strong></div>
-            <div class="guide-line"><span>Flexible days</span><strong>2 per week</strong></div>
-            <div class="guide-line"><span>Daily steps</span><strong>10,000</strong></div>
-            <div class="guide-line"><span>Calorie approach</span><strong>Approximate</strong></div>
-            <p class="guide-footnote">Eat enough to meet your nutrition needs. One-meal fasting can make that difficult. It's okay to split food into more meals when needed; no punishment or compensatory fasting.</p> 
-              </div>
-            </details>
-          </section>
-        </aside>
       </div>
       <nav class="app-bottom-nav" id="appBottomNav" aria-label="Tracker navigation">
         <div class="app-bottom-nav-inner">
@@ -380,7 +347,6 @@
         </div>
       </nav>
       <footer class="footer">
-        <span>Built for progress, not perfection.</span>
         <span>Private wellness tracker · Your progress stays yours</span>
       </footer>
     </main>

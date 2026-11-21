@@ -1,8 +1,8 @@
 /* 10K daily goal streaks computed on-device from saved step records.
-   The streak is independent of the 30-day challenge and includes imported history. */
+   Includes imported history. */
 (() => {
   'use strict';
-  const START='2026-11-15',GOAL=10000;
+  const GOAL=10000;
   function parse(key){
     if(!/^\d{4}-\d{2}-\d{2}$/.test(key||''))return null;
     const [y,m,d]=key.split('-').map(Number);
@@ -45,5 +45,5 @@
     return {current,best,goalDays,latest:current?anchor:null,metToday,
       pendingToday:!metToday&&current>0,asOf:selected};
   }
-  window.FitnessProgress=Object.freeze({streak,shift,today,GOAL,START});
+  window.FitnessProgress=Object.freeze({streak,shift,today,GOAL});
 })();

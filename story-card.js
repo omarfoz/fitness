@@ -7,7 +7,7 @@
  */
 (() => {
   'use strict';
-  const START='2026-11-15',GOAL=10000;
+  const GOAL=10000;
   const $=id=>document.getElementById(id);
   let mode='story',getState=null,blob=null,previewURL=null,currentDate=null,busy=false,serial=0,queued=false;
   const K={ink:'#F4F7FF',mist:'#A9BCD8',dim:'#56688A',glass:'#8DC8FF',
@@ -53,12 +53,11 @@
   }
   function dateText(k){return parse(k).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});}
   function short(k){return parse(k).toLocaleDateString('en-GB',{day:'numeric',month:'short'});}
-  function dayNumber(k){const base=parse(START),to=parse(k);return Math.round((to-base)/86400000)+1;}
   function compute(entries,selected){
     if(!(entries instanceof Map))entries=new Map();
     const at=parse(selected);
     if(!at||selected>key(new Date()))throw new Error('Choose a valid date up to today.');
-    const archived=selected<START,day=archived?null:dayNumber(selected);
+    const archived=false,day=null;
     const monthStart=new Date(at.getFullYear(),at.getMonth(),1,12);
     const daysInMonth=new Date(at.getFullYear(),at.getMonth()+1,0).getDate();
     const offset=(monthStart.getDay()+6)%7; // Monday first, like a real calendar
@@ -335,8 +334,7 @@
       blob=image;previewURL=URL.createObjectURL(image);
       const img=$('storyPreviewImage');
       img.width=canvas.width;img.height=canvas.height;img.src=previewURL;
-      const label=info.archived?'Before the challenge':('Challenge day '+info.day);
-      $('storyPreviewCaption').textContent=label+', '+dateText(info.date)+': '+
+      $('storyPreviewCaption').textContent=dateText(info.date)+': '+
         display(info.entry?.steps)+' steps, '+display(info.entry?.calories_estimate)+' kcal';
       status('Image ready. Share it or save it to your photos.','success');
     }finally{
@@ -357,7 +355,7 @@
     ready();
     const input=$('storySelectedDate');
     const dates=[...state.entries.keys()].sort();
-    input.min=dates[0]||START;input.max=key(new Date());
+    input.min=dates[0]||key(new Date());input.max=key(new Date());
     const request=new URLSearchParams(window.location.search).get('story');
     const date=parse(request)&&request<=input.max&&request>=input.min?request:key(new Date());
     input.value=date;

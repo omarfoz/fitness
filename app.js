@@ -351,7 +351,7 @@
       if(node)node.hidden=readonly;
     }
     const quick=$('quickLogBtn');
-    if(quick.firstChild)quick.firstChild.textContent = readonly ? 'View day ' : 'Log a meal ';
+    if(quick.firstChild)quick.firstChild.textContent = readonly ? 'View day ' : 'Add a meal ';
   }
   async function openTracker(id) {
     if (!user || !db || id === currentTrackerId) return;
@@ -564,7 +564,7 @@
       : 'Prioritize enough nutrition.');
     setText('logTitle', viewingShared()
       ? 'Shared day: '+fmtDay(selectedDate,{month:'short',day:'numeric'})
-      : (selectedDate === localDateKey(new Date()) ? 'Log your day' : 'Log ' + fmtDay(selectedDate, { month: 'short', day: 'numeric' })));
+      : (selectedDate === localDateKey(new Date()) ? 'Today’s check-in' : 'Check-in · ' + fmtDay(selectedDate, { month: 'short', day: 'numeric' })));
   }
   function renderStreak() {
     const info=window.FitnessProgress?.streak(entries,localDateKey(new Date()));

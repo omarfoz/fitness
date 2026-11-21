@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#16233d">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="description" content="Private daily wellness tracker for food, steps, fasting and flexible days.">
-  <title>Fitness Tracker | Log</title>
+  <title>Fitness Tracker | Check-in</title>
   <link rel="icon" type="image/svg+xml" href="/fitness-icon.svg">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -152,7 +152,7 @@
   <script defer src="/config.js"></script>
   <script defer src="/food-catalog.js?v=20261115-food-v2"></script>
   <script defer src="/food-browser.js?v=20261115-ux-v2"></script>
-  <script defer src="/app.js?v=20261119-multipage-v6"></script>
+  <script defer src="/app.js?v=20261121-checkin-v1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -168,7 +168,7 @@
       </a>
       <nav class="desktop-page-nav" aria-label="Tracker pages">
         <a href="/" class="page-nav-link">Today</a>
-        <a href="/log.html" class="page-nav-link is-active" aria-current="page">Log</a>
+        <a href="/log.html" class="page-nav-link is-active" aria-current="page">Check-in</a>
         <a href="/history.html" class="page-nav-link">History</a>
         <a href="/share.html" class="page-nav-link">Share</a>
       </nav>
@@ -222,7 +222,7 @@
     </section>
 
     <main id="appView" data-page="logSection" hidden>
-      <section class="page-intro" aria-labelledby="pageTitle"><div><span class="eyebrow">DAILY CHECK-IN</span><h1 id="pageTitle">Log your day</h1><p>Record steps, meals, fasting and the details that matter. Your entries save privately to your account.</p></div></section>
+      <section class="page-intro" aria-labelledby="pageTitle"><div><span class="eyebrow">DAILY CHECK-IN</span><h1 id="pageTitle">Check in for today</h1><p>Record steps, meals, fasting and the details that matter. Your entries save privately to your account.</p></div></section>
       <section id="trackerSwitcher" class="glass-card tracker-switcher" hidden aria-label="Choose a progress tracker">
         <div><label for="trackerSelect">VIEWING PROGRESS</label><p class="muted small">Choose whose progress to view.</p></div>
         <select id="trackerSelect" aria-label="Progress tracker"><option value="mine">My progress</option></select>
@@ -232,7 +232,7 @@
       <div class="content-grid page-layout-log">
         <section class="glass-card logging-card" id="logSection" aria-labelledby="logTitle">
           <div class="section-heading">
-            <div><span class="eyebrow">DAILY CHECK-IN</span><h2 id="logTitle">Log your day</h2></div>
+            <div><span class="eyebrow">DAILY CHECK-IN</span><h2 id="logTitle">Today’s check-in</h2></div>
             <input id="entryDate" class="date-input" type="date" aria-label="Select date for daily entry">
           </div>
           <div class="log-story-shortcut"><button type="button" id="logStoryBtn" class="button subtle">Create story for this day</button></div>
@@ -369,7 +369,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z"/></svg><span>Today</span>
           </a>
           <a class="bottom-tab is-active" href="/log.html" data-nav-target="logSection" aria-current="page">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Log</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Check-in</span>
           </a>
           <a class="bottom-tab" href="/history.html" data-nav-target="historySection">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></svg><span>History</span>

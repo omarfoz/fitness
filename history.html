@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#16233d">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="description" content="Private daily wellness tracker for food, steps, fasting and flexible days.">
-  <title>Fitness Tracker | History</title>
+  <title>Fitness Tracker | Calendar</title>
   <link rel="icon" type="image/svg+xml" href="/fitness-icon.svg">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -168,7 +168,7 @@
       <nav class="desktop-page-nav" aria-label="Tracker pages">
         <a href="/" class="page-nav-link">Today</a>
         <a href="/log.html" class="page-nav-link">Check-in</a>
-        <a href="/history.html" class="page-nav-link is-active" aria-current="page">History</a>
+        <a href="/history.html" class="page-nav-link is-active" aria-current="page">Calendar</a>
         <a href="/share.html" class="page-nav-link">Share</a>
       </nav>
       <div class="tracker-actions">
@@ -221,7 +221,7 @@
     </section>
 
     <main id="appView" data-page="historySection" hidden>
-      <section class="page-intro" aria-labelledby="pageTitle"><div><span class="eyebrow">PROGRESS OVER TIME</span><h1 id="pageTitle">Your history</h1><p>Browse saved days, explore step trends, and import or export your own CSV records.</p></div></section>
+      <section class="page-intro" aria-labelledby="pageTitle"><div><span class="eyebrow">PROGRESS OVER TIME</span><h1 id="pageTitle">Your calendar</h1><p>Browse saved days, explore step trends, and import or export your own CSV records.</p></div></section>
       <section id="trackerSwitcher" class="glass-card tracker-switcher" hidden aria-label="Choose a progress tracker">
         <div><label for="trackerSelect">VIEWING PROGRESS</label><p class="muted small">Choose whose progress to view.</p></div>
         <select id="trackerSelect" aria-label="Progress tracker"><option value="mine">My progress</option></select>
@@ -231,7 +231,7 @@
       <div class="page-layout-history">
       <section class="glass-card history-card" id="historySection" aria-labelledby="historyTitle">
         <div class="section-heading history-heading">
-          <div><span class="eyebrow">PROGRESS OVER TIME</span><h2 id="historyTitle">Your calendar</h2></div>
+          <div><span class="eyebrow">PROGRESS OVER TIME</span><h2 id="historyTitle">Every saved day</h2></div>
           <div class="history-actions">
             <button id="prevMonth" class="icon-button" type="button" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
             <strong id="monthLabel">November 2026</strong>
@@ -307,7 +307,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Check-in</span>
           </a>
           <a class="bottom-tab is-active" href="/history.html" data-nav-target="historySection" aria-current="page">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></svg><span>History</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></svg><span>Calendar</span>
           </a>
           <a class="bottom-tab" href="/share.html" id="bottomShareBtn" data-nav-target="sharingPanel">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-2a5.5 5.5 0 0 1 11 0v2m3-9h5m-2.5-2.5v5"/></svg><span>Share</span>

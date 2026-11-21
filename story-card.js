@@ -1,5 +1,5 @@
-/* Private monthly image in two formats: a 1080 × 1920 story with the
- * month card centred on a quiet background, or the card alone (1080 wide,
+/* Private monthly image in two formats: a 9:16 story (2160 × 3840) with the
+ * month card centred on a quiet background, or the card alone (2160 wide,
  * transparent corners).
  * Any past day can be selected. Steps and estimated calories are only shown
  * when recorded, with no invented zeroes. All drawing happens locally.
@@ -156,6 +156,9 @@
   // One month card, used two ways: centred on a quiet 9:16 story
   // background, or exported alone with transparent corners.
   const CARD_W=920;
+  // Rendered at 2× so the saved photo stays sharp when zoomed. 2160 × 3840
+  // stays under the iOS Safari canvas area limit (16.7 MP).
+  const SCALE=2;
   function cardHeight(w,weeks){return (w/CARD_W)*(408+weeks*108);}
   function steps(v){
     if(v==null||!Number.isFinite(Number(v)))return null;
@@ -233,10 +236,10 @@
       }
       const label=logged?steps(d.steps):null;
       if(label){
-        font(c,19,700);const bw=Math.max(34,c.measureText(label).width+16),bx=cx+R*.62,by=cy-R*.78;
-        rr(c,bx-bw/2,by-16,bw,32,16);c.fillStyle='#0B1733';c.fill();
+        font(c,22,700);const bw=Math.max(38,c.measureText(label).width+18),bx=cx+R*.62,by=cy-R*.8;
+        rr(c,bx-bw/2,by-18,bw,36,18);c.fillStyle='#0B1733';c.fill();
         c.lineWidth=2;c.strokeStyle=d.goal?'#FF9A5C':'rgba(141,200,255,.55)';c.stroke();
-        text(c,label,bx,by+7,19,K.ink,700,BODY,'center');
+        text(c,label,bx,by+8,22,K.ink,700,BODY,'center');
       }
     }
 
@@ -266,9 +269,10 @@
   }
   function drawStory(data){
     const W=1080,H=1920;
-    const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
+    const canvas=document.createElement('canvas');canvas.width=W*SCALE;canvas.height=H*SCALE;
     const c=canvas.getContext('2d',{alpha:false});
     if(!c)throw new Error('Could not render the story on this device.');
+    c.scale(SCALE,SCALE);
     const bg=c.createLinearGradient(0,0,0,H);
     bg.addColorStop(0,'#0E2147');bg.addColorStop(.55,'#0A1A3B');bg.addColorStop(1,'#071330');
     c.fillStyle=bg;c.fillRect(0,0,W,H);
@@ -295,9 +299,10 @@
   }
   function drawCardOnly(data){
     const w=1080,h=Math.ceil(cardHeight(w,data.weeks)),pad=0;
-    const canvas=document.createElement('canvas');canvas.width=w+pad*2;canvas.height=h+pad*2;
+    const canvas=document.createElement('canvas');canvas.width=(w+pad*2)*SCALE;canvas.height=(h+pad*2)*SCALE;
     const c=canvas.getContext('2d');
     if(!c)throw new Error('Could not render the card on this device.');
+    c.scale(SCALE,SCALE);
     drawCard(c,data,pad,pad,w,false);
     return canvas;
   }

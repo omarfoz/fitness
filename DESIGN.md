@@ -241,10 +241,10 @@ Real-device Safari and Snapchat checks are still pending.
 
 The share dialog now offers two images built from the same month card:
 
-- **Story 9:16** (1080 × 1920): the card is centred on the night-navy ground,
+- **Story 9:16** (2160 × 3840, i.e. 9:16 at 2× for sharp zooming): the card is centred on the night-navy ground,
   with one ember ring behind it (a full circle, so no cut ends; same ember gradient as the 10K days) and empty edges. The brand sits under the
   card.
-- **Card only** (1080 wide, transparent corners): just the card, for use as a
+- **Card only** (2160 wide, transparent corners): just the card, for use as a
   sticker or a post.
 
 The card follows a simple monthly streak-calendar layout: month, three stats

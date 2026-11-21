@@ -360,12 +360,29 @@
     try{await prepare()}catch(e){status(e.message||'Could not create a story.','error');}
   }
   function filename(){return 'fitness-'+mode+'-'+(currentDate||key(new Date()))+'.png';}
-  function save(){
-    if(!blob){status('Select a day and wait for the image.','error');return;}
+  // iPhone/iPad Safari turns <a download> into a file preview instead of
+  // saving to Photos. There, the share sheet's "Save Image" is the way in.
+  const touchApple=()=>/iP(hone|ad|od)/.test(navigator.userAgent)||
+    (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  function download(){
     const url=URL.createObjectURL(blob),a=document.createElement('a');
     a.href=url;a.download=filename();document.body.append(a);a.click();a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),30000);
-    status('Saved the story image. Choose it from Snapchat photos.','success');
+    status('Image saved to your downloads.','success');
+  }
+  async function save(){
+    if(!blob){status('Select a day and wait for the image.','error');return;}
+    const file=new File([blob],filename(),{type:'image/png'});
+    if(touchApple()&&navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+      try{
+        await navigator.share({files:[file]});
+        status('Choose "Save Image" to add it to Photos.','success');
+      }catch(e){
+        if(e.name!=='AbortError')status('Press and hold the preview, then tap "Save to Photos".','error');
+      }
+      return;
+    }
+    download();
   }
   async function share(){
     if(!blob){status('Select a day and wait for the image.','error');return;}
@@ -375,7 +392,7 @@
         await navigator.share({files:[file]});
         status('Sharing opened. Choose Snapchat or your photo app.','success');
       }catch(e){if(e.name!=='AbortError')status('Sharing was unavailable. Tap Save image.','error');}
-    }else save();
+    }else download();
   }
   function mount(callback){
     if(getState)return;

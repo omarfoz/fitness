@@ -5,7 +5,7 @@ self.addEventListener('push', (event) => {
   const title = typeof data.title === 'string' ? data.title : 'Fitness Tracker';
   event.waitUntil(self.registration.showNotification(title, {
     body: typeof data.body === 'string' ? data.body : 'Your daily wellness reminder.',
-    icon: '/fitness-icon.svg',
+    icon: '/fitness-icon-192.png',
     badge: '/fitness-icon.svg',
     tag: typeof data.tag === 'string' ? data.tag : 'fitness-reminder',
     data: { url: 'https://fitness.oalfawzan.sa/' }

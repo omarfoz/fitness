@@ -302,3 +302,16 @@ King Fahd Road 49 km, Riyadh–Al-Kharj ~85 km and Riyadh–Thadiq ~125 km by ro
 Sports Boulevard ~135 km, Kingdom Centre 302.3 m, King Abdulaziz Mosque
 minarets in Al-Kharj ~83 m (Saudipedia), Al-Marqab Tower in Raghba ~30 m
 (Saudipedia). Illustrations are original flat SVGs in the app palette.
+
+**Update (23 Nov, later):** redrawn illustrations (round night-sky badges,
+silhouettes close to the real landmarks) and a daily card on Today. The daily
+card picks a landmark for today's steps (it changes every 2,500 steps), shows
+the 10K gap and the streak at stake, then a bar to the next milestone (first
+km, 10 Kingdom Centres, King Salman Park loop, Wadi Hanifah trail, Diriyah).
+Copy is upbeat on purpose: the goal is to get people excited to walk.
+Added figures: Riyadh Water Tower 61 m, Kingdom Centre Sky Bridge 65 m, Riyadh
+TV Tower 170 m, PIF Tower 385 m, King Salman Park loop 7.2 km, central Riyadh to
+Diriyah ~20 km (Saudipedia), city to King Khalid Airport ~35 km, Riyadh to the
+Edge of the World ~100 km (sources say 100–120 km), Wadi Hanifah 120 km. The Al-Kharj
+mosque minaret was dropped (its real shape is unverified); Al-Kharj and Thadiq
+are shown as green road signs instead.

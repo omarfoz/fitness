@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="/ux-refine.css?v=20261115-ux-v3">
   <link rel="stylesheet" href="/type-palette.css?v=20261116-typography-v3">
   <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
-  <link rel="stylesheet" href="/weekly-recap.css?v=20261123-recap-v1">
+  <link rel="stylesheet" href="/weekly-recap.css?v=20261123-landmarks-v2">
   <link rel="stylesheet" href="/pages.css?v=20261121-declutter-v3">
   <link rel="stylesheet" href="/story-card.css?v=20261121-declutter-v1">
 
@@ -154,7 +154,7 @@
   <script defer src="/config.js"></script>
   <script defer src="/progress-metrics.js?v=20261121-declutter-v1"></script>
   <script defer src="/story-card.js?v=20261121-declutter-v1"></script>
-  <script defer src="/weekly-recap.js?v=20261123-recap-v1"></script>
+  <script defer src="/weekly-recap.js?v=20261123-landmarks-v2"></script>
   <script defer src="/app.js?v=20261121-declutter-v1"></script>
 </head>
 <body>
@@ -299,6 +299,16 @@
         </div>
       </section>
 
+      <section class="glass-card landmark-today" id="landmarkToday" hidden aria-labelledby="landmarkHead">
+        <div class="landmark-art" id="landmarkArt" aria-hidden="true"></div>
+        <div class="landmark-copy">
+          <span class="landmark-tag" id="landmarkTag">Today</span>
+          <h2 id="landmarkHead">Where will your steps take you today?</h2>
+          <p class="muted small" id="landmarkSub"></p>
+          <div class="landmark-track" aria-hidden="true"><span id="landmarkBar"></span></div>
+          <p class="landmark-next" id="landmarkNext"></p>
+        </div>
+      </section>
       <section class="glass-card streak-panel" aria-labelledby="streakHeading">
         <div class="streak-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M12 22c4.2 0 7-2.9 7-7 0-3.1-1.9-5.8-4.4-8-.1 2.5-1.1 3.9-2.5 4.9C12.5 8.4 10.7 5.1 8 2c.2 3.3-1 5.3-2.6 7.4C4.2 11 5 12.1 5 15c0 4.1 2.8 7 7 7Z"/><path d="M12 21.8c1.9-.8 2.8-2.3 2.8-4.1 0-1.3-.7-2.3-1.9-3.3-.1 1.1-.6 1.7-1.3 2.1-.2-1.5-.9-2.7-2-3.8.1 2.1-1.3 3-1.3 4.9 0 1.9 1 3.3 3.7 4.2Z"/></svg></div>
         <div class="streak-copy">

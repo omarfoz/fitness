@@ -15,7 +15,8 @@
     (inertElements[id] ||= document.createElement('div'));
   const page = document.getElementById('appView')?.dataset.page || 'todaySection';
   const routes = Object.freeze({todaySection:'/', logSection:'/log.html',
-    historySection:'/history.html', sharingPanel:'/share.html'});
+    historySection:'/history.html', sharingPanel:'/share.html',
+    challengesSection:'/challenges.html'});
   function rememberTracker(id) {
     try {
       if(id==='mine')sessionStorage.removeItem('fitness-active-tracker');
@@ -452,7 +453,10 @@
       renderDay();
     }else if(page==='historySection'){
       renderCalendar();renderSummary();
+    }else if(page==='challengesSection'){
+      window.FitnessChallenges?.refresh?.();
     }
+    if(page==='todaySection')window.FitnessChallenges?.celebrate?.();
   }
   function refreshForNewDay() {
     const currentDate = localDateKey(new Date());
@@ -769,6 +773,9 @@
   });
   // Import reads the CSV locally. All Supabase writes are scoped to the
   // authenticated owner's daily entries; viewers cannot import or overwrite.
+  window.FitnessChallenges?.mount?.(() => ({
+    db, userId:user?.id||null, readonly:viewingShared(), entries
+  }));
   window.FitnessRecap?.mount?.(() => ({
     userId:user?.id||null,readonly:viewingShared(),entries
   }));

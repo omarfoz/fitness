@@ -315,3 +315,28 @@ Diriyah ~20 km (Saudipedia), city to King Khalid Airport ~35 km, Riyadh to the
 Edge of the World ~100 km (sources say 100–120 km), Wadi Hanifah 120 km. The Al-Kharj
 mosque minaret was dropped (its real shape is unverified); Al-Kharj and Thadiq
 are shown as green road signs instead.
+
+
+### 23 Nov 2026: Challenges page (monthly challenges + badges)
+
+New `challenges.html` (5th tab, trophy icon) with two tabs:
+
+- **Monthly challenges** (`challenges.js`): one challenge per month, defined
+  in code (Nov: Road to Al-Kharj, Dec: Metro Month, Jan: Tuwaiq Trek, Feb:
+  Diriyah Weekends, Mar: Kingdom Climb, Apr: Park Laps). Join with one tap;
+  the whole month's steps count, even from before joining. Three levels,
+  bronze/silver/gold: reaching bronze wins the month. No rankings. A team bar
+  sums everyone who joined via `challenge_team_summary(month)` (aggregate
+  only; owner chose to show it from the first participant). Finisher medals
+  (`challenge-medals.js`) look deliberately unlike badges: Sadu neck ribbon,
+  eight-pointed Najdi star, landmark embossed in the metal, name round the rim.
+- **My badges** (`badges.js`): 17 round medallions with a Najdi parapet rim in
+  five tiers (best day, streak, journey, special), computed from all saved
+  history, so past achievements count. "Almost there" shows the three closest.
+  On first visit one popup announces how many badges past steps already
+  earned; after that each new badge gets its own popup (Today and Challenges
+  pages), with Share as a 9:16 image.
+
+Database: `supabase/migrations/20261123_monthly_challenges.sql` and
+`20261123_challenge_team_total_always.sql` (table `challenge_participants`,
+RLS own rows only).

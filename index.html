@@ -26,8 +26,9 @@
   <link rel="stylesheet" href="/ux-refine.css?v=20261115-ux-v3">
   <link rel="stylesheet" href="/type-palette.css?v=20261116-typography-v3">
   <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
-  <link rel="stylesheet" href="/weekly-recap.css?v=20261123-landmarks-v2">
-  <link rel="stylesheet" href="/pages.css?v=20261121-declutter-v3">
+  <link rel="stylesheet" href="/weekly-recap.css?v=20261123-challenges-v1">
+  <link rel="stylesheet" href="/challenges.css?v=20261123-challenges-v1">
+  <link rel="stylesheet" href="/pages.css?v=20261123-challenges-v1">
   <link rel="stylesheet" href="/story-card.css?v=20261121-declutter-v1">
 
   <!-- Inline critical layout: prevents giant icons and uneven daily-input cards
@@ -154,8 +155,11 @@
   <script defer src="/config.js"></script>
   <script defer src="/progress-metrics.js?v=20261121-declutter-v1"></script>
   <script defer src="/story-card.js?v=20261121-declutter-v1"></script>
-  <script defer src="/weekly-recap.js?v=20261123-landmarks-v2"></script>
-  <script defer src="/app.js?v=20261121-declutter-v1"></script>
+  <script defer src="/weekly-recap.js?v=20261123-challenges-v1"></script>
+  <script defer src="/badges.js?v=20261123-challenges-v1"></script>
+  <script defer src="/challenge-medals.js?v=20261123-challenges-v1"></script>
+  <script defer src="/challenges.js?v=20261123-challenges-v1"></script>
+  <script defer src="/app.js?v=20261123-challenges-v1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -173,6 +177,7 @@
         <a href="/" class="page-nav-link is-active" aria-current="page">Today</a>
         <a href="/log.html" class="page-nav-link">Check-in</a>
         <a href="/history.html" class="page-nav-link">Calendar</a>
+        <a href="/challenges.html" class="page-nav-link">Challenges</a>
         <a href="/share.html" class="page-nav-link">Share</a>
       </nav>
       <div class="tracker-actions">
@@ -334,6 +339,14 @@
         </div>
         <button id="storyOpenBtn" type="button" class="button primary">Create story</button>
       </section>
+      <dialog class="recap-dialog badge-dialog" id="badgeDialog" aria-labelledby="badgeTitle">
+        <div class="recap-head"><span class="badge-kicker">NEW BADGE UNLOCKED</span><button id="badgeClose" type="button" class="story-close" aria-label="Close">×</button></div>
+        <div class="badge-art" id="badgeArt"></div>
+        <h2 id="badgeTitle">Badge</h2>
+        <p id="badgeText" class="recap-line"></p>
+        <p id="badgeNext" class="badge-next"></p>
+        <div class="badge-actions"><button id="badgeShare" type="button" class="button subtle">Share</button><button id="badgeKeep" type="button" class="button primary">Keep walking</button></div>
+      </dialog>
       <dialog class="recap-dialog" id="recapDialog" aria-labelledby="recapPeriod">
         <div class="recap-head"><span id="recapPeriod">Last week</span><button id="recapClose" type="button" class="story-close" aria-label="Close recap">×</button></div>
         <div class="recap-slide" id="recapSlide" aria-live="polite"></div>
@@ -368,6 +381,9 @@
           </a>
           <a class="bottom-tab" href="/history.html" data-nav-target="historySection">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></svg><span>Calendar</span>
+          </a>
+          <a class="bottom-tab" href="/challenges.html" data-nav-target="challengesSection">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8v5a4 4 0 0 1-8 0V3Z"/><path d="M8 5H5v1a3 3 0 0 0 3 3M16 5h3v1a3 3 0 0 1-3 3M12 12v4M8.5 21h7M10 16h4l1 5H9l1-5Z"/></svg><span>Challenges</span>
           </a>
           <a class="bottom-tab" href="/share.html" id="bottomShareBtn" data-nav-target="sharingPanel">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-2a5.5 5.5 0 0 1 11 0v2m3-9h5m-2.5-2.5v5"/></svg><span>Share</span>

@@ -108,3 +108,6 @@
 .push-help summary{cursor:pointer;font-weight:700;}
 .csv-import-tech{display:block;margin-top:8px;font-size:.92em;opacity:.8;}
 .calendar-day.is-goal{border-color:color-mix(in srgb,#ff8a4c 45%,var(--border));}
+
+/* Five bottom tabs: keep labels on one line on small phones. */
+.app-bottom-nav .bottom-tab span{white-space:nowrap;font-size:clamp(.6rem,2.9vw,.72rem);}

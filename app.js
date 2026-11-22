@@ -447,7 +447,7 @@
     if (!user) return;
     renderSharingState();
     if(page==='todaySection'){
-      renderHero();renderStats();renderStreak();
+      renderHero();renderStats();renderStreak();window.FitnessRecap?.refresh?.();
     }else if(page==='logSection'){
       renderDay();
     }else if(page==='historySection'){
@@ -769,6 +769,9 @@
   });
   // Import reads the CSV locally. All Supabase writes are scoped to the
   // authenticated owner's daily entries; viewers cannot import or overwrite.
+  window.FitnessRecap?.mount?.(() => ({
+    userId:user?.id||null,readonly:viewingShared(),entries
+  }));
   window.FitnessStory?.mount?.(() => ({
     userId:user?.id||null,readonly:viewingShared(),entries
   }));

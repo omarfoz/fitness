@@ -1,0 +1,23 @@
+/* Weekly recap card + dialog. */
+.recap-cta{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 18px;margin:12px 0;}
+.recap-cta h2{font-size:.98rem;margin:0;}
+.recap-cta p{margin:3px 0 0;}
+.recap-cta .button{flex:0 0 auto;}
+.recap-dialog{width:min(420px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:18px;border:1px solid rgba(170,212,255,.24);
+  border-radius:28px;background:linear-gradient(180deg,#14284c,#0b1a38);color:#f4f7ff;box-shadow:0 30px 80px rgba(0,6,24,.6);}
+.recap-dialog::backdrop{background:rgba(3,9,24,.72);backdrop-filter:blur(6px);}
+.recap-head{display:flex;align-items:center;justify-content:space-between;font-weight:700;color:#a9bcd8;font-size:.85rem;}
+.recap-slide{text-align:center;padding:6px 6px 0;min-height:420px;}
+.recap-art{width:min(250px,62vw);margin:4px auto 6px;}
+.recap-art svg{display:block;width:100%;height:auto;}
+.recap-tag{display:inline-block;margin-bottom:4px;padding:3px 10px;border-radius:999px;background:rgba(144,232,199,.14);
+  color:#90e8c7;font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+.recap-big{margin:4px 0 8px;font-size:2.2rem;font-weight:800;letter-spacing:-.03em;color:#90e8c7;}
+.recap-line{margin:4px 0;font-size:1rem;line-height:1.45;color:#f4f7ff;}
+.recap-dots{display:flex;justify-content:center;gap:6px;margin:14px 0 10px;}
+.recap-dots i{width:7px;height:7px;border-radius:50%;background:rgba(169,188,216,.35);}
+.recap-dots i.is-on{width:20px;border-radius:4px;background:#8dc8ff;}
+.recap-actions{display:grid;grid-template-columns:auto auto 1fr;gap:8px;}
+.recap-actions .button{min-height:46px;}
+.recap-actions #recapBack{width:46px;padding:0;font-size:1.3rem;}
+.recap-actions #recapBack:disabled{opacity:.35;}

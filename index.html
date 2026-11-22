@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="/ux-refine.css?v=20261115-ux-v3">
   <link rel="stylesheet" href="/type-palette.css?v=20261116-typography-v3">
   <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
+  <link rel="stylesheet" href="/weekly-recap.css?v=20261123-recap-v1">
   <link rel="stylesheet" href="/pages.css?v=20261121-declutter-v3">
   <link rel="stylesheet" href="/story-card.css?v=20261121-declutter-v1">
 
@@ -153,6 +154,7 @@
   <script defer src="/config.js"></script>
   <script defer src="/progress-metrics.js?v=20261121-declutter-v1"></script>
   <script defer src="/story-card.js?v=20261121-declutter-v1"></script>
+  <script defer src="/weekly-recap.js?v=20261123-recap-v1"></script>
   <script defer src="/app.js?v=20261121-declutter-v1"></script>
 </head>
 <body>
@@ -309,12 +311,30 @@
           <span>Best streak</span>
         </div>
       </section>
+      <section class="glass-card recap-cta" id="recapSection" hidden aria-labelledby="recapHeading">
+        <div class="recap-cta-copy">
+          <h2 id="recapHeading">Your week in landmarks</h2>
+          <p id="recapCardText" class="muted small">Log steps this week to unlock your recap.</p>
+        </div>
+        <button type="button" class="button secondary" id="recapOpenBtn">See recap</button>
+      </section>
       <section class="story-cta" id="storySection" aria-labelledby="storyHeading">
         <div class="story-cta-copy">
           <h2 id="storyHeading">Share your month as a story</h2>
         </div>
         <button id="storyOpenBtn" type="button" class="button primary">Create story</button>
       </section>
+      <dialog class="recap-dialog" id="recapDialog" aria-labelledby="recapPeriod">
+        <div class="recap-head"><span id="recapPeriod">Last week</span><button id="recapClose" type="button" class="story-close" aria-label="Close recap">×</button></div>
+        <div class="recap-slide" id="recapSlide" aria-live="polite"></div>
+        <div class="recap-dots" id="recapDots" aria-hidden="true"></div>
+        <div class="recap-actions">
+          <button id="recapBack" type="button" class="button subtle" aria-label="Previous slide">‹</button>
+          <button id="recapShare" type="button" class="button subtle">Share</button>
+          <button id="recapNext" type="button" class="button primary">Next</button>
+        </div>
+        <p id="recapStatus" class="story-status" role="status" aria-live="polite"></p>
+      </dialog>
       <dialog class="story-dialog" id="storyDialog" aria-labelledby="storyDialogTitle">
         <div class="story-dialog-header"><h2 id="storyDialogTitle">Your achievement story</h2><button id="storyCloseBtn" type="button" class="story-close" aria-label="Close preview">×</button></div>
         <div class="story-date-control">

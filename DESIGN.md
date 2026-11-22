@@ -286,3 +286,19 @@ colleagues, everything personal or repeated was removed:
 
 Checked in desktop Chrome at iPhone width with a mocked Supabase session: all
 four pages render with no console errors. Live account and iPhone checks pending.
+
+
+### 23 Nov 2026: weekly recap in landmarks
+
+A "Your week in landmarks" card on Today opens three slides for last week
+(Mon–Sun; falls back to this week so far): total steps as a landmark
+comparison, best day and 10K days, and the streak. Each slide can be shared as
+a 2160 × 3840 image. Steps become distance at about 0.75 m a step.
+
+Landmarks are Riyadh, Thadiq and Al-Kharj only, with figures from public
+sources: Wadi Hanifah trail 13.4 km (Sports Boulevard site), King Abdullah Road
+~25 km (Saudipedia), Riyadh Metro Blue Line 38 km and full network 176 km,
+King Fahd Road 49 km, Riyadh–Al-Kharj ~85 km and Riyadh–Thadiq ~125 km by road,
+Sports Boulevard ~135 km, Kingdom Centre 302.3 m, King Abdulaziz Mosque
+minarets in Al-Kharj ~83 m (Saudipedia), Al-Marqab Tower in Raghba ~30 m
+(Saudipedia). Illustrations are original flat SVGs in the app palette.

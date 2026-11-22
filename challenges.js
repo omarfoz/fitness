@@ -88,9 +88,9 @@
   const art = (name, place, size) => (window.FitnessRecap?.svg?.(name, place) || '').replace('<svg ', `<svg width="${size}" height="${size}" `);
   const medal = (ch, tier, size, locked) => window.FitnessChallengeMedals?.svg?.(medalOf(ch), tier, { size, locked }) || '';
 
-  function challengeCard(ch, entries, now) {
+  function challengeCard(ch, entries, now, viewing = false) {
     const monthKey = key(now).slice(0, 7);
-    const live = ch.id === monthKey, past = ch.id < monthKey, isIn = joined.has(ch.id);
+    const live = ch.id === monthKey, past = ch.id < monthKey, isIn = viewing || joined.has(ch.id);
     const p = progress(ch, entries);
     const end = new Date(yearOf(ch.id), Number(ch.id.slice(5)), 0);
     const daysLeft = Math.max(0, Math.ceil((end - parse(key(now))) / 864e5) + 1);
@@ -103,14 +103,14 @@
         <span>${fmt(ch, ch.levels[i])}</span></div>`).join('');
     const status = live ? `<span class="ch-live">LIVE · ${daysLeft} day${daysLeft === 1 ? '' : 's'} left</span>`
       : past ? '<span class="ch-past">Finished</span>' : `<span class="ch-soon">Starts 1 ${monthName(ch.id)}</span>`;
-    const you = !isIn ? (past ? '' : `<p class="ch-cta-note">${live ? 'Join now. Your steps from the whole month count, even the ones before you joined.' : 'Join early and it starts counting on day one.'}</p>`)
+    const you = viewing && !live && !past ? '' : !isIn ? (past ? '' : `<p class="ch-cta-note">${live ? 'Join now. Your steps from the whole month count, even the ones before you joined.' : 'Join early and it starts counting on day one.'}</p>`)
       : (live || past) ? `<p class="ch-you"><strong>${fmt(ch, p.value)}</strong> ${p.level ? `· ${TIERS[p.level - 1][0].toUpperCase() + TIERS[p.level - 1].slice(1)} won! 🎉` : ''}
           ${nextLevel != null && live ? `<span>${fmt(ch, nextLevel - p.value)} to ${TIERS[p.level]}</span>` : ''}</p>`
       : '<p class="ch-you">You are in. See you on day one! 🔥</p>';
     const teamLine = !t || !t.participants ? '' : `<div class="ch-team"><div class="ch-team-head"><strong>Walking together</strong><span>${t.participants} ${t.participants === 1 ? 'walker' : 'walking'}</span></div>
           <div class="ch-track ch-track-team"><span style="width:${Math.min(100, Math.max(2, (teamKm / ch.teamKm) * 100)).toFixed(1)}%"></span></div>
           <p>${nice(teamKm)} of ${ch.teamKm.toLocaleString('en-US')} km · ${esc(ch.team)}</p></div>`;
-    const btn = past ? '' : `<button type="button" class="button ${isIn ? 'subtle' : 'primary'}" data-join="${ch.id}" data-on="${isIn ? '0' : '1'}">${isIn ? 'Leave' : 'Join challenge'}</button>`;
+    const btn = past || viewing ? '' : `<button type="button" class="button ${isIn ? 'subtle' : 'primary'}" data-join="${ch.id}" data-on="${isIn ? '0' : '1'}">${isIn ? 'Leave' : 'Join challenge'}</button>`;
     return `<article class="glass-card ch-card${live ? ' is-live' : ''}">
       <div class="ch-head">
         <div class="ch-art">${art(ch.art, ch.place, 88)}</div>
@@ -148,18 +148,17 @@
     if (!root || !ctx) return;
     const { userId, readonly, entries } = ctx();
     if (!userId) return;
-    if (readonly) { root.innerHTML = '<p class="muted">Challenges and badges are personal. Switch back to My progress to see yours.</p>'; return; }
     const now = new Date(), monthKey = key(now).slice(0, 7);
     document.querySelectorAll('[data-ch-tab]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.chTab === tab)));
-    if (tab === 'badges') { root.innerHTML = badgeGrid(entries); celebrate(entries); return; }
+    if (tab === 'badges') { root.innerHTML = badgeGrid(entries); if (!readonly) celebrate(entries); return; }
     const current = CHALLENGES.filter((c) => c.id >= monthKey).slice(0, 3);
-    const past = CHALLENGES.filter((c) => c.id < monthKey && joined.has(c.id));
-    root.innerHTML = current.map((c) => challengeCard(c, entries, now)).join('') +
+    const past = CHALLENGES.filter((c) => c.id < monthKey && (readonly || joined.has(c.id)));
+    root.innerHTML = current.map((c) => challengeCard(c, entries, now, readonly)).join('') +
       (past.length ? `<h2 class="bd-sub">Your medals</h2><div class="ch-medals">${past.map((c) => {
         const p = progress(c, entries);
         return p.level ? `<div class="ch-medal">${medal(c, TIERS[p.level - 1], 84)}<strong>${esc(c.title)}</strong><span>${monthName(c.id)} · ${TIERS[p.level - 1]}</span></div>` : '';
       }).join('')}</div>` : '');
-    celebrate(entries);
+    if (!readonly) celebrate(entries);
   }
 
   /* ---------- celebration for newly earned badges ---------- */

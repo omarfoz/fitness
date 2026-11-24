@@ -500,3 +500,20 @@
   @view-transition { navigation: none; }
 }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* ---------- 17. Gradient headline text (clip to letters) + live dot ---------- */
+.gradient-text {
+  -webkit-background-clip: text !important; background-clip: text !important;
+  -webkit-text-fill-color: transparent !important; color: transparent !important;
+  background-color: transparent !important; display: inline; padding-bottom: .06em;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+:root:not([data-theme="light"]) .live-dot { background: #FF7A3D !important; color: #FF7A3D !important; box-shadow: 0 0 0 4px rgba(255,122,61,.18) !important; }
+:root[data-theme="light"] .live-dot { background: #EA580C !important; color: #EA580C !important; box-shadow: 0 0 0 4px rgba(234,88,12,.14) !important; }
+:root[data-theme="light"] .auth-panel h1, :root[data-theme="light"] .auth-panel h2,
+:root[data-theme="light"] .auth-card h2, :root[data-theme="light"] .hero-copy h1,
+:root[data-theme="light"] .glass-card h2 { color: #1C1917 !important; }
+:root[data-theme="light"] .auth-card p, :root[data-theme="light"] .auth-panel p,
+:root[data-theme="light"] .hero-copy p, :root[data-theme="light"] .glass-card .muted { color: #57534E !important; }
+:root[data-theme="light"] label { color: #1C1917; }
+:root[data-theme="light"] input::placeholder, :root[data-theme="light"] textarea::placeholder { color: #A8A29E !important; -webkit-text-fill-color: #A8A29E !important; }

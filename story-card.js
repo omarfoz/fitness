@@ -10,7 +10,7 @@
   const GOAL=10000;
   const $=id=>document.getElementById(id);
   let mode='story',getState=null,blob=null,previewURL=null,currentDate=null,busy=false,serial=0,queued=false;
-  const K={ink:'#F4F7FF',mist:'#A9BCD8',dim:'#56688A',glass:'#8DC8FF',
+  const K={ink:'#F5F2EE',mist:'#B9B1AA',dim:'#6B6460',glass:'#FFCBA0',
     mint:'#90E8C7',coral:'#FFBAAE',
     emberDeep:'#7A2610',ember:'#C4461C',cream:'#FFF3E1',peach:'#FFD7C6',flameDay:'#FFD3A1'};
   // Story-only typefaces, registered under private names so the app UI's
@@ -179,12 +179,12 @@
     c.save();if(shadow){c.shadowColor='rgba(0,6,24,.6)';c.shadowBlur=70;c.shadowOffsetY=26;}
     rr(c,0,0,W,H,52);
     const g=c.createLinearGradient(0,0,0,H);
-    g.addColorStop(0,'#1A2F57');g.addColorStop(1,'#0F1F42');
+    g.addColorStop(0,'#24211F');g.addColorStop(1,'#141317');
     c.fillStyle=g;c.fill();c.restore();
-    c.save();rr(c,0,0,W,H,52);c.lineWidth=2;c.strokeStyle='rgba(170,212,255,.26)';c.stroke();
+    c.save();rr(c,0,0,W,H,52);c.lineWidth=2;c.strokeStyle='rgba(255,178,122,.22)';c.stroke();
     const rim=c.createLinearGradient(0,0,W,0);
-    rim.addColorStop(0,'rgba(255,255,255,0)');rim.addColorStop(.3,'rgba(220,240,255,.7)');
-    rim.addColorStop(.7,'rgba(220,240,255,.3)');rim.addColorStop(1,'rgba(255,255,255,0)');
+    rim.addColorStop(0,'rgba(255,255,255,0)');rim.addColorStop(.3,'rgba(255,226,204,.6)');
+    rim.addColorStop(.7,'rgba(255,226,204,.25)');rim.addColorStop(1,'rgba(255,255,255,0)');
     c.beginPath();c.moveTo(52,1.5);c.lineTo(W-52,1.5);c.lineWidth=3;c.strokeStyle=rim;c.stroke();
     c.restore();
 
@@ -216,7 +216,7 @@
       const {cx,cy}=pos(d),logged=Boolean(d.entry);
       if(d.future){text(c,String(d.day),cx,cy+11,30,K.dim,500,BODY,'center');continue;}
       if(d.selected){
-        c.save();c.shadowColor='rgba(141,200,255,.8)';c.shadowBlur=18;
+        c.save();c.shadowColor='rgba(255,203,160,.8)';c.shadowBlur=18;
         c.beginPath();c.arc(cx,cy,R+8,0,Math.PI*2);c.lineWidth=4;c.strokeStyle=K.glass;c.stroke();c.restore();
       }
       c.beginPath();c.arc(cx,cy,R,0,Math.PI*2);
@@ -226,8 +226,8 @@
         c.save();c.shadowColor='rgba(255,104,44,.45)';c.shadowBlur=20;c.fillStyle=f;c.fill();c.restore();
         flame(c,cx-24,cy-27,48);
       }else if(logged){
-        c.fillStyle='rgba(141,200,255,.15)';c.fill();
-        c.lineWidth=2;c.strokeStyle='rgba(141,200,255,.42)';c.stroke();
+        c.fillStyle='rgba(255,203,160,.12)';c.fill();
+        c.lineWidth=2;c.strokeStyle='rgba(255,203,160,.40)';c.stroke();
         shoe(c,cx-21,cy-23,42,K.glass);
       }else{
         c.lineWidth=2;c.strokeStyle='rgba(169,188,216,.22)';c.stroke();
@@ -236,8 +236,8 @@
       const label=logged?steps(d.steps):null;
       if(label){
         font(c,22,700);const bw=Math.max(38,c.measureText(label).width+18),bx=cx+R*.62,by=cy-R*.8;
-        rr(c,bx-bw/2,by-18,bw,36,18);c.fillStyle='#0B1733';c.fill();
-        c.lineWidth=2;c.strokeStyle=d.goal?'#FF9A5C':'rgba(141,200,255,.55)';c.stroke();
+        rr(c,bx-bw/2,by-18,bw,36,18);c.fillStyle='#141317';c.fill();
+        c.lineWidth=2;c.strokeStyle=d.goal?'#FF9A5C':'rgba(255,203,160,.5)';c.stroke();
         text(c,label,bx,by+8,22,K.ink,700,BODY,'center');
       }
     }
@@ -273,7 +273,7 @@
     if(!c)throw new Error('Could not render the story on this device.');
     c.scale(SCALE,SCALE);
     const bg=c.createLinearGradient(0,0,0,H);
-    bg.addColorStop(0,'#0E2147');bg.addColorStop(.55,'#0A1A3B');bg.addColorStop(1,'#071330');
+    bg.addColorStop(0,'#1C1512');bg.addColorStop(.55,'#121114');bg.addColorStop(1,'#0E0F12');
     c.fillStyle=bg;c.fillRect(0,0,W,H);
     // One ember ring behind the card. It is a full circle, so its ends are
     // always hidden by the canvas edges or the card and never look cut off.
@@ -283,7 +283,7 @@
     c.globalAlpha=.9;c.beginPath();c.arc(860,520,560,0,Math.PI*2);
     c.lineWidth=140;c.strokeStyle=arc;c.stroke();c.restore();
     const cool=c.createRadialGradient(160,1700,10,160,1700,700);
-    cool.addColorStop(0,'rgba(64,150,255,.18)');cool.addColorStop(1,'rgba(64,150,255,0)');
+    cool.addColorStop(0,'rgba(255,90,31,.10)');cool.addColorStop(1,'rgba(255,90,31,0)');
     c.fillStyle=cool;c.fillRect(0,1000,W,920);
 
     const w=CARD_W,h=cardHeight(w,data.weeks),x=(W-w)/2,y=Math.round((H-h)/2-50);

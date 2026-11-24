@@ -131,10 +131,10 @@
   /* ---------- illustrations ----------
    * Flat scenes in the app palette, each inside a round sky like a badge.
    * Shapes follow the real landmarks' silhouettes. */
-  const C = { sky1: '#2A4F86', sky2: '#13284D', ground: '#C9A36B', groundDark: '#A9834F', sand: '#E8C994',
-    cream: '#FFF3E1', glass: '#8DC8FF', glassDark: '#4F86C6', steel: '#C7D6EA', steelDark: '#8FA6C4',
+  const C = { sky1: '#1C1A20', sky2: '#5A2A18', ground: '#C9A36B', groundDark: '#A9834F', sand: '#E8C994',
+    cream: '#FFF3E1', glass: '#FFD2B0', glassDark: '#B97A5C', steel: '#C7D6EA', steelDark: '#8FA6C4',
     mint: '#90E8C7', palm: '#3FA37A', palmDark: '#2B7A5A', trunk: '#8B6A44', ember: '#E0592A', gold: '#F2C14E',
-    mud: '#D2A26B', mudDark: '#A87A45', mudShade: '#BD8D57', sign: '#13804A', night: '#0F2347' };
+    mud: '#D2A26B', mudDark: '#A87A45', mudShade: '#BD8D57', sign: '#13804A', night: '#16131A' };
   const stars = '<g fill="#fff" opacity=".7"><circle cx="110" cy="92" r="2"/><circle cx="292" cy="78" r="1.6"/><circle cx="318" cy="140" r="2.2"/><circle cx="84" cy="160" r="1.4"/><circle cx="250" cy="52" r="1.3"/></g>';
   const frame = (id, inner, groundFill = C.ground, horizon = 300) => `
     <defs>
@@ -147,9 +147,9 @@
       <rect x="0" y="${horizon}" width="400" height="${400 - horizon}" fill="${groundFill}"/>
       ${inner}
     </g>
-    <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(170,212,255,.35)" stroke-width="3"/>`;
+    <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(255,178,122,.40)" stroke-width="3"/>`;
   // Small Riyadh skyline for backgrounds: Kingdom Centre + Al Faisaliah.
-  const skyline = (y, s = 1, fill = '#1B3560') => `
+  const skyline = (y, s = 1, fill = '#2A2026') => `
     <g fill="${fill}" transform="translate(0 ${y}) scale(${s})">
       <path d="M150 0 L158 -96 C159 -108 162 -116 166 -122 L168 -96 C170 -86 174 -82 176 -82 C178 -82 182 -86 184 -96 L186 -122 C190 -116 193 -108 194 -96 L202 0 Z"/>
       <path d="M232 0 L250 -86 L268 0 Z"/><circle cx="250" cy="-62" r="6"/><rect x="249" y="-104" width="2" height="20"/>
@@ -187,13 +187,13 @@
       <path fill="${C.palm}" d="M60 300 q-30 -4 -44 18 q22 -6 44 -10 q-16 12 -20 30 q14 -14 24 -24 Z M60 300 q30 -4 44 18 q-22 -6 -44 -10 q16 12 20 30 q-14 -14 -24 -24 Z"/>
       <rect x="57" y="300" width="6" height="70" fill="${C.trunk}"/>`, C.groundDark, 250),
     metro: frame('mt', `
-      ${skyline(230, 1, '#1F3B68')}
+      ${skyline(230, 1, '#33252A')}
       <rect x="0" y="252" width="400" height="18" fill="#B8C7DC"/>
       <g fill="#94A7C2"><rect x="70" y="270" width="22" height="130"/><rect x="308" y="270" width="22" height="130"/></g>
       <path fill="#E7EEF8" d="M96 252 V170 C96 136 122 118 156 118 H244 C278 118 304 136 304 170 V252 Z"/>
       <path fill="${C.night}" d="M120 196 V170 C120 152 136 142 156 142 H244 C264 142 280 152 280 170 V196 Z"/>
       <path fill="${C.glass}" opacity=".35" d="M126 176 C130 156 146 148 164 148 H200 L170 192 H126 Z"/>
-      <rect x="96" y="212" width="208" height="12" fill="#2B6CB8"/>
+      <rect x="96" y="212" width="208" height="12" fill="#E0592A"/>
       <circle cx="132" cy="236" r="8" fill="${C.gold}"/><circle cx="268" cy="236" r="8" fill="${C.gold}"/>
       <rect x="176" y="226" width="48" height="10" rx="5" fill="#9FB3CF"/>`, C.groundDark, 330),
     wadi: frame('wd', `
@@ -281,7 +281,7 @@
       <g transform="translate(176 190) rotate(-18)">
         <path fill="#F4F7FF" d="M-110 0 C-110 -12 -96 -18 -80 -18 H80 C104 -18 120 -8 124 0 C120 8 104 14 80 14 H-80 C-96 14 -110 10 -110 0 Z"/>
         <path fill="#C7D6EA" d="M-20 4 L30 4 L-30 62 H-52 Z"/><path fill="#DCE6F2" d="M-20 -10 L20 -10 L-24 -52 H-44 Z"/>
-        <path fill="#2B6CB8" d="M-110 0 L-96 -46 H-80 L-70 -16 Z"/>
+        <path fill="#E0592A" d="M-110 0 L-96 -46 H-80 L-70 -16 Z"/>
         <g fill="${C.glass}">${[60, 40, 20, 0, -20, -40, -60].map((x) => `<circle cx="${x}" cy="-4" r="4"/>`).join('')}</g>
         <path fill="${C.night}" d="M100 -12 C110 -10 118 -6 120 -2 H100 Z"/>
       </g>`, '#2A3A55', 300),
@@ -397,10 +397,10 @@
     const c = canvas.getContext('2d', { alpha: false });
     c.scale(S, S);
     const bg = c.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#0E2147'); bg.addColorStop(1, '#071330');
+    bg.addColorStop(0, '#24140F'); bg.addColorStop(1, '#0E0F12');
     c.fillStyle = bg; c.fillRect(0, 0, W, H);
     const glow = c.createRadialGradient(540, 700, 40, 540, 700, 620);
-    glow.addColorStop(0, 'rgba(141,200,255,.18)'); glow.addColorStop(1, 'rgba(141,200,255,0)');
+    glow.addColorStop(0, 'rgba(255,90,31,.22)'); glow.addColorStop(1, 'rgba(255,90,31,0)');
     c.fillStyle = glow; c.fillRect(0, 0, W, H);
     const img = new Image();
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg(s.art, s.place).replace('role="img" aria-hidden="true"', 'width="800" height="800"'));
@@ -408,15 +408,15 @@
     c.drawImage(img, 190, 300, 700, 700);
     const body = '-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif';
     c.textAlign = 'center';
-    c.fillStyle = '#A9BCD8'; c.font = `600 40px ${body}`;
+    c.fillStyle = '#B9B1AA'; c.font = `600 40px ${body}`;
     c.fillText(week.label + ' · ' + range(week), W / 2, 200);
     let y = 1130;
-    if (s.tag) { c.fillStyle = '#90E8C7'; c.font = `700 34px ${body}`; c.fillText(s.tag.toUpperCase(), W / 2, y); y += 140; }
-    c.fillStyle = '#90E8C7'; c.font = `800 110px ${body}`;
+    if (s.tag) { c.fillStyle = '#FFB27A'; c.font = `700 34px ${body}`; c.fillText(s.tag.toUpperCase(), W / 2, y); y += 140; }
+    c.fillStyle = '#FF9A5C'; c.font = `800 110px ${body}`;
     c.fillText(s.big || s.title, W / 2, y); y += 100;
-    c.fillStyle = '#F4F7FF'; c.font = `500 48px ${body}`;
+    c.fillStyle = '#F5F2EE'; c.font = `500 48px ${body}`;
     for (const l of s.lines) for (const line of wrap(c, l, 860)) { c.fillText(line, W / 2, y); y += 66; }
-    c.fillStyle = '#A9BCD8'; c.font = `500 30px ${body}`;
+    c.fillStyle = '#B9B1AA'; c.font = `500 30px ${body}`;
     c.fillText('fitness.oalfawzan.sa', W / 2, H - 80);
     return new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error('Could not create the image.'))), 'image/png'));
   }

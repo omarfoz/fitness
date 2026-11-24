@@ -56,4 +56,4 @@
 .ch-tabs button[aria-checked="true"]{background:rgba(141,200,255,.2);color:#f6f8ff;box-shadow:inset 0 0 0 1px rgba(141,200,255,.45);}
 .ch-tabs button:focus-visible{outline:2px solid #8dc8ff;outline-offset:2px;}
 html[data-theme="light"] .ch-tabs button{color:#3d5375;}
-html[data-theme="light"] .ch-tabs button[aria-checked="true"]{color:#0f2347;background:rgba(10,132,255,.14);}
+html[data-theme="light"] .ch-tabs button[aria-checked="true"]{color:#7c2d12;background:rgba(234,88,12,.12);}

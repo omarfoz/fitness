@@ -340,3 +340,26 @@ New `challenges.html` (5th tab, trophy icon) with two tabs:
 Database: `supabase/migrations/20261123_monthly_challenges.sql` and
 `20261123_challenge_team_total_always.sql` (table `challenge_participants`,
 RLS own rows only).
+
+
+### 24 Nov 2026: Ember on graphite
+
+The owner chose "Ember on graphite" from a three-palette comparison (Claude
+Design canvas, "Home page: current vs proposed"). Fitness apps lead with one
+energy colour on near-black; navy read as banking.
+
+- `ember-theme.css` loads last on every page: graphite page (#0E0F12), neutral
+  glass cards, one ember accent (#FF5A1F / #FF7A3D / #FFB27A), cream text.
+  The rainbow of per-card tints (mint steps, pink food, purple fasting, blue
+  challenge) is gone; mint stays only for "saved" states. Light mode keeps
+  its look with an ember accent (#C2410C for contrast).
+- Today (`index.html` + `today-hero.js`): greeting and a live title
+  ("10K done. On fire!" / "2,300 steps to 10K"), a 🔥 streak pill, a big steps
+  ring with km / kcal / fasting under it, This week bars (Mon–Sun, dashed 10K
+  line), the landmark card, a one-line challenge strip with the medal, and
+  Week recap / Share story buttons. The old calories ring, steps card and
+  streak card are gone (same data, new places).
+- Generated art follows: landmark skies are a dusk gradient (graphite to
+  ember), Metro and plane accents ember, story card / recap / badge share
+  images on graphite with ember highlights. Badge tiers and medal metals are
+  unchanged.

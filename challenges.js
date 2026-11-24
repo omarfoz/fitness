@@ -209,7 +209,7 @@
     const g = c.getContext('2d', { alpha: false });
     g.scale(S, S);
     const bg = g.createRadialGradient(540, 760, 60, 540, 760, 1100);
-    bg.addColorStop(0, '#2A4F86'); bg.addColorStop(1, '#071330');
+    bg.addColorStop(0, '#4A2010'); bg.addColorStop(1, '#0E0F12');
     g.fillStyle = bg; g.fillRect(0, 0, W, H);
     const img = new Image();
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(window.FitnessBadges.svg(b, { size: 720 }));
@@ -218,9 +218,9 @@
     const font = '-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif';
     g.textAlign = 'center';
     g.fillStyle = '#FFB27A'; g.font = `800 40px ${font}`; g.fillText('NEW BADGE UNLOCKED', W / 2, 260);
-    g.fillStyle = '#F4F7FF'; g.font = `800 96px ${font}`; g.fillText(b.title, W / 2, 1300);
-    g.fillStyle = '#C9D6EA'; g.font = `500 44px ${font}`; g.fillText(b.hint, W / 2, 1390, 960);
-    g.fillStyle = '#A9BCD8'; g.font = `500 30px ${font}`; g.fillText('fitness.oalfawzan.sa', W / 2, H - 80);
+    g.fillStyle = '#F5F2EE'; g.font = `800 96px ${font}`; g.fillText(b.title, W / 2, 1300);
+    g.fillStyle = '#D9D1CA'; g.font = `500 44px ${font}`; g.fillText(b.hint, W / 2, 1390, 960);
+    g.fillStyle = '#B9B1AA'; g.font = `500 30px ${font}`; g.fillText('fitness.oalfawzan.sa', W / 2, H - 80);
     const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
     const file = new File([blob], 'fitness-badge-' + b.id + '.png', { type: 'image/png' });
     if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {

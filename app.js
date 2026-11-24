@@ -89,7 +89,7 @@
     // native status-bar tint on a Home Screen app when the theme changes.
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
-      const color = mode === 'light' ? '#f5f7fb' : '#16233d';
+      const color = mode === 'light' ? '#f5f7fb' : '#0E0F12';
       if (meta.content !== color) {
         const updated = meta.cloneNode();
         updated.setAttribute('content', color);
@@ -448,7 +448,7 @@
     if (!user) return;
     renderSharingState();
     if(page==='todaySection'){
-      renderHero();renderStats();renderStreak();window.FitnessRecap?.refresh?.();
+      renderHero();renderStats();renderStreak();window.FitnessRecap?.refresh?.();window.FitnessToday?.render?.();
     }else if(page==='logSection'){
       renderDay();
     }else if(page==='historySection'){
@@ -775,6 +775,9 @@
   // authenticated owner's daily entries; viewers cannot import or overwrite.
   window.FitnessChallenges?.mount?.(() => ({
     db, userId:user?.id||null, readonly:viewingShared(), entries
+  }));
+  window.FitnessToday?.mount?.(() => ({
+    userId:user?.id||null, readonly:viewingShared(), entries, selectedDate
   }));
   window.FitnessRecap?.mount?.(() => ({
     userId:user?.id||null,readonly:viewingShared(),entries

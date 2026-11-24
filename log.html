@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="app-build" content="20261124-1050">
+  <meta name="app-build" content="20261124-1051">
   <style id="critical">html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:#0E0F12;color-scheme:dark}html[data-theme="light"]{background:#F6F3EF;color-scheme:light}body{margin:0;background:transparent;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif}</style>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Fitness">
@@ -31,132 +31,16 @@
   <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
   <link rel="stylesheet" href="/pages.css?v=20261123-5tabs">
   <link rel="stylesheet" href="/ember-theme.css?v=20261124-smooth-v1">
+  <link rel="stylesheet" href="/pages-ember.css?v=20261124-pages-v4">
 
-  <!-- Inline critical layout: prevents giant icons and uneven daily-input cards
-       if GitHub Pages deploys HTML before an external stylesheet update. -->
-  <style id="fitness-critical-log-layout">
-    .logging-card #entryForm .quick-entry-grid {
-      display: grid !important;
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      gap: 10px !important;
-      align-items: stretch !important;
-      min-width: 0;
-      max-width: 100%;
-      margin-top: 8px;
-    }
-    .logging-card #entryForm .quick-entry-field {
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: space-between !important;
-      align-items: stretch !important;
-      grid-template-columns: none !important;
-      grid-template-rows: none !important;
-      min-width: 0 !important;
-      min-height: 122px !important;
-      padding: 13px !important;
-      gap: 12px !important;
-      border: 1px solid rgba(151,181,224,.27);
-      border-radius: 15px;
-      overflow: hidden;
-      background: rgba(255,255,255,.045);
-      box-sizing: border-box;
-    }
-    .logging-card #entryForm .quick-entry-steps {
-      background: linear-gradient(150deg,rgba(67,193,152,.14),rgba(67,193,152,.035));
-      border-color: rgba(85,208,164,.28);
-    }
-    .logging-card #entryForm .quick-entry-calories {
-      background: linear-gradient(150deg,rgba(246,130,114,.14),rgba(246,130,114,.035));
-      border-color: rgba(246,148,133,.30);
-    }
-    .logging-card #entryForm .quick-entry-info,
-    .logging-card #entryForm .quick-entry-copy {
-      display: block !important;
-      width: 100%;
-      min-width: 0 !important;
-      max-width: 100%;
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-    .logging-card #entryForm .quick-entry-field label {
-      display: block !important;
-      margin: 0 0 4px !important;
-      padding: 0 !important;
-      color: var(--text);
-      font-size: 15px !important;
-      font-weight: 750 !important;
-      line-height: 1.2 !important;
-    }
-    .logging-card #entryForm .quick-entry-caption {
-      display: block !important;
-      margin: 0;
-      color: var(--muted);
-      font-size: 12px !important;
-      line-height: 1.35 !important;
-      overflow-wrap: break-word;
-    }
-    .logging-card #entryForm .quick-entry-field > input {
-      display: block !important;
-      position: static !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      min-width: 0 !important;
-      min-height: 46px !important;
-      height: 46px !important;
-      margin: 0 !important;
-      padding: 9px 10px !important;
-      font-size: 17px !important;
-      font-weight: 650;
-      line-height: 1.3;
-      text-align: left;
-      font-variant-numeric: tabular-nums;
-      box-sizing: border-box;
-    }
-    .logging-card #entryForm .quick-entry-grid > .calorie-mode-row {
-      grid-column: 1 / -1 !important;
-      display: flex !important;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      min-width: 0;
-      margin: 0 !important;
-      padding: 1px 2px !important;
-      gap: 6px;
-    }
-    .logging-card #entryForm .calorie-mode-row .field-help {
-      margin: 0 !important;
-      font-size: 12px !important;
-      line-height: 1.4;
-    }
-    .logging-card #entryForm .calorie-mode-row [hidden],
-    [hidden] { display: none !important; }
-    :root[data-theme="light"] .logging-card #entryForm .quick-entry-steps {
-      background: linear-gradient(150deg,#e6f6ed,#f7fdf9);
-      border-color: #b7e2ca;
-    }
-    :root[data-theme="light"] .logging-card #entryForm .quick-entry-calories {
-      background: linear-gradient(150deg,#fff0e9,#fff9f5);
-      border-color: #f0c7b9;
-    }
-    :root[data-theme="light"] .logging-card #entryForm .quick-entry-field > input {
-      background: #fff;
-    }
-    @media (max-width: 359px) {
-      .logging-card #entryForm .quick-entry-grid {
-        grid-template-columns: minmax(0, 1fr) !important;
-      }
-      .logging-card #entryForm .quick-entry-field {
-        min-height: 0 !important;
-      }
-    }
-  </style>
   <script>try{const mode=localStorage.getItem('fitness-theme')==='light'?'light':'dark';document.documentElement.dataset.theme=mode;document.querySelector('meta[name="theme-color"]').setAttribute('content',mode==='light'?'#f5f7fb':'#0E0F12')}catch(e){}</script>
   <script defer src="/page-loading.js?v=20261124-update-v1"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script defer src="/config.js"></script>
   <script defer src="/food-catalog.js?v=20261115-food-v2"></script>
   <script defer src="/food-browser.js?v=20261115-ux-v2"></script>
-  <script defer src="/app.js?v=20261124-ember-v1"></script>
+  <script defer src="/pages-ember.js?v=20261124-pages-v1"></script>
+  <script defer src="/app.js?v=20261124-pages-v1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>

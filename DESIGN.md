@@ -392,3 +392,22 @@ now carries `<meta name="app-build">`; `page-loading.js` compares it with
 `/version.json` (fetched with no-store) on open and when the app returns to
 the foreground, and reloads once through `?_b=<build>` if they differ.
 Run `tools/bump-build.sh` before each deploy.
+
+### 24 Nov 2026: Ember layout for Check-in, Calendar, Challenges and Share
+
+Following the Dribbble pattern (near-black + one orange, few big numbers,
+clear hierarchy), the other pages now match Today. Code: `pages-ember.js`
+(adds UI around app.js's existing IDs; app.js calls `FitnessPages.render`)
+and `pages-ember.css`.
+- All pages: an orange eyebrow (date / section) above a Today-sized title.
+- Check-in: date as a pill; Steps is the hero (huge number, live bar to 10K,
+  km, quick-add chips +1,000 / +2,500 / +5,000 / 10K); Calories as one row;
+  Save check-in floats above the bottom bar.
+- Calendar: "This month" card (total steps, 10K days, km, avg, best day and
+  a bar per day with the 10K line); days are shaded by steps (heat) and 10K
+  days are solid orange; calories left the cells (still on the day itself);
+  all-time numbers as tiles.
+- Challenges: three tiles (this month km, badges earned, all-time km).
+- Share: icon headers; reminder toggles in orange.
+- Removed the old inline "fitness-critical-log-layout" style block from every
+  page; it forced the two-column Steps/Calories layout.

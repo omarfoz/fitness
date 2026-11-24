@@ -457,6 +457,7 @@
       window.FitnessChallenges?.refresh?.();
     }
     if(page==='todaySection')window.FitnessChallenges?.celebrate?.();
+    window.FitnessPages?.render?.(page);
   }
   function refreshForNewDay() {
     const currentDate = localDateKey(new Date());
@@ -655,9 +656,11 @@
       } else {
         btn.append(status);
       }
+      if (entry?.steps != null) btn.style.setProperty('--heat', Math.min(1, entry.steps / STEP_GOAL).toFixed(2));
       btn.addEventListener('click', () => setDate(key, true));
       grid.append(btn);
     }
+    window.FitnessPages?.render?.(page);
   }
   function renderSummary() {
     const rows = [...entries.values()];
@@ -775,6 +778,9 @@
   // authenticated owner's daily entries; viewers cannot import or overwrite.
   window.FitnessChallenges?.mount?.(() => ({
     db, userId:user?.id||null, readonly:viewingShared(), entries
+  }));
+  window.FitnessPages?.mount?.(() => ({
+    userId:user?.id||null, readonly:viewingShared(), entries, selectedDate, displayedMonth
   }));
   window.FitnessToday?.mount?.(() => ({
     userId:user?.id||null, readonly:viewingShared(), entries, selectedDate

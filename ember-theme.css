@@ -484,3 +484,19 @@
 .story-preview-caption { color: var(--muted) !important; }
 :root:not([data-theme="light"]) .story-preview-caption { color: #B9B1AA !important; }
 :focus-visible { outline-color: #EA580C; }
+
+/* ---------- 16. Smooth page-to-page in the Home Screen app ----------
+   Cross-document view transitions (Safari 18.2+, Chrome 126+): the old page
+   stays on screen until the new one is laid out, then a short cross-fade.
+   Header and bottom bar are pinned so they do not move at all. */
+@view-transition { navigation: auto; }
+.app-header { view-transition-name: app-header; }
+.app-bottom-nav { view-transition-name: app-bottom-nav; }
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: .18s; animation-timing-function: ease-out; }
+::view-transition-group(app-header),
+::view-transition-group(app-bottom-nav) { animation-duration: 0s; }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+}
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }

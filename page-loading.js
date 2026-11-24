@@ -3,7 +3,7 @@
  * Keep native links/back/forward and warm likely destinations quietly. */
 (() => {
   'use strict';
-  const ROUTES = new Set(['/', '/log.html', '/history.html', '/share.html']);
+  const ROUTES = new Set(['/', '/log.html', '/history.html', '/challenges.html', '/share.html']);
   try { sessionStorage.removeItem('fitness-page-transition'); } catch (_) {}
 
   // Previous app versions call hide() once Supabase has finished restoring

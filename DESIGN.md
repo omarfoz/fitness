@@ -370,3 +370,16 @@ No green, pink, purple or blue left in either mode.
 
 No emoji in the UI. Icons are inline SVG (`.ico-flame`, `.ico-medal` in
 `ember-theme.css`); copy that used emoji now relies on the words alone.
+
+### 24 Nov 2026: Smooth page changes in the Home Screen app
+
+On iPhone (Home Screen app) text looked bigger for a moment on every page
+change, then settled. Fixes:
+- `-webkit-text-size-adjust: 100%` in an inline `<style id="critical">` at the
+  top of every page, so Safari never runs its text inflation while the CSS
+  files are still loading. The same block paints the page background
+  (graphite / paper) before any CSS arrives.
+- `@view-transition { navigation: auto; }` (Safari 18.2+): the old page stays
+  until the new one is laid out, then a 0.18 s cross-fade. Header and bottom
+  bar are pinned with `view-transition-name`, so they do not blink.
+- Challenges added to the pages prefetched on touch.

@@ -383,3 +383,12 @@ change, then settled. Fixes:
   until the new one is laid out, then a 0.18 s cross-fade. Header and bottom
   bar are pinned with `view-transition-name`, so they do not blink.
 - Challenges added to the pages prefetched on touch.
+
+### 24 Nov 2026: Always on the latest version
+
+GitHub Pages lets browsers keep HTML for 10 minutes and the iPhone Home
+Screen app keeps it longer, so after a deploy people saw old pages. Every page
+now carries `<meta name="app-build">`; `page-loading.js` compares it with
+`/version.json` (fetched with no-store) on open and when the app returns to
+the foreground, and reloads once through `?_b=<build>` if they differ.
+Run `tools/bump-build.sh` before each deploy.

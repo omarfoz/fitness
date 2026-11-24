@@ -73,3 +73,39 @@
   if (document.readyState === 'complete') backgroundWarm();
   else window.addEventListener('load', backgroundWarm, { once: true });
 })();
+
+/* Stay on the latest version. GitHub Pages lets browsers keep HTML for up to
+ * 10 minutes and the iPhone Home Screen app holds it longer, so after a
+ * deploy people could see old pages. On open (and when the app comes back to
+ * the foreground) compare this page's build with /version.json; if newer,
+ * reload once through a cache-busting URL, then tidy the URL. */
+(() => {
+  'use strict';
+  const meta = document.querySelector('meta[name="app-build"]');
+  const mine = meta?.content || '';
+  try {
+    const u = new URL(location.href);
+    if (u.searchParams.has('_b')) { u.searchParams.delete('_b'); history.replaceState(history.state, '', u.pathname + u.search + u.hash); }
+  } catch (_) {}
+  let checking = false;
+  const check = async () => {
+    if (checking || !mine || !navigator.onLine) return;
+    checking = true;
+    try {
+      const r = await fetch('/version.json?t=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) return;
+      const { build } = await r.json();
+      if (!build || build === mine) return;
+      const key = 'fitness-reloaded-for';
+      if (sessionStorage.getItem(key) === build) return; // never loop
+      sessionStorage.setItem(key, build);
+      const u = new URL(location.href);
+      u.searchParams.set('_b', build);
+      location.replace(u.pathname + u.search + u.hash);
+    } catch (_) { /* offline or blocked: keep the page as is */ }
+    finally { checking = false; }
+  };
+  check();
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+  window.addEventListener('pageshow', (e) => { if (e.persisted) check(); });
+})();

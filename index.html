@@ -31,7 +31,7 @@
   <link rel="stylesheet" href="/challenges.css?v=20261124-ember-v1">
   <link rel="stylesheet" href="/pages.css?v=20261123-5tabs">
   <link rel="stylesheet" href="/story-card.css?v=20261121-declutter-v1">
-  <link rel="stylesheet" href="/ember-theme.css?v=20261124-ember-v2">
+  <link rel="stylesheet" href="/ember-theme.css?v=20261124-ember-v5">
 
   <!-- Inline critical layout: prevents giant icons and uneven daily-input cards
        if GitHub Pages deploys HTML before an external stylesheet update. -->
@@ -157,11 +157,11 @@
   <script defer src="/config.js"></script>
   <script defer src="/progress-metrics.js?v=20261121-declutter-v1"></script>
   <script defer src="/story-card.js?v=20261124-ember-v1"></script>
-  <script defer src="/weekly-recap.js?v=20261124-ember-v1"></script>
+  <script defer src="/weekly-recap.js?v=20261124-ember-v3"></script>
   <script defer src="/badges.js?v=20261123-challenges-v1"></script>
   <script defer src="/challenge-medals.js?v=20261123-challenges-v1"></script>
-  <script defer src="/challenges.js?v=20261124-ember-v1"></script>
-  <script defer src="/today-hero.js?v=20261124-ember-v1"></script>
+  <script defer src="/challenges.js?v=20261124-ember-v3"></script>
+  <script defer src="/today-hero.js?v=20261124-ember-v3"></script>
   <script defer src="/app.js?v=20261124-ember-v1"></script>
 </head>
 <body>
@@ -237,7 +237,7 @@
           <h1 id="todayTitle">Let's walk.</h1>
           <p class="muted small" id="overviewDay">Today</p>
         </div>
-        <span class="streak-pill" id="streakPill" aria-label="10K streak">🔥 <span id="streakCurrent">0</span> <span id="streakPillUnit">days</span></span>
+        <span class="streak-pill" id="streakPill" aria-label="10K streak"><svg class="ico-flame" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true"><path fill="currentColor" d="M12.6 2.2c.4 3-1.2 4.6-2.7 6.2C8.4 10 7 11.6 7 14.3A5 5 0 0 0 12 19.5a5 5 0 0 0 5-5.2c0-2.2-1-3.6-2-4.8.1 1.6-.5 2.7-1.6 3.1.6-3.7-.3-7.4-.8-10.4Z"/><path fill="currentColor" opacity=".55" d="M12 21.8c-3.9 0-7.2-3-7.2-7.4 0-1.6.4-3 1.1-4.2-.1 3.6 1.7 7.4 6.1 7.4s6.2-3.8 6.1-7.4c.7 1.2 1.1 2.6 1.1 4.2 0 4.4-3.3 7.4-7.2 7.4Z"/></svg> <span id="streakCurrent">0</span> <span id="streakPillUnit">days</span></span>
       </section>
 
       <section id="trackerSwitcher" class="glass-card tracker-switcher" hidden aria-label="Choose a progress tracker">

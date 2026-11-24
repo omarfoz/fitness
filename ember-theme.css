@@ -319,3 +319,168 @@
 :root:not([data-theme="light"]) .calendar-metrics-legend .legend-step { color: #FF9A5C !important; }
 :root:not([data-theme="light"]) .calendar-metric--calories,
 :root:not([data-theme="light"]) .calendar-metrics-legend .legend-calorie { color: #E7D9CC !important; }
+
+/* ---------- 13. Light mode: Ember on paper ---------- */
+:root[data-theme="light"] {
+  --bg: #F6F3EF; --text: #1C1917; --muted: #6B635C; --border: rgba(28,25,23,.09);
+  --ios-canvas: #F6F3EF;
+}
+:root[data-theme="light"] html,
+:root[data-theme="light"] body { background: #F6F3EF !important; background-color: #F6F3EF !important; color: #1C1917; }
+:root[data-theme="light"] body::before {
+  content: ""; position: fixed; inset: 0 0 auto 0; height: 55vh; pointer-events: none; z-index: 0;
+  background: radial-gradient(90% 70% at 50% -10%, rgba(249,115,22,.10), transparent 70%);
+}
+:root[data-theme="light"] .glass-card,
+:root[data-theme="light"] .app-header,
+:root[data-theme="light"] .tracker-switcher,
+:root[data-theme="light"] .energy-card,
+:root[data-theme="light"] .steps-card,
+:root[data-theme="light"] .compact-metric,
+:root[data-theme="light"] .logging-card,
+:root[data-theme="light"] .history-card,
+:root[data-theme="light"] .push-card,
+:root[data-theme="light"] .share-card,
+:root[data-theme="light"] .food-browser,
+:root[data-theme="light"] .summary-panel,
+:root[data-theme="light"] .ch-card,
+:root[data-theme="light"] .challenge-strip {
+  background: #FFFFFF !important;
+  border-color: rgba(28,25,23,.08) !important;
+  box-shadow: 0 1px 2px rgba(28,25,23,.04), 0 12px 32px rgba(28,25,23,.06) !important;
+}
+:root[data-theme="light"] .streak-panel,
+:root[data-theme="light"] .ch-card.is-live,
+:root[data-theme="light"] .today-hero {
+  background: radial-gradient(120% 90% at 0% 0%, rgba(249,115,22,.09), transparent 60%), #FFFFFF !important;
+  border-color: rgba(234,88,12,.28) !important;
+}
+:root[data-theme="light"] .button.secondary {
+  background: rgba(234,88,12,.08) !important; border-color: rgba(234,88,12,.35) !important; color: #9A3412 !important;
+}
+:root[data-theme="light"] .button.subtle,
+:root[data-theme="light"] .icon-button { background: #FFFFFF !important; border-color: rgba(28,25,23,.12) !important; color: #1C1917 !important; }
+:root[data-theme="light"] .pill,
+:root[data-theme="light"] .landmark-tag,
+:root[data-theme="light"] .recap-tag,
+:root[data-theme="light"] .food-browser-tag,
+:root[data-theme="light"] .food-category.is-active {
+  background: rgba(234,88,12,.09) !important; border-color: rgba(234,88,12,.28) !important; color: #9A3412 !important;
+}
+:root[data-theme="light"] input,
+:root[data-theme="light"] select,
+:root[data-theme="light"] textarea { background: #FFFFFF !important; border-color: rgba(28,25,23,.14) !important; color: #1C1917 !important; }
+:root[data-theme="light"] input:focus,
+:root[data-theme="light"] select:focus,
+:root[data-theme="light"] textarea:focus { border-color: #EA580C !important; box-shadow: 0 0 0 3px rgba(234,88,12,.15) !important; }
+:root[data-theme="light"] input[type=checkbox] { accent-color: #EA580C; }
+:root[data-theme="light"] .eyebrow,
+:root[data-theme="light"] .tracker-switcher label,
+:root[data-theme="light"] .text-button,
+:root[data-theme="light"] .goal-caption,
+:root[data-theme="light"] .steps-total strong,
+:root[data-theme="light"] .badge-next,
+:root[data-theme="light"] .ch-team-head span,
+:root[data-theme="light"] .ch-soon,
+:root[data-theme="light"] .ch-live,
+:root[data-theme="light"] .food-result-energy,
+:root[data-theme="light"] .custom-food-title svg,
+:root[data-theme="light"] .recap-big,
+:root[data-theme="light"] .steps-ring-label { color: #C2410C !important; }
+:root[data-theme="light"] .gradient-text { background-image: linear-gradient(110deg, #EA580C, #9A3412) !important; }
+:root[data-theme="light"] .tracker-mark { color: #EA580C !important; background: rgba(234,88,12,.08) !important; border-color: rgba(234,88,12,.25) !important; }
+:root[data-theme="light"] .app-bottom-nav { background: rgba(255,255,255,.94) !important; border-top-color: rgba(28,25,23,.08) !important; }
+:root[data-theme="light"] .app-bottom-nav .bottom-tab { color: #6B635C !important; }
+:root[data-theme="light"] .app-bottom-nav .bottom-tab[aria-current="page"] { color: #C2410C !important; background: rgba(234,88,12,.09) !important; }
+:root[data-theme="light"] .track-fill,
+:root[data-theme="light"] .step-track span,
+:root[data-theme="light"] #stepProgress,
+:root[data-theme="light"] .ch-track span,
+:root[data-theme="light"] .ch-track-team span,
+:root[data-theme="light"] .challenge-strip-bar span,
+:root[data-theme="light"] #challengeStripBar { background: linear-gradient(90deg, #EA580C, #FB923C) !important; }
+:root[data-theme="light"] .metric-icon { color: #C2410C !important; background: rgba(234,88,12,.09) !important; }
+/* calendar */
+:root[data-theme="light"] .calendar-day,
+:root[data-theme="light"] .calendar-day.is-logged:not(.is-flex) { background: #FFFFFF !important; border-color: rgba(28,25,23,.09) !important; color: #1C1917 !important; }
+:root[data-theme="light"] .calendar-day.is-goal { background: rgba(249,115,22,.10) !important; border-color: rgba(234,88,12,.35) !important; }
+:root[data-theme="light"] .calendar-day.is-selected { border-color: #EA580C !important; box-shadow: inset 0 0 0 1px #EA580C !important; }
+:root[data-theme="light"] .calendar-day.is-today { color: #C2410C !important; }
+:root[data-theme="light"] .calendar-day.empty { background: transparent !important; border-color: transparent !important; }
+:root[data-theme="light"] .calendar-metric--steps,
+:root[data-theme="light"] .calendar-metrics-legend .legend-step { color: #C2410C !important; }
+:root[data-theme="light"] .calendar-metric--calories,
+:root[data-theme="light"] .calendar-metrics-legend .legend-calorie { color: #57534E !important; }
+:root[data-theme="light"] .summary-panel strong,
+:root[data-theme="light"] .summary-panel > div strong { color: #1C1917 !important; }
+:root[data-theme="light"] .key-dot.logged { background-color: #EA580C !important; }
+/* check-in + food */
+:root[data-theme="light"] .quick-entry-field { background: #FAF8F6 !important; border-color: rgba(28,25,23,.10) !important; }
+:root[data-theme="light"] .quick-entry-steps { background: rgba(249,115,22,.07) !important; border-color: rgba(234,88,12,.32) !important; }
+:root[data-theme="light"] .food-category,
+:root[data-theme="light"] .food-result,
+:root[data-theme="light"] .selected-food-row,
+:root[data-theme="light"] .quick-food { background: #FFFFFF !important; border-color: rgba(28,25,23,.10) !important; }
+/* dialogs + tabs + challenges */
+:root[data-theme="light"] .recap-dialog,
+:root[data-theme="light"] .story-dialog { background: #FFFFFF !important; border-color: rgba(28,25,23,.10) !important; color: #1C1917 !important; }
+:root[data-theme="light"] .badge-dialog { background: radial-gradient(90% 60% at 50% 30%, rgba(249,115,22,.14), transparent 70%), #FFFFFF !important; color: #1C1917 !important; }
+:root[data-theme="light"] .recap-dots i.is-on { background: #EA580C !important; }
+:root[data-theme="light"] .ch-tabs,
+:root[data-theme="light"] .story-format { background: rgba(28,25,23,.04) !important; border-color: rgba(28,25,23,.08) !important; }
+:root[data-theme="light"] .ch-tabs button,
+:root[data-theme="light"] .story-format button { color: #57534E !important; }
+:root[data-theme="light"] .ch-tabs button[aria-checked="true"],
+:root[data-theme="light"] .story-format button[aria-checked="true"] {
+  background: #FFFFFF !important; color: #9A3412 !important; box-shadow: inset 0 0 0 1px rgba(234,88,12,.40), 0 2px 8px rgba(28,25,23,.06) !important;
+}
+:root[data-theme="light"] .ch-team,
+:root[data-theme="light"] .bd-near-row { background: #FAF8F6 !important; border-color: rgba(28,25,23,.09) !important; }
+/* today */
+:root[data-theme="light"] .streak-pill { background: rgba(234,88,12,.10); border-color: rgba(234,88,12,.35); color: #9A3412; }
+:root[data-theme="light"] .steps-ring-track { stroke: rgba(28,25,23,.07); }
+:root[data-theme="light"] .steps-ring.is-done svg { filter: drop-shadow(0 0 12px rgba(234,88,12,.25)); }
+:root[data-theme="light"] .landmark-today .landmark-goal,
+:root[data-theme="light"] .landmark-goal { color: #9A3412 !important; }
+:root[data-theme="light"] .landmark-today h2,
+:root[data-theme="light"] .landmark-today h3 { color: #1C1917 !important; }
+
+/* ---------- 14. Inline SVG icons (no emoji) ---------- */
+.ico-flame, .ico-medal { display: inline-block; width: 1em; height: 1em; vertical-align: -0.14em; flex: 0 0 auto; }
+.ico-flame { color: #FF7A3D; }
+.ico-medal { color: #E0A93A; }
+:root[data-theme="light"] .ico-flame { color: #EA580C; }
+:root[data-theme="light"] .ico-medal { color: #B7791F; }
+.streak-pill .ico-flame { width: 1.05em; height: 1.05em; }
+:root[data-theme="light"] .landmark-next { color: #9A3412 !important; }
+:root[data-theme="light"] .landmark-track,
+:root[data-theme="light"] .challenge-strip-track,
+:root[data-theme="light"] .ch-track { background: rgba(28,25,23,.08) !important; }
+
+/* ---------- 15. Ring icon size fix + dialog text in both modes ---------- */
+.steps-ring svg.ico-flame { display: inline-block; width: 1em; height: 1em; }
+.recap-head { color: var(--muted) !important; }
+.recap-line { color: var(--text) !important; }
+.story-dialog-header h2,
+.story-date-control label { color: var(--text) !important; }
+.story-dialog-note, .story-status, .story-date-help { color: var(--muted) !important; }
+.story-format button { color: var(--muted); }
+:root:not([data-theme="light"]) .recap-head,
+:root:not([data-theme="light"]) .story-status,
+:root:not([data-theme="light"]) .story-date-help { color: #B9B1AA !important; }
+:root[data-theme="light"] .recap-dialog .icon-button,
+:root[data-theme="light"] .story-dialog .icon-button,
+:root[data-theme="light"] .badge-dialog .icon-button,
+:root[data-theme="light"] dialog [class*="close"] { color: #1C1917 !important; background: #F6F3EF !important; border-color: rgba(28,25,23,.12) !important; }
+:root[data-theme="light"] .story-date-control { background: #FAF8F6 !important; border-color: rgba(28,25,23,.09) !important; }
+:root[data-theme="light"] .story-preview,
+:root[data-theme="light"] .story-dialog canvas,
+:root[data-theme="light"] .story-dialog img { box-shadow: 0 10px 30px rgba(28,25,23,.18); }
+:root[data-theme="light"] .badge-dialog h2,
+:root[data-theme="light"] .badge-dialog h3 { color: #1C1917 !important; }
+:root[data-theme="light"] .badge-dialog p { color: #57534E !important; }
+:root[data-theme="light"] .badge-dialog .badge-next { color: #C2410C !important; }
+.story-dialog img, .story-preview img, #storyPreview { background: #0E0F12 !important; }
+.story-preview-caption { color: var(--muted) !important; }
+:root:not([data-theme="light"]) .story-preview-caption { color: #B9B1AA !important; }
+:focus-visible { outline-color: #EA580C; }

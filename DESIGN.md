@@ -363,3 +363,10 @@ energy colour on near-black; navy read as banking.
   ember), Metro and plane accents ember, story card / recap / badge share
   images on graphite with ember highlights. Badge tiers and medal metals are
   unchanged.
+
+Light mode is "Ember on paper": warm off-white page (#F6F3EF), white cards,
+dark warm text, the same single ember accent (#EA580C / #C2410C for text).
+No green, pink, purple or blue left in either mode.
+
+No emoji in the UI. Icons are inline SVG (`.ico-flame`, `.ico-medal` in
+`ember-theme.css`); copy that used emoji now relies on the words alone.

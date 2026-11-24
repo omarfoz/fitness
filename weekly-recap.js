@@ -333,13 +333,13 @@
     }];
     if (w.best) out.push({
       art: 'shoe', big: compact(w.best.steps) + ' steps',
-      lines: [`${dayName(w.best.key)} was your power day! 💪`,
+      lines: [`${dayName(w.best.key)} was your power day!`,
         w.goalDays ? `You hit 10K on ${w.goalDays} of ${w.days.length} days.${w.goalDays >= 5 ? ' Unstoppable!' : ''}` : 'This week, go for your first 10K day!']
     });
     out.push(w.streak.current > 0
       ? { art: 'flame', big: w.streak.current + (w.streak.current === 1 ? ' day' : ' days'),
-          lines: ['Your 10K streak is on fire. Don\'t let it go out! 🔥', w.streak.current >= w.streak.best ? 'This is your best streak ever!' : `Best streak: ${w.streak.best} days. Can you beat it?`] }
-      : { art: 'flame', big: 'New week', lines: ['Fresh start! Hit 10,000 steps today to light a new streak. 🔥', w.streak.best ? `Best streak so far: ${w.streak.best} days.` : ''].filter(Boolean) });
+          lines: ['Your 10K streak is on fire. Don\'t let it go out!', w.streak.current >= w.streak.best ? 'This is your best streak ever!' : `Best streak: ${w.streak.best} days. Can you beat it?`] }
+      : { art: 'flame', big: 'New week', lines: ['Fresh start! Hit 10,000 steps today to light a new streak.', w.streak.best ? `Best streak so far: ${w.streak.best} days.` : ''].filter(Boolean) });
     return out;
   }
 
@@ -466,8 +466,8 @@
     if (steps < GOAL) {
       const left = GOAL - steps;
       goal = streak.current > 0
-        ? `${left.toLocaleString('en-US')} steps to 10K. Keep your ${streak.current}-day streak alive! 🔥`
-        : `${left.toLocaleString('en-US')} steps to 10K and a brand-new streak! 🔥`;
+        ? `${left.toLocaleString('en-US')} steps to 10K. Keep your ${streak.current}-day streak alive!`
+        : `${left.toLocaleString('en-US')} steps to 10K and a brand-new streak!`;
       pct = steps / GOAL;
     } else if (next) {
       const from = MILESTONES.filter((m) => m.km * 1000 / STEP_M <= steps).pop();
@@ -475,7 +475,7 @@
       goal = `10K done! Only ${next.stepsLeft.toLocaleString('en-US')} steps to ${next.text}.`;
       pct = (steps - startSteps) / (endSteps - startSteps);
     } else {
-      goal = 'You walked further than Diriyah today. Legend! 🏆';
+      goal = 'You walked further than Diriyah today. Legend!';
       pct = 1;
     }
     $('landmarkNext').textContent = goal;

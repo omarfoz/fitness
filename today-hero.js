@@ -26,8 +26,8 @@
       ring.setAttribute('aria-valuenow', String(Math.min(GOAL, steps)));
       ring.classList.toggle('is-done', steps >= GOAL);
     }
-    $('stepMeta').textContent = !has ? 'Log steps to fill the ring'
-      : steps >= GOAL ? 'of 10,000 · goal hit 🔥' : `${(GOAL - steps).toLocaleString('en-US')} to go`;
+    $('stepMeta').innerHTML = !has ? 'Log steps to fill the ring'
+      : steps >= GOAL ? 'of 10,000 · goal hit <svg class="ico-flame" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true"><path fill="currentColor" d="M12.6 2.2c.4 3-1.2 4.6-2.7 6.2C8.4 10 7 11.6 7 14.3A5 5 0 0 0 12 19.5a5 5 0 0 0 5-5.2c0-2.2-1-3.6-2-4.8.1 1.6-.5 2.7-1.6 3.1.6-3.7-.3-7.4-.8-10.4Z"/><path fill="currentColor" opacity=".55" d="M12 21.8c-3.9 0-7.2-3-7.2-7.4 0-1.6.4-3 1.1-4.2-.1 3.6 1.7 7.4 6.1 7.4s6.2-3.8 6.1-7.4c.7 1.2 1.1 2.6 1.1 4.2 0 4.4-3.3 7.4-7.2 7.4Z"/></svg>' : `${(GOAL - steps).toLocaleString('en-US')} to go`;
     $('heroKm').textContent = has ? (Math.round(steps * STEP_M / 100) / 10).toString() : '—';
   }
 
@@ -70,9 +70,9 @@
     const end = new Date(Number(month.slice(0, 4)), Number(month.slice(5)), 0);
     const left = Math.max(0, Math.ceil((end - parse(key(new Date()))) / 864e5) + 1);
     $('challengeStripTitle').textContent = ch.title;
-    $('challengeStripText').textContent = next != null
+    $('challengeStripText').innerHTML = next != null
       ? `${fmt(p.value)} · ${tiers[p.level][0].toUpperCase() + tiers[p.level].slice(1)} in ${fmt(next - p.value)}`
-      : `${fmt(p.value)} · Gold won! 🎉`;
+      : `${fmt(p.value)} · Gold won <svg class="ico-medal" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true"><path fill="currentColor" opacity=".6" d="M7 2h4l2 5-3 2zM17 2h-4l-2 5 3 2z"/><circle cx="12" cy="15" r="6.2" fill="currentColor"/><path fill="#fff" opacity=".85" d="m12 11.4 1.1 2.2 2.4.4-1.7 1.7.4 2.4-2.2-1.1-2.2 1.1.4-2.4-1.7-1.7 2.4-.4z"/></svg>`;
     $('challengeStripDays').textContent = `${left} day${left === 1 ? '' : 's'}`;
     const goal = next ?? ch.levels[2];
     $('challengeStripBar').style.width = Math.max(3, Math.min(100, (p.value / goal) * 100)).toFixed(0) + '%';

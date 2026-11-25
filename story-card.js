@@ -196,13 +196,17 @@
     const n=data.streak.current;
     const stats=[
       ['10K streak',n+(n===1?' day':' days')],
-      ['10K days',data.goalDays+' of '+data.monthEntries.length+' logged'],
+      ['10K days · '+data.monthEntries.length+' logged',String(data.goalDays)],
       ['Best streak',data.streak.best+(data.streak.best===1?' day':' days')]
     ];
     stats.forEach(([label,value],i)=>{
       const x=P+i*262;
-      text(c,label,x,186,27,K.mist,500);
-      text(c,value,x-2,254,68,i===0&&n>0?'#FFB27A':K.ink,900,DISPLAY);
+      // Each stat keeps to its own 240px column: shrink to fit instead of overlapping.
+      const COL=240;
+      let ls=27; font(c,ls,500,BODY); while(ls>18&&c.measureText(label).width>COL){ls--;font(c,ls,500,BODY);}
+      text(c,label,x,186,ls,K.mist,500);
+      let vs=68; font(c,vs,900,DISPLAY); while(vs>36&&c.measureText(value).width>COL){vs-=2;font(c,vs,900,DISPLAY);}
+      text(c,value,x-2,254,vs,i===0&&n>0?'#FFB27A':K.ink,900,DISPLAY);
     });
 
     // Calendar grid with a weekly column on the right.

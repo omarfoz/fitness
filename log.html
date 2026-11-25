@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="app-build" content="20261126-0003">
+  <meta name="app-build" content="20261126-0123">
   <style id="critical">html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:#0E0F12;color-scheme:dark}html[data-theme="light"]{background:#F6F3EF;color-scheme:light}body{margin:0;background:transparent;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif}</style>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Fitness">
@@ -31,7 +31,7 @@
   <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
   <link rel="stylesheet" href="/pages.css?v=20261123-5tabs">
   <link rel="stylesheet" href="/ember-theme.css?v=20261124-clip-v3">
-  <link rel="stylesheet" href="/pages-ember.css?v=20261126-3d-v1">
+  <link rel="stylesheet" href="/pages-ember.css?v=20261126-fb-v2">
 
   <script>try{const mode=localStorage.getItem('fitness-theme')==='light'?'light':'dark';document.documentElement.dataset.theme=mode;document.querySelector('meta[name="theme-color"]').setAttribute('content',mode==='light'?'#f5f7fb':'#0E0F12')}catch(e){}</script>
   <script defer src="/page-loading.js?v=20261124-update-v1"></script>
@@ -39,8 +39,8 @@
   <script defer src="/config.js"></script>
   <script defer src="/food-catalog.js?v=20261115-food-v2"></script>
   <script defer src="/food-browser.js?v=20261115-ux-v2"></script>
-  <script defer src="/pages-ember.js?v=20261124-pages-v1"></script>
-  <script defer src="/app.js?v=20261124-pages-v1"></script>
+  <script defer src="/pages-ember.js?v=20261126-fb-v2"></script>
+  <script defer src="/app.js?v=20261126-fb-v1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -109,7 +109,7 @@
     </section>
 
     <main id="appView" data-page="logSection" hidden>
-      <section class="page-intro" aria-labelledby="pageTitle"><div><h1 id="pageTitle">Check-in</h1><p>Steps and food are all you need. Everything else is optional.</p></div></section>
+      <section class="page-intro" aria-labelledby="pageTitle"><div><h1 id="pageTitle">Check-in</h1><p>Enter your steps. Everything else is optional.</p></div></section>
       <section id="trackerSwitcher" class="glass-card tracker-switcher" hidden aria-label="Choose a progress tracker">
         <div><label for="trackerSelect">VIEWING PROGRESS</label><p class="muted small">Choose whose progress to view.</p></div>
         <select id="trackerSelect" aria-label="Progress tracker"><option value="mine">My progress</option></select>

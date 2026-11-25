@@ -86,15 +86,116 @@
     const entries = st.entries, selected = st.selectedDate || key(new Date());
     const e = entries.get(selected), steps = Number(e?.steps) || 0, has = e?.steps != null;
     $('todayGreeting').textContent = st.readonly ? 'Viewing a shared tracker' : greeting();
-    $('todayTitle').textContent = !has ? "Let's walk." : steps >= GOAL ? '10K done. On fire!' : `${(GOAL - steps).toLocaleString('en-US')} steps to 10K`;
+    const km = Math.round(steps * STEP_M / 100) / 10;
+    const isToday = selected === key(new Date());
+    // Celebrate what was walked; the shortfall is said once, inside the ring.
+    $('todayTitle').textContent = !has ? (isToday ? "Let's walk." : 'Nothing logged yet.')
+      : steps >= GOAL ? '10K done. On fire!'
+      : `You walked about ${km} km${isToday ? ' today' : ''}.`;
     renderRing(steps, has);
     renderWeek(entries, selected);
     renderChallenge(entries);
     const n = Number(($('streakCurrent')?.textContent || '0').replace(/\D/g, '')) || 0;
     $('streakPillUnit').textContent = n === 1 ? 'day' : 'days';
-    $('streakPill')?.classList.toggle('is-cold', n === 0);
+    if ($('streakPill')) $('streakPill').hidden = n === 0;   // only shown when there is a streak to celebrate
+    // Optional metrics appear only once entered.
+    if ($('heroCalBox')) $('heroCalBox').hidden = e?.calories_estimate == null;
+    if ($('heroFastBox')) $('heroFastBox').hidden = e?.fasting_hours == null;
+    // The title already says the distance below 10K; drop the stats row when it would only repeat it.
+    const stats = document.querySelector('.hero-stats');
+    if (stats) stats.hidden = has && steps < GOAL && e?.calories_estimate == null && e?.fasting_hours == null;
+    const btn = $('quickLogBtn');
+    if (btn && !st.readonly && btn.firstChild) btn.firstChild.textContent = has ? 'Update steps' : 'Log steps';
+    renderHighlight(entries);
   }
 
-  function mount(cb) { if (!getState) getState = cb; }
-  window.FitnessToday = Object.freeze({ mount, render });
+  /* ---------- weekly highlight: the recap's best line, on Today ---------- */
+  function renderHighlight(entries) {
+    const box = $('weekHighlight'), R = window.FitnessRecap;
+    if (!box || !R?.summary) return;
+    const w = R.summary(entries, key(new Date()));
+    if (!w?.total) { box.hidden = true; return; }
+    box.hidden = false;
+    const kmW = Math.round(w.km * 10) / 10;
+    $('weekHighlightKicker').textContent = (w.label === 'Last week' ? 'LAST WEEK' : 'THIS WEEK SO FAR') + ` · ${w.logged} ${w.logged === 1 ? 'DAY' : 'DAYS'} LOGGED`;
+    $('weekHighlightKm').textContent = `You walked ${kmW} km`;
+    $('weekHighlightText').textContent = w.cmp?.text || `${w.total.toLocaleString('en-US')} steps in total.`;
+    $('weekHighlightArt').innerHTML = R.svg(w.cmp?.place.art || 'shoe', w.cmp?.place.area);
+    if (!box.dataset.wired) {
+      box.dataset.wired = '1';
+      box.addEventListener('click', () => $('recapOpenBtn')?.click());
+    }
+  }
+
+  /* ---------- quick step entry ---------- */
+  let qsDay = 0;
+  const qsKey = () => { const d = new Date(); d.setDate(d.getDate() + qsDay); return key(d); };
+  const digits = (s) => String(s || '').replace(/[^0-9]/g, '');
+  function qsSync() {
+    const k = qsKey(), cur = window.FitnessApp?.stepsFor?.(k);
+    $('quickSheetTitle').textContent = cur == null ? 'Log steps' : 'Update steps';
+    $('quickStepsLabel').textContent = qsDay === 0 ? "Today's total steps" : "Yesterday's total steps";
+    const input = $('quickSteps');
+    input.value = cur == null ? '' : Number(cur).toLocaleString('en-US');
+    document.querySelectorAll('[data-qs-day]').forEach((b) => b.setAttribute('aria-checked', String(Number(b.dataset.qsDay) === qsDay)));
+    $('quickSheetMore').href = '/log.html?date=' + k;
+    $('quickSheetMsg').textContent = ''; $('quickSheetMsg').className = 'qs-msg';
+    qsLive();
+  }
+  function qsLive() {
+    const n = Number(digits($('quickSteps').value));
+    $('quickStepsLive').textContent = !n ? "Copy the total from your phone's Health app."
+      : n >= GOAL ? `About ${Math.round(n * STEP_M / 100) / 10} km. That's a 10K day!`
+      : `About ${Math.round(n * STEP_M / 100) / 10} km.`;
+  }
+  function openQuick() {
+    const dlg = $('quickSheet');
+    if (!dlg || !window.FitnessApp?.canEdit?.()) return false;
+    qsDay = 0; qsSync();
+    dlg.showModal();
+    requestAnimationFrame(() => { const i = $('quickSteps'); i.focus(); i.select?.(); });
+    return true;
+  }
+  function wireQuick() {
+    const dlg = $('quickSheet');
+    if (!dlg || dlg.dataset.wired) return;
+    dlg.dataset.wired = '1';
+    const input = $('quickSteps');
+    input.addEventListener('input', () => {
+      const raw = digits(input.value).slice(0, 6);
+      input.value = raw ? Number(raw).toLocaleString('en-US') : '';
+      qsLive();
+    });
+    document.querySelectorAll('[data-qs-day]').forEach((b) => b.addEventListener('click', () => { qsDay = Number(b.dataset.qsDay); qsSync(); input.focus(); }));
+    $('quickSheetClose').addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (ev) => { if (ev.target === dlg) dlg.close(); });
+    $('quickSheetForm').addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const raw = digits(input.value), msg = $('quickSheetMsg'), save = $('quickSheetSave');
+      if (!raw) { msg.textContent = 'Type your total steps first.'; msg.className = 'qs-msg is-error'; input.focus(); return; }
+      if (save.disabled) return;
+      save.disabled = true; save.textContent = 'Saving…';
+      try {
+        const saved = await window.FitnessApp.saveSteps(qsKey(), Number(raw));
+        if (saved) {
+          dlg.close();
+          const s = Number(saved.steps);
+          toast(s >= GOAL ? `Saved. ${s.toLocaleString('en-US')} steps, 10K done!` : `Saved. ${s.toLocaleString('en-US')} steps, about ${Math.round(s * STEP_M / 100) / 10} km.`);
+        }
+      } catch (err) {
+        msg.textContent = (err && err.message) || 'Could not save. Check your connection and try again.';
+        msg.className = 'qs-msg is-error';           // the typed number stays in the field
+      } finally { save.disabled = false; save.textContent = 'Save steps'; }
+    });
+  }
+  function toast(text) {
+    let el = $('todayToast');
+    if (!el) { el = document.createElement('div'); el.id = 'todayToast'; el.className = 'today-toast'; el.setAttribute('role', 'status'); document.body.append(el); }
+    el.textContent = text;
+    el.classList.remove('is-on'); void el.offsetWidth; el.classList.add('is-on');
+    clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('is-on'), 2600);
+  }
+
+  function mount(cb) { if (!getState) getState = cb; wireQuick(); }
+  window.FitnessToday = Object.freeze({ mount, render, openQuick });
 })();

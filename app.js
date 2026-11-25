@@ -339,7 +339,8 @@
       if(node)node.hidden=readonly;
     }
     const quick=$('quickLogBtn');
-    if(quick.firstChild)quick.firstChild.textContent = readonly ? 'View day ' : 'Check in today ';
+    if(quick.firstChild)quick.firstChild.textContent = readonly ? 'View day ' : 'Log steps ';
+    const more=document.getElementById('heroMoreLink'); if(more)more.hidden=readonly;
   }
   async function openTracker(id) {
     if (!user || !db || id === currentTrackerId) return;
@@ -550,13 +551,14 @@
     if(!info)return;
     setText('streakCurrent',shortNum(info.current));
     setText('streakBest',shortNum(info.best));
+    const bu=document.getElementById('streakBestUnit'); if(bu)bu.textContent=info.best===1?'day':'days';
     setText('streakMessage',info.metToday
-      ? '10,000-step goal reached today. Keep the streak going!'
+      ? (info.current>1 ? 'You reached 10K '+info.current+' days in a row.' : 'You reached 10K today.')
       : info.pendingToday
-        ? 'Your streak is alive. Reach 10K steps today to extend it.'
+        ? 'You reached 10K '+info.current+(info.current===1?' day':' days')+' in a row. Today can make it '+(info.current+1)+'.'
         : info.current===0 && info.goalDays===0
-          ? 'Reach 10,000 steps to start your first streak.'
-          : 'A fresh 10,000-step streak can begin today.');
+          ? 'Every step counts. 10K days build a streak.'
+          : 'Every step counts. A new streak can start any day.');
   }
   function renderStats() {
     const entry = entries.get(selectedDate);
@@ -587,8 +589,9 @@
   // Full, unrounded numbers remain available in the button's accessible label.
   function compactCalendarNumber(value) {
     const n = Number(value);
-    if (n >= 10000) return Math.round(n / 1000) + 'k';
-    if (n >= 1000) return (Math.round(n / 100) / 10).toString() + 'k';
+    // Round down so 9,999 never reads as 10k on a day that missed the goal.
+    if (n >= 10000) return Math.floor(n / 1000) + 'k';
+    if (n >= 1000) return (Math.floor(n / 100) / 10).toString() + 'k';
     return String(n);
   }
   function calendarMetric(kind, value) {
@@ -686,7 +689,10 @@
     if(section)section.scrollIntoView({behavior:'smooth',block:'start'});
     if(focusMeal && page==='logSection' && !viewingShared())$('meals').focus({preventScroll:true});
   }
-  $('quickLogBtn').addEventListener('click',()=>jumpToSection('logSection'));
+  $('quickLogBtn').addEventListener('click',()=>{
+    if(!viewingShared() && window.FitnessToday?.openQuick) window.FitnessToday.openQuick();
+    else jumpToSection('logSection');
+  });
 
   // Keep reference cards open on desktop and collapsible on mobile, including
   // after a screen rotation or viewport resize.
@@ -741,6 +747,32 @@
         showMessage('entryMessage', 'Saved securely for ' + fmtDay(saved.entry_date) + '.', 'success');
       } catch (e) { showMessage('entryMessage', errorText(e), 'error'); }
     });
+  });
+  // Quick step entry from Today: writes the steps column only, so an evening
+  // correction keeps the food, fasting and notes saved earlier that day.
+  let quickSaving=false;
+  window.FitnessApp = Object.freeze({
+    earliest: () => earliestLogDate(),
+    canEdit: () => !!user && !!db && !viewingShared(),
+    stepsFor: (k) => entries.get(k)?.steps ?? null,
+    async saveSteps(dateKey, steps) {
+      if (!user || !db || viewingShared()) throw new Error('Sign in to save steps.');
+      if (!Number.isInteger(steps) || steps < 0 || steps > 100000) throw new Error('Steps should be a whole number up to 100,000.');
+      if (dateKey < earliestLogDate() || dateKey > localDateKey(new Date())) throw new Error('You can log the last 60 days.');
+      if (quickSaving) return null;
+      quickSaving = true;
+      try {
+        const { data: saved, error } = await db.from('daily_entries')
+          .upsert({ user_id: user.id, entry_date: dateKey, steps }, { onConflict: 'user_id,entry_date' })
+          .select('id,entry_date,steps,calories_estimate,meals,fasting_hours,one_meal,coffee_cups,waist_cm,notes,meal_items')
+          .single();
+        if (error) throw new Error(errorText(error));
+        entries.set(saved.entry_date, saved);
+        window.FitnessFoodBrowser?.invalidate();
+        renderAll();
+        return saved;
+      } finally { quickSaving = false; }
+    }
   });
   $('deleteEntryBtn').addEventListener('click', async () => {
     if (!user || viewingShared() || !entries.has(selectedDate) || !window.confirm('Delete your entry for ' + fmtDay(selectedDate) + '? This cannot be undone.')) return;

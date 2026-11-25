@@ -423,3 +423,30 @@ the badge as a solid coin (`badge-3d.js`, pure CSS 3D + requestAnimationFrame):
 - 24 stacked discs make the edge; a light streak moves across the face as it
   turns; the floor shadow narrows when the coin is side-on.
 `badges.js` gained `svg(..., { flat: true })` (no floor shadow) and exports `rim`.
+
+### 26 Nov 2026: Feedback round (two ChatGPT reviews)
+
+Both reviews agreed the daily task felt bigger than one number and Today
+repeated the shortfall. Shipped:
+- Quick step entry: Today's button is "Log steps" / "Update steps" and opens
+  a bottom sheet (Today / Yesterday, prefilled total, live km, Save steps).
+  `FitnessApp.saveSteps` upserts the steps column only, so food, fasting and
+  notes saved earlier that day are kept. Errors keep the typed number; double
+  taps save once. "Add food or notes" links to Check-in for the same day.
+- Today celebrates distance ("You walked about 4.8 km today."); the shortfall
+  is said once, inside the ring. The landmark card sits right under the ring
+  and its line points to the next landmark, not to 10K. The streak pill hides
+  at 0; food kcal and fasting appear only once entered; the km row hides when
+  the title already says it.
+- Weekly highlight inside This week: last week's (or this week so far) km,
+  landmark art and comparison; tapping opens the recap. The separate Week
+  recap button is hidden.
+- Copy and numbers: Check-in "Enter your steps. Everything else is
+  optional."; "Today's total steps"; the confusing orange 10K chip removed
+  (chips sit under "Add to total"); "avg per logged day"; "est. km"; calendar
+  cells round down (9,999 shows 9.9k); "1 day" singular; streak lines state
+  facts ("You reached 10K 4 days in a row."); story card shows
+  "10K days: X of Y logged" instead of X / days-elapsed; challenge copy says
+  every walk counts and Bronze is the first medal.
+Not done yet (need decisions/tables): office walks, walking-only sharing with
+preview, reminders moved to settings, Sign out into an account menu.

@@ -338,8 +338,8 @@
     });
     out.push(w.streak.current > 0
       ? { art: 'flame', big: w.streak.current + (w.streak.current === 1 ? ' day' : ' days'),
-          lines: ['Your 10K streak is on fire. Don\'t let it go out!', w.streak.current >= w.streak.best ? 'This is your best streak ever!' : `Best streak: ${w.streak.best} days. Can you beat it?`] }
-      : { art: 'flame', big: 'New week', lines: ['Fresh start! Hit 10,000 steps today to light a new streak.', w.streak.best ? `Best streak so far: ${w.streak.best} days.` : ''].filter(Boolean) });
+          lines: [`You reached 10K ${w.streak.current === 1 ? 'today' : w.streak.current + ' days in a row'}.`, w.streak.current >= w.streak.best ? 'This is your best streak ever!' : `Best streak: ${w.streak.best} ${w.streak.best === 1 ? 'day' : 'days'}.`] }
+      : { art: 'flame', big: 'New week', lines: ['Fresh start! Hit 10,000 steps today to light a new streak.', w.streak.best ? `Best streak so far: ${w.streak.best} ${w.streak.best === 1 ? 'day' : 'days'}.` : ''].filter(Boolean) });
     return out;
   }
 
@@ -463,12 +463,14 @@
       ? `${CHEERS[day % CHEERS.length]} ${steps.toLocaleString('en-US')} steps, about ${nice(km)} km.`
       : 'Log your first steps and turn them into Riyadh landmarks.';
     let goal = '', pct = 0;
-    if (steps < GOAL) {
-      const left = GOAL - steps;
-      goal = streak.current > 0
-        ? `${left.toLocaleString('en-US')} steps to 10K. Keep your ${streak.current}-day streak alive!`
-        : `${left.toLocaleString('en-US')} steps to 10K and a brand-new streak!`;
-      pct = steps / GOAL;
+    if (!steps) {
+      goal = 'Your first kilometre is about 1,300 steps away.';
+      pct = 0;
+    } else if (steps < GOAL && next) {
+      const from = MILESTONES.filter((m) => m.km * 1000 / STEP_M <= steps).pop();
+      const startSteps = from ? from.km * 1000 / STEP_M : 0, endSteps = steps + next.stepsLeft;
+      goal = `Next stop: ${next.text}, ${next.stepsLeft.toLocaleString('en-US')} steps away.`;
+      pct = (steps - startSteps) / (endSteps - startSteps);
     } else if (next) {
       const from = MILESTONES.filter((m) => m.km * 1000 / STEP_M <= steps).pop();
       const startSteps = from ? from.km * 1000 / STEP_M : 0, endSteps = steps + next.stepsLeft;

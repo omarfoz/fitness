@@ -196,7 +196,7 @@
     const n=data.streak.current;
     const stats=[
       ['10K streak',n+(n===1?' day':' days')],
-      ['10K days',data.goalDays+' / '+data.elapsed],
+      ['10K days',data.goalDays+' of '+data.monthEntries.length+' logged'],
       ['Best streak',data.streak.best+(data.streak.best===1?' day':' days')]
     ];
     stats.forEach(([label,value],i)=>{

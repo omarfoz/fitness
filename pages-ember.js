@@ -43,11 +43,11 @@
       <div class="steps-live">
         <div class="steps-live-track" aria-hidden="true"><span id="stepsLiveBar"></span><i></i></div>
         <div class="steps-live-meta"><span id="stepsLiveText">0 of 10,000</span><span id="stepsLiveKm">0 km</span></div>
-        <div class="steps-chips" role="group" aria-label="Quick add steps">
+        <span class="steps-chips-label">Add to total</span>
+        <div class="steps-chips" role="group" aria-label="Add to total">
           <button type="button" data-add="1000">+1,000</button>
           <button type="button" data-add="2500">+2,500</button>
           <button type="button" data-add="5000">+5,000</button>
-          <button type="button" data-set="10000">10K</button>
         </div>
       </div>`);
     box.querySelectorAll('.steps-chips button').forEach((b) => b.addEventListener('click', () => {
@@ -75,6 +75,8 @@
   function renderCheckin(ctx) {
     wireCheckin();
     liveSteps();
+    const lab = document.querySelector('label[for="steps"]');
+    if (lab && ctx?.selectedDate) lab.textContent = ctx.selectedDate === key(new Date()) ? "Today's total steps" : 'Total steps that day';
     if (ctx?.selectedDate) {
       const today = key(new Date());
       eyebrow(ctx.selectedDate === today ? 'TODAY · ' + dayLabel(today) : dayLabel(ctx.selectedDate));
@@ -92,8 +94,8 @@
           <span class="month-hero-pill" id="monthHeroGoal">0 days at 10K</span>
         </div>
         <div class="month-hero-stats">
-          <div><strong id="monthHeroKm">0</strong><span>km walked</span></div>
-          <div><strong id="monthHeroAvg">0</strong><span>avg / day</span></div>
+          <div><strong id="monthHeroKm">0</strong><span>est. km</span></div>
+          <div><strong id="monthHeroAvg">0</strong><span>avg per logged day</span></div>
           <div><strong id="monthHeroBest">0</strong><span>best day</span></div>
         </div>
         <div class="month-bars" id="monthBars" aria-hidden="true"></div>
@@ -182,7 +184,7 @@
     document.documentElement.dataset.page = page || '';
     if (page === 'logSection') renderCheckin(ctx);
     else if (page === 'historySection') { eyebrow('YOUR HISTORY'); renderCalendar(ctx); }
-    else if (page === 'challengesSection') { eyebrow('EVERYONE WINS'); renderChallenges(ctx); }
+    else if (page === 'challengesSection') { eyebrow('EVERY WALK COUNTS'); renderChallenges(ctx); }
     else if (page === 'sharingPanel') { eyebrow('FRIENDS & REMINDERS'); renderShare(); }
   }
   function mount(fn) { getCtx = fn; wired = true; }

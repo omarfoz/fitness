@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="app-build" content="20261126-0003">
+  <meta name="app-build" content="20261126-0123">
   <style id="critical">html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:#0E0F12;color-scheme:dark}html[data-theme="light"]{background:#F6F3EF;color-scheme:light}body{margin:0;background:transparent;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif}</style>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Fitness">
@@ -34,21 +34,21 @@
   <link rel="stylesheet" href="/pages.css?v=20261123-5tabs">
   <link rel="stylesheet" href="/story-card.css?v=20261121-declutter-v1">
   <link rel="stylesheet" href="/ember-theme.css?v=20261124-clip-v3">
-  <link rel="stylesheet" href="/pages-ember.css?v=20261126-3d-v1">
+  <link rel="stylesheet" href="/pages-ember.css?v=20261126-fb-v2">
 
   <script>try{const mode=localStorage.getItem('fitness-theme')==='light'?'light':'dark';document.documentElement.dataset.theme=mode;document.querySelector('meta[name="theme-color"]').setAttribute('content',mode==='light'?'#f5f7fb':'#0E0F12')}catch(e){}</script>
   <script defer src="/page-loading.js?v=20261124-update-v1"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script defer src="/config.js"></script>
   <script defer src="/progress-metrics.js?v=20261121-declutter-v1"></script>
-  <script defer src="/story-card.js?v=20261124-ember-v1"></script>
-  <script defer src="/weekly-recap.js?v=20261124-ember-v3"></script>
+  <script defer src="/story-card.js?v=20261126-fb-v1"></script>
+  <script defer src="/weekly-recap.js?v=20261126-fb-v1"></script>
   <script defer src="/badges.js?v=20261126-3d-v1"></script>
   <script defer src="/badge-3d.js?v=20261126-3d-v2"></script>
   <script defer src="/challenge-medals.js?v=20261123-challenges-v1"></script>
-  <script defer src="/challenges.js?v=20261126-3d-v1"></script>
-  <script defer src="/today-hero.js?v=20261124-ember-v3"></script>
-  <script defer src="/app.js?v=20261124-pages-v1"></script>
+  <script defer src="/challenges.js?v=20261126-fb-v1"></script>
+  <script defer src="/today-hero.js?v=20261126-fb-v2"></script>
+  <script defer src="/app.js?v=20261126-fb-v1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -146,17 +146,12 @@
           </div>
         </div>
         <div class="hero-stats">
-          <div><strong id="heroKm">—</strong><span>km</span></div>
-          <div><strong id="calValue">—</strong><span>kcal, rough</span></div>
-          <div><strong id="fastValue">—</strong><span id="fastMeta">fasted</span></div>
+          <div id="heroKmBox"><strong id="heroKm">—</strong><span>est. km</span></div>
+          <div id="heroCalBox"><strong id="calValue">—</strong><span>food kcal (est.)</span></div>
+          <div id="heroFastBox"><strong id="fastValue">—</strong><span id="fastMeta">fasted</span></div>
         </div>
-        <button id="quickLogBtn" type="button" class="button primary hero-cta">Check in today</button>
-      </section>
-
-      <section class="glass-card week-bars" aria-labelledby="weekBarsTitle">
-        <div class="week-bars-head"><h2 id="weekBarsTitle">This week</h2><span id="weekCount">0 of 7 at 10K</span></div>
-        <div class="week-chart" id="weekChart" role="img" aria-label="Steps for each day this week"></div>
-        <p class="week-foot muted small">Best streak <strong id="streakBest">0</strong> days · <span id="streakMessage">Reach 10,000 steps each day to keep your streak alive.</span></p>
+        <button id="quickLogBtn" type="button" class="button primary hero-cta">Log steps</button>
+        <a class="hero-more" id="heroMoreLink" href="/log.html">Add food or notes</a>
       </section>
 
       <section class="glass-card landmark-today" id="landmarkToday" hidden aria-labelledby="landmarkHead">
@@ -169,6 +164,18 @@
           <p class="landmark-next" id="landmarkNext"></p>
         </div>
       </section>
+
+      <section class="glass-card week-bars" aria-labelledby="weekBarsTitle">
+        <div class="week-bars-head"><h2 id="weekBarsTitle">This week</h2><span id="weekCount">0 of 7 at 10K</span></div>
+        <div class="week-chart" id="weekChart" role="img" aria-label="Steps for each day this week"></div>
+        <p class="week-foot muted small">Best streak <strong id="streakBest">0</strong> <span id="streakBestUnit">days</span> · <span id="streakMessage">Reach 10,000 steps each day to keep your streak alive.</span></p>
+        <button type="button" class="week-highlight" id="weekHighlight" hidden>
+          <span class="wh-art" id="weekHighlightArt" aria-hidden="true"></span>
+          <span class="wh-copy"><small id="weekHighlightKicker">THIS WEEK SO FAR</small><strong id="weekHighlightKm">0 km</strong><span id="weekHighlightText"></span></span>
+          <svg class="wh-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+        </button>
+      </section>
+
       <a class="glass-card challenge-strip" id="challengeStrip" href="/challenges.html" hidden>
         <span class="challenge-strip-medal" id="challengeStripMedal" aria-hidden="true"></span>
         <span class="challenge-strip-copy">
@@ -179,9 +186,28 @@
         <small class="challenge-strip-days" id="challengeStripDays"></small>
       </a>
       <section class="today-actions" id="storySection" aria-label="Recap and story">
-        <button type="button" class="button subtle" id="recapOpenBtn">Week recap</button>
+        <button type="button" class="button subtle" id="recapOpenBtn" hidden>Week recap</button>
         <button id="storyOpenBtn" type="button" class="button subtle">Share story</button>
       </section>
+      <dialog class="quick-sheet" id="quickSheet" aria-labelledby="quickSheetTitle">
+        <form method="dialog" class="qs-form" id="quickSheetForm" novalidate>
+          <div class="qs-grab" aria-hidden="true"></div>
+          <div class="qs-head">
+            <h2 id="quickSheetTitle">Log steps</h2>
+            <button type="button" class="story-close" id="quickSheetClose" aria-label="Close">×</button>
+          </div>
+          <div class="qs-days" role="radiogroup" aria-label="Day">
+            <button type="button" role="radio" data-qs-day="0" aria-checked="true">Today</button>
+            <button type="button" role="radio" data-qs-day="-1" aria-checked="false">Yesterday</button>
+          </div>
+          <label class="qs-label" for="quickSteps"><span id="quickStepsLabel">Today's total steps</span></label>
+          <input id="quickSteps" type="text" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" enterkeyhint="done" placeholder="0">
+          <p class="qs-live" id="quickStepsLive">Copy the total from your phone's Health app.</p>
+          <p class="qs-msg" id="quickSheetMsg" role="status" aria-live="polite"></p>
+          <button type="submit" class="button primary qs-save" id="quickSheetSave">Save steps</button>
+          <a class="qs-more" href="/log.html" id="quickSheetMore">Add food or notes instead</a>
+        </form>
+      </dialog>
       <dialog class="recap-dialog badge-dialog" id="badgeDialog" aria-labelledby="badgeTitle">
         <div class="recap-head"><span class="badge-kicker">NEW BADGE UNLOCKED</span><button id="badgeClose" type="button" class="story-close" aria-label="Close">×</button></div>
         <div class="badge-art" id="badgeArt"></div>

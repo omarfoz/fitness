@@ -481,3 +481,20 @@ with compression; the live site can't be reached from the build machine.
 - Result: first paint 1.4 s → 1.1 s, requests 29-40 → 21-28, scores 98-100.
 Next option if needed: cache the app files on the phone (service worker) so
 pages open without waiting on the network.
+
+### 26 Nov 2026: Pages open from the phone (service worker cache)
+
+`fitness-push-sw.js` (the existing reminders worker; one worker per site, so
+caching lives in the same file) now also keeps the app's own files on the
+phone. `page-loading.js` registers it on every page after load.
+- Pages: served from the cache instantly and refreshed in the background.
+  The build check in page-loading.js reloads with `?_b=<build>` after a
+  deploy; those loads go to the network first, so updates still arrive.
+- Versioned CSS/JS and images: cache first; one copy per file is kept (older
+  `?v=` copies are deleted).
+- Never cached: `/version.json`, the worker itself, and anything on another
+  origin (Supabase API, i.e. all personal data).
+- Install pre-caches all six pages and the files they link.
+Measured on a local copy with slow 4G: first visit paints at ~1.5 s, later
+pages at 0.1-0.2 s; pages open offline; a simulated deploy was picked up and
+the old CSS copy removed. Change `CACHE` in the worker to wipe all copies.

@@ -109,3 +109,13 @@
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
   window.addEventListener('pageshow', (e) => { if (e.persisted) check(); });
 })();
+
+/* Keep the app's files on the phone so pages open without waiting on the
+ * network (fitness-push-sw.js, the same worker that delivers reminders).
+ * Registered after the page has loaded so it never competes with first paint. */
+(() => {
+  'use strict';
+  if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
+  const go = () => navigator.serviceWorker.register('/fitness-push-sw.js', { scope: '/' }).catch(() => {});
+  if (document.readyState === 'complete') go(); else window.addEventListener('load', go, { once: true });
+})();

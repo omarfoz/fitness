@@ -1,0 +1,68 @@
+{
+  "bundles": {
+    "today": [
+      "style.css",
+      "dashboard.css",
+      "light-mode.css",
+      "colors.css",
+      "food-browser.css",
+      "calendar-metrics.css",
+      "notifications.css",
+      "ios-app.css",
+      "mobile-polish.css",
+      "ux-refine.css",
+      "type-palette.css",
+      "csv-import.css",
+      "weekly-recap.css",
+      "challenges.css",
+      "pages.css",
+      "story-card.css",
+      "ember-theme.css",
+      "pages-ember.css"
+    ],
+    "app": [
+      "style.css",
+      "dashboard.css",
+      "light-mode.css",
+      "colors.css",
+      "food-browser.css",
+      "calendar-metrics.css",
+      "notifications.css",
+      "ios-app.css",
+      "mobile-polish.css",
+      "ux-refine.css",
+      "type-palette.css",
+      "csv-import.css",
+      "pages.css",
+      "ember-theme.css",
+      "pages-ember.css"
+    ],
+    "challenges": [
+      "style.css",
+      "dashboard.css",
+      "light-mode.css",
+      "colors.css",
+      "food-browser.css",
+      "calendar-metrics.css",
+      "notifications.css",
+      "ios-app.css",
+      "mobile-polish.css",
+      "ux-refine.css",
+      "type-palette.css",
+      "csv-import.css",
+      "weekly-recap.css",
+      "challenges.css",
+      "pages.css",
+      "ember-theme.css",
+      "pages-ember.css"
+    ]
+  },
+  "pages": {
+    "index": "today",
+    "log": "app",
+    "history": "app",
+    "challenges": "challenges",
+    "share": "app",
+    "settings": "app"
+  }
+}

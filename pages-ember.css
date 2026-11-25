@@ -273,5 +273,5 @@
 .settings-switch[aria-checked="true"] i { transform: translateX(20px); }
 :root[data-theme="light"] .settings-switch { background: rgba(28,25,23,.12); border-color: rgba(28,25,23,.1); }
 :root[data-theme="light"] .settings-switch[aria-checked="true"] { background: linear-gradient(110deg, #FB923C, #EA580C); }
-.settings-signout { width: 100%; min-height: 48px; margin-top: 6px; color: #FF8A80 !important; }
-:root[data-theme="light"] .settings-signout { color: #B91C1C !important; }
+.settings-signout, .button.subtle.settings-signout { width: 100%; min-height: 48px; margin-top: 6px; color: #FF8A80 !important; }
+:root[data-theme="light"] .button.subtle.settings-signout, :root[data-theme="light"] .settings-signout { color: #B91C1C !important; }

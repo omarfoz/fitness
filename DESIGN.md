@@ -463,3 +463,21 @@ were hidden inside Share.
 - Share is now only "Share your progress" (who can view). Sharing scope is
   unchanged on purpose (owner prefers the current behaviour).
 Office walks and walking-only sharing were reviewed and declined.
+
+### 26 Nov 2026: Speed pass
+
+Measured with Lighthouse (mobile, simulated slow 4G) on a local copy served
+with compression; the live site can't be reached from the build machine.
+- Pages loaded 15-18 separate render-blocking CSS files. They are now combined
+  into one file per page in `css/` (`app.css` for Check-in, Calendar, Share
+  and Settings, which have identical styles; `today.css`; `challenges.css`),
+  in the exact original order. Pixel comparison of all six pages in both
+  themes before/after: identical. Sources are unchanged; edit them, then
+  `tools/bump-build.sh` rebuilds the bundles (`tools/build-css.py`, list in
+  `tools/css-bundles.json`).
+- supabase-js is served from `/vendor/supabase-js-2.119.2.min.js` instead of
+  the jsDelivr CDN: no extra connection to a second host, and the version no
+  longer floats under `@2`.
+- Result: first paint 1.4 s → 1.1 s, requests 29-40 → 21-28, scores 98-100.
+Next option if needed: cache the app files on the phone (service worker) so
+pages open without waiting on the network.

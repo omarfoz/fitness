@@ -185,9 +185,13 @@
     showBadge(fresh, list);
   }
   function save(store) { try { localStorage.setItem(store, JSON.stringify(seen)); } catch (_) {} }
+  let badge3d = null;
   function showBadge(b, list, already = 0) {
     const next = list.filter((x) => x.group === b.group && !x.earnedOn).sort((x, y) => x.need - y.need)[0];
-    $('badgeArt').innerHTML = window.FitnessBadges.svg(b, { size: 220 });
+    badge3d?.destroy?.();
+    badge3d = null;
+    if (window.FitnessBadge3D) badge3d = window.FitnessBadge3D.mount($('badgeArt'), b, { size: 220 });
+    else $('badgeArt').innerHTML = window.FitnessBadges.svg(b, { size: 220 });
     $('badgeTitle').textContent = b.title + '!';
     $('badgeText').textContent = b.group === 'journey'
       ? `You have walked ${b.need} km since you started. ${b.hint.split(', ')[1] || ''}, on foot!`
@@ -251,6 +255,7 @@
         showBadge(list.find((b) => b.id === badge.dataset.badgeOpen), list);
       }
     });
+    $('badgeDialog')?.addEventListener('close', () => { badge3d?.destroy?.(); badge3d = null; });
     $('badgeClose')?.addEventListener('click', () => $('badgeDialog').close());
     $('badgeKeep')?.addEventListener('click', () => $('badgeDialog').close());
     $('badgeShare')?.addEventListener('click', () => shareBadge().catch(() => {}));

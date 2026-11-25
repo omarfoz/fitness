@@ -68,7 +68,7 @@
     ${locked ? `<filter id="${id}g"><feColorMatrix type="saturate" values="0"/></filter>` : ''}
   </defs>
   <g ${locked ? `filter="url(#${id}g)" opacity=".5"` : ''}>
-    <ellipse cx="120" cy="238" rx="70" ry="8" fill="#000" opacity=".25"/>
+    ${opts.flat ? '' : '<ellipse cx="120" cy="238" rx="70" ry="8" fill="#000" opacity=".25"/>'}
     <polygon points="${rim(120, 116, 101, 113, 28)}" fill="${t.rim}"/>
     <circle cx="120" cy="116" r="101" fill="${t.rim}"/>
     <circle cx="120" cy="116" r="96" fill="url(#${id}d)"/>
@@ -128,5 +128,5 @@
     });
   }
 
-  window.FitnessBadges = Object.freeze({ BADGES, TIERS, svg, evaluate });
+  window.FitnessBadges = Object.freeze({ BADGES, TIERS, svg, evaluate, rim });
 })();

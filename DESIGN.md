@@ -411,3 +411,15 @@ and `pages-ember.css`.
 - Share: icon headers; reminder toggles in orange.
 - Removed the old inline "fitness-critical-log-layout" style block from every
   page; it forced the two-column Steps/Calories layout.
+
+### 26 Nov 2026: 3D badges you can spin
+
+The badge window (new badge popup, and tapping any badge in My badges) shows
+the badge as a solid coin (`badge-3d.js`, pure CSS 3D + requestAnimationFrame):
+- spins in when it opens (skipped with Reduce Motion);
+- drag to turn it, with momentum; it slows and settles on a face;
+- tap (or Enter / Space / arrow keys) to flip; the back shows the badge name,
+  the date it was earned and the tier;
+- 24 stacked discs make the edge; a light streak moves across the face as it
+  turns; the floor shadow narrows when the coin is side-on.
+`badges.js` gained `svg(..., { flat: true })` (no floor shadow) and exports `rim`.

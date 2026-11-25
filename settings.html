@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="app-build" content="20261126-0127">
+  <style id="critical">html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:#0E0F12;color-scheme:dark}html[data-theme="light"]{background:#F6F3EF;color-scheme:light}body{margin:0;background:transparent;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif}</style>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Fitness">
+  <meta name="theme-color" content="#0E0F12">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="description" content="Private daily wellness tracker for food, steps, fasting and flexible days.">
+  <title>Fitness | Settings</title>
+  <link rel="icon" type="image/svg+xml" href="/fitness-icon.svg?v=20261123-shoe">
+  <link rel="icon" type="image/png" sizes="192x192" href="/fitness-icon-192.png?v=20261123-shoe">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://pazcqsayftolmjxgqtwj.supabase.co" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/fitness-icon-180.png?v=20261123-shoe">
+  <link rel="stylesheet" href="/style.css?v=20261115-ios-theme-sync-v2">
+  <link rel="stylesheet" href="/dashboard.css?v=20261123-5tabs">
+  <link rel="stylesheet" href="/light-mode.css?v=20261115-light-v3">
+  <link rel="stylesheet" href="/colors.css?v=20261115-colors-v1">
+  <link rel="stylesheet" href="/food-browser.css?v=20261115-mobile-v3">
+  <link rel="stylesheet" href="/calendar-metrics.css?v=20261115-cal-v1">
+  <link rel="stylesheet" href="/notifications.css?v=20261115-push-v1">
+  <link rel="stylesheet" href="/ios-app.css?v=20261115-ios-theme-sync-v2">
+  <link rel="stylesheet" href="/mobile-polish.css?v=20261116-polish-v2">
+  <link rel="stylesheet" href="/ux-refine.css?v=20261115-ux-v3">
+  <link rel="stylesheet" href="/type-palette.css?v=20261116-typography-v3">
+  <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
+  <link rel="stylesheet" href="/pages.css?v=20261123-5tabs">
+  <link rel="stylesheet" href="/ember-theme.css?v=20261124-clip-v3">
+  <link rel="stylesheet" href="/pages-ember.css?v=20261126-settings-v1">
+
+  <script>try{const mode=localStorage.getItem('fitness-theme')==='light'?'light':'dark';document.documentElement.dataset.theme=mode;document.querySelector('meta[name="theme-color"]').setAttribute('content',mode==='light'?'#f5f7fb':'#0E0F12')}catch(e){}</script>
+  <script defer src="/page-loading.js?v=20261126-settings-v1"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script defer src="/config.js"></script>
+  <script defer src="/notifications.js?v=20261121-declutter-v1"></script>
+  <script defer src="/pages-ember.js?v=20261126-settings-v1"></script>
+  <script defer src="/app.js?v=20261126-settings-v1"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="layout">
+    <header class="app-header" aria-label="Fitness Tracker">
+      <a class="tracker-identity" href="/" aria-label="Fitness Tracker home">
+        <span class="tracker-mark" aria-hidden="true">
+          <svg viewBox="1 5 39 33" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 27C10 26 11 17 15 10L22 16L27 18C28 23 34 25 37 26L37 32Q19 35 4 32Z"/><path d="M16 17L21 21M7 30H36"/></svg>
+        </span>
+        <span class="tracker-heading"><strong>Fitness</strong><small>Steps · food · streaks</small></span>
+      </a>
+      <nav class="desktop-page-nav" aria-label="Tracker pages">
+        <a href="/" class="page-nav-link">Today</a>
+        <a href="/log.html" class="page-nav-link">Check-in</a>
+        <a href="/history.html" class="page-nav-link">Calendar</a>
+        <a href="/challenges.html" class="page-nav-link">Challenges</a>
+        <a href="/share.html" class="page-nav-link">Share</a>
+      </nav>
+      <div class="tracker-actions">
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode" aria-pressed="false" title="Light mode">
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.8 15.1A8 8 0 0 1 8.9 4.2 8 8 0 1 0 19.8 15.1Z"/></svg>
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.4"/><path d="M12 3v1.8M12 19.2V21M3 12h1.8M19.2 12H21M5.64 5.64l1.27 1.27M17.09 17.09l1.27 1.27M5.64 18.36l1.27-1.27M17.09 6.91l1.27-1.27"/></svg>
+        </button>
+        <a class="account-btn is-active" aria-current="page" id="accountBtn" href="/settings.html" aria-label="Settings" title="Settings" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
+        </a>
+      </div>
+    </header>
+    <div id="main-content">
+    <div id="globalAlert" class="global-alert" role="status" aria-live="polite" hidden></div>
+
+    <section id="authView" class="auth-layout" aria-labelledby="authTitle">
+      <div class="auth-intro">
+        <span class="eyebrow"><span class="live-dot"></span> PRIVATE WELLNESS SPACE</span>
+        <h1>Progress over<br><span class="gradient-text">perfection.</span></h1>
+        <p>Check in with your daily steps and a rough calorie estimate. Hit 10,000 steps a day to build a streak. No scale, no strict diet.</p>
+        <div class="auth-steps">
+          <span>10K step streaks</span>
+          <span>Approximate calories</span>
+          <span>Your data stays yours</span>
+        </div>
+      </div>
+      <div class="glass-card auth-card">
+        <span class="eyebrow">WELCOME BACK</span>
+        <h2 id="authTitle">Sign in to your tracker</h2>
+        <p class="muted auth-description">Sign in with your email and password.</p>
+        <form id="authForm" class="form-stack">
+          <label for="authEmail">Email address</label>
+          <input id="authEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required maxlength="254">
+          <label for="authPassword">Password</label>
+          <input id="authPassword" name="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" minlength="8" required>
+          <button id="authSubmit" class="button primary full" type="submit">Sign in</button>
+        </form>
+        <div class="auth-links">
+          <button class="text-button" id="toggleSignup" type="button">Create an account</button>
+          <button class="text-button" id="forgotPassword" type="button">Forgot password?</button>
+        </div>
+        <div id="resetView" hidden>
+          <p class="muted">Choose a new password for your account.</p>
+          <form id="resetForm" class="form-stack">
+            <label for="newPassword">New password</label>
+            <input id="newPassword" type="password" required minlength="8" autocomplete="new-password">
+            <button class="button primary full" type="submit">Update password</button>
+          </form>
+        </div>
+        <div id="authMessage" class="inline-message" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <main id="appView" data-page="settingsSection" hidden>
+      <section class="page-intro" aria-labelledby="pageTitle"><div><h1 id="pageTitle">Settings</h1><p>Reminders, appearance and your account.</p></div></section>
+
+      <div class="page-layout-share">
+          <section class="glass-card push-card" id="pushPanel" aria-labelledby="pushTitle">
+            <details class="card-collapse" open>
+              <summary><span class="card-collapse-head">
+              <h2 id="pushTitle">Daily reminders</h2>
+              </span><svg class="card-collapse-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></summary>
+              <div class="card-collapse-body">
+            <p class="muted small">Up to three reminders a day, even when Fitness is closed. Pick the ones you want, then tap Enable notifications.</p>
+            <div id="pushInstallHint" class="push-install-hint" hidden>
+              <strong>On iPhone, add Fitness to your Home Screen first</strong>
+              <ol>
+                <li>In Safari, tap Share, then Add to Home Screen.</li>
+                <li>Open Fitness from the new Home Screen icon and sign in.</li>
+                <li>Come back here and tap Enable notifications.</li>
+              </ol>
+            </div>
+            <div class="push-times" aria-label="Daily reminders, Saudi time">
+              <button type="button" class="push-time-toggle is-on" data-time="10:00" aria-pressed="true">
+                <span class="push-time-indicator"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke="currentColor" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></span>
+                <span><strong>10:00 AM</strong><small>Morning motivation</small></span>
+              </button>
+              <button type="button" class="push-time-toggle is-on" data-time="16:00" aria-pressed="true">
+                <span class="push-time-indicator"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke="currentColor" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></span>
+                <span><strong>4:00 PM</strong><small>Steps check-in</small></span>
+              </button>
+              <button type="button" class="push-time-toggle is-on" data-time="21:00" aria-pressed="true">
+                <span class="push-time-indicator"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke="currentColor" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></span>
+                <span><strong>9:00 PM</strong><small>Evening check-in</small></span>
+              </button>
+            </div>
+            <p class="muted small">Times are Riyadh time.</p>
+            <div class="push-actions">
+              <button id="pushEnableBtn" type="button" class="button primary">Enable notifications</button>
+              <button id="pushDisableBtn" type="button" class="button subtle" hidden>Turn off reminders</button>
+              <button id="pushTestBtn" type="button" class="button secondary" hidden>Send test notification</button>
+              <button id="pushVerifyBtn" type="button" class="button subtle" hidden>Check registration</button>
+            </div>
+            <div id="pushStatus" class="push-message" role="status" aria-live="polite"></div>
+            <details class="push-help">
+              <summary>Not getting notifications on Android?</summary>
+              <ol>
+                <li>Open Settings → Apps → Fitness (or Chrome / Samsung Internet) → Notifications, and turn them on.</li>
+                <li>Check that Do Not Disturb is off.</li>
+                <li>Turn off battery saving for the app.</li>
+              </ol>
+            </details>
+              </div>
+            </details>
+          </section>
+          <section class="glass-card settings-card" id="appearancePanel" aria-labelledby="appearanceTitle">
+            <h2 id="appearanceTitle">Appearance</h2>
+            <div class="settings-row">
+              <span><strong>Light mode</strong><small>Dark is the default. Switch any time.</small></span>
+              <button type="button" class="settings-switch" id="settingsThemeSwitch" role="switch" aria-checked="false" aria-label="Light mode"><i></i></button>
+            </div>
+          </section>
+          <section class="glass-card settings-card" id="accountPanel" aria-labelledby="accountTitle">
+            <h2 id="accountTitle">Account</h2>
+            <div class="settings-row">
+              <span><strong>Signed in as</strong><small id="settingsEmail">—</small></span>
+            </div>
+            <button class="button subtle settings-signout" id="logoutBtn" type="button" hidden>Sign out</button>
+          </section>
+      </div>
+      <nav class="app-bottom-nav" id="appBottomNav" aria-label="Tracker navigation">
+        <div class="app-bottom-nav-inner">
+          <a class="bottom-tab" href="/" data-nav-target="todaySection">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z"/></svg><span>Today</span>
+          </a>
+          <a class="bottom-tab" href="/log.html" data-nav-target="logSection">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Check-in</span>
+          </a>
+          <a class="bottom-tab" href="/history.html" data-nav-target="historySection">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></svg><span>Calendar</span>
+          </a>
+          <a class="bottom-tab" href="/challenges.html" data-nav-target="challengesSection">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8v5a4 4 0 0 1-8 0V3Z"/><path d="M8 5H5v1a3 3 0 0 0 3 3M16 5h3v1a3 3 0 0 1-3 3M12 12v4M8.5 21h7M10 16h4l1 5H9l1-5Z"/></svg><span>Challenges</span>
+          </a>
+          <a class="bottom-tab" href="/share.html" id="bottomShareBtn" data-nav-target="sharingPanel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-2a5.5 5.5 0 0 1 11 0v2m3-9h5m-2.5-2.5v5"/></svg><span>Share</span>
+          </a>
+        </div>
+      </nav>
+      <footer class="footer">
+        <span>Private wellness tracker · Your progress stays yours</span>
+      </footer>
+    </main>
+    </div>
+  </div>
+</body>
+</html>

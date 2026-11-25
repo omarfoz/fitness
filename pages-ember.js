@@ -179,13 +179,35 @@
     add('sharingTitle', ICON.people);
   }
 
+  /* ---------- Settings ---------- */
+  const GEAR = '<circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/>';
+  const PERSON = '<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>';
+  function renderSettings(ctx) {
+    const add = (id, icon) => {
+      const h = $(id);
+      if (h && !h.querySelector('.head-icon')) h.insertAdjacentHTML('afterbegin', `<span class="head-icon">${svg(icon)}</span>`);
+    };
+    add('pushTitle', ICON.bell); add('appearanceTitle', GEAR); add('accountTitle', PERSON);
+    const mail = $('settingsEmail'); if (mail) mail.textContent = ctx?.email || '—';
+    const sw = $('settingsThemeSwitch');
+    if (!sw) return;
+    const sync = () => sw.setAttribute('aria-checked', String(document.documentElement.dataset.theme === 'light'));
+    sync();
+    if (!sw.dataset.wired) {
+      sw.dataset.wired = '1';
+      sw.addEventListener('click', () => { $('themeToggle')?.click(); setTimeout(sync, 0); });
+      $('themeToggle')?.addEventListener('click', () => setTimeout(sync, 0));
+    }
+  }
+
   function render(page) {
     const ctx = getCtx?.() || {};
     document.documentElement.dataset.page = page || '';
     if (page === 'logSection') renderCheckin(ctx);
     else if (page === 'historySection') { eyebrow('YOUR HISTORY'); renderCalendar(ctx); }
     else if (page === 'challengesSection') { eyebrow('EVERY WALK COUNTS'); renderChallenges(ctx); }
-    else if (page === 'sharingPanel') { eyebrow('FRIENDS & REMINDERS'); renderShare(); }
+    else if (page === 'sharingPanel') { eyebrow('PEOPLE WITH ACCESS'); renderShare(); }
+    else if (page === 'settingsSection') { eyebrow('YOUR ACCOUNT'); renderSettings(ctx); }
   }
   function mount(fn) { getCtx = fn; wired = true; }
 

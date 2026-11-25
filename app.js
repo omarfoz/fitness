@@ -15,7 +15,7 @@
     (inertElements[id] ||= document.createElement('div'));
   const page = document.getElementById('appView')?.dataset.page || 'todaySection';
   const routes = Object.freeze({todaySection:'/', logSection:'/log.html',
-    historySection:'/history.html', sharingPanel:'/share.html',
+    historySection:'/history.html', sharingPanel:'/share.html', settingsSection:'/settings.html',
     challengesSection:'/challenges.html'});
   function rememberTracker(id) {
     try {
@@ -177,7 +177,7 @@
     user = null; entries.clear(); flex.clear();
     currentTrackerId='mine';rememberTracker('mine'); ownedShares=[]; incomingShares=[]; lastInvitedEmail='';
     window.FitnessFoodBrowser?.clear();
-    $('appView').hidden = true; $('authView').hidden = false; $('logoutBtn').hidden = true;
+    $('appView').hidden = true; $('authView').hidden = false; $('logoutBtn').hidden = true; $('accountBtn').hidden = true;
     $('authPassword').value = '';
     showMessage('authMessage', 'Signed out successfully.', 'success');
   });
@@ -189,7 +189,7 @@
       return;
     }
     user = session.user;
-    $('authView').hidden = true; $('appView').hidden = false; $('logoutBtn').hidden = false;
+    $('authView').hidden = true; $('appView').hidden = false; $('logoutBtn').hidden = false; $('accountBtn').hidden = false;
     window.FitnessNotifications?.mount?.(db, user);
     showMessage('globalAlert', '');
     try {
@@ -812,7 +812,7 @@
     db, userId:user?.id||null, readonly:viewingShared(), entries
   }));
   window.FitnessPages?.mount?.(() => ({
-    userId:user?.id||null, readonly:viewingShared(), entries, selectedDate, displayedMonth
+    userId:user?.id||null, email:user?.email||'', readonly:viewingShared(), entries, selectedDate, displayedMonth
   }));
   window.FitnessToday?.mount?.(() => ({
     userId:user?.id||null, readonly:viewingShared(), entries, selectedDate
@@ -870,7 +870,7 @@
         user = null; entries.clear(); flex.clear();
         currentTrackerId='mine'; rememberTracker('mine'); ownedShares=[]; incomingShares=[]; lastInvitedEmail='';
     window.FitnessFoodBrowser?.clear();
-        $('appView').hidden = true; $('authView').hidden = false; $('logoutBtn').hidden = true;
+        $('appView').hidden = true; $('authView').hidden = false; $('logoutBtn').hidden = true; $('accountBtn').hidden = true;
         return;
       }
       if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session && !recovering) {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="app-build" content="20261126-0123">
+  <meta name="app-build" content="20261126-0127">
   <style id="critical">html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:#0E0F12;color-scheme:dark}html[data-theme="light"]{background:#F6F3EF;color-scheme:light}body{margin:0;background:transparent;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif}</style>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Fitness">
@@ -31,16 +31,16 @@
   <link rel="stylesheet" href="/csv-import.css?v=20261118-csv-history-v3">
   <link rel="stylesheet" href="/pages.css?v=20261123-5tabs">
   <link rel="stylesheet" href="/ember-theme.css?v=20261124-clip-v3">
-  <link rel="stylesheet" href="/pages-ember.css?v=20261126-fb-v2">
+  <link rel="stylesheet" href="/pages-ember.css?v=20261126-settings-v1">
 
   <script>try{const mode=localStorage.getItem('fitness-theme')==='light'?'light':'dark';document.documentElement.dataset.theme=mode;document.querySelector('meta[name="theme-color"]').setAttribute('content',mode==='light'?'#f5f7fb':'#0E0F12')}catch(e){}</script>
-  <script defer src="/page-loading.js?v=20261124-update-v1"></script>
+  <script defer src="/page-loading.js?v=20261126-settings-v1"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script defer src="/config.js"></script>
   <script defer src="/food-catalog.js?v=20261115-food-v2"></script>
   <script defer src="/food-browser.js?v=20261115-ux-v2"></script>
-  <script defer src="/pages-ember.js?v=20261126-fb-v2"></script>
-  <script defer src="/app.js?v=20261126-fb-v1"></script>
+  <script defer src="/pages-ember.js?v=20261126-settings-v1"></script>
+  <script defer src="/app.js?v=20261126-settings-v1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -64,7 +64,9 @@
           <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.8 15.1A8 8 0 0 1 8.9 4.2 8 8 0 1 0 19.8 15.1Z"/></svg>
           <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.4"/><path d="M12 3v1.8M12 19.2V21M3 12h1.8M19.2 12H21M5.64 5.64l1.27 1.27M17.09 17.09l1.27 1.27M5.64 18.36l1.27-1.27M17.09 6.91l1.27-1.27"/></svg>
         </button>
-        <button class="button button-small subtle" id="logoutBtn" type="button" hidden>Sign out</button>
+        <a class="account-btn" id="accountBtn" href="/settings.html" aria-label="Settings" title="Settings" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
+        </a>
       </div>
     </header>
     <div id="main-content">

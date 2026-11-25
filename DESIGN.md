@@ -450,3 +450,16 @@ repeated the shortfall. Shipped:
   every walk counts and Bronze is the first medal.
 Not done yet (need decisions/tables): office walks, walking-only sharing with
 preview, reminders moved to settings, Sign out into an account menu.
+
+### 26 Nov 2026: Settings page, Sign out moved
+
+Feedback: Sign out took the top-right corner on every page, and reminders
+were hidden inside Share.
+- Header: a gear button (`#accountBtn`, shown when signed in) replaces the
+  Sign out button and opens `/settings.html`.
+- Settings (`data-page="settingsSection"`): Daily reminders (moved from Share,
+  open by default, `notifications.js` now loads here), Appearance (light mode
+  switch, mirrors the header toggle), Account (email + Sign out).
+- Share is now only "Share your progress" (who can view). Sharing scope is
+  unchanged on purpose (owner prefers the current behaviour).
+Office walks and walking-only sharing were reviewed and declined.

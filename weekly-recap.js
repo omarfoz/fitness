@@ -48,7 +48,7 @@
   const key = (d) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   const parse = (k) => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
   const addDays = (k, n) => { const d = parse(k); d.setDate(d.getDate() + n); return key(d); };
-  const mondayOf = (k) => addDays(k, -((parse(k).getDay() + 6) % 7));
+  const mondayOf = (k) => addDays(k, -parse(k).getDay()); // start of week: Sunday (Saudi work week)
 
   function nice(n) {
     if (n >= 10) return String(Math.round(n));

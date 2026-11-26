@@ -60,7 +60,7 @@
     const archived=false,day=null;
     const monthStart=new Date(at.getFullYear(),at.getMonth(),1,12);
     const daysInMonth=new Date(at.getFullYear(),at.getMonth()+1,0).getDate();
-    const offset=(monthStart.getDay()+6)%7; // Monday first, like a real calendar
+    const offset=monthStart.getDay(); // Sunday first (Saudi work week)
     const weeks=Math.ceil((offset+daysInMonth)/7);
     const monthDays=Array.from({length:daysInMonth},(_,i)=>{
       const d=new Date(at.getFullYear(),at.getMonth(),i+1,12);
@@ -211,7 +211,7 @@
 
     // Calendar grid with a weekly column on the right.
     const right=104,gridW=W-P*2-right-16,pitch=gridW/7,y0=354,R=41;
-    ['M','T','W','T','F','S','S'].forEach((d,i)=>
+    ['S','M','T','W','T','F','S'].forEach((d,i)=>
       text(c,d,P+pitch*(i+.5),326,28,K.mist,600,BODY,'center'));
     const pos=d=>{const i=data.offset+d.day-1;
       return {cx:P+pitch*(i%7+.5),cy:y0+Math.floor(i/7)*108+54,row:Math.floor(i/7)};};

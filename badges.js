@@ -39,7 +39,7 @@
     { id: 'trip800', group: 'journey', need: 800, tier: 'legend', art: 'cliff', label: '800 KM', title: 'All of Tuwaiq', hint: 'Walk 800 km in total, the length of the Tuwaiq escarpment' },
 
     { id: 'first', group: 'special', need: 1, tier: 'bronze', art: 'shoe', label: 'DAY 1', title: 'First Steps', hint: 'Save your first check-in' },
-    { id: 'perfect', group: 'special', need: 7, tier: 'gold', art: 'park', label: '7 / 7', title: 'Perfect Week', hint: '10K steps every day, Monday to Sunday' }
+    { id: 'perfect', group: 'special', need: 7, tier: 'gold', art: 'park', label: '7 / 7', title: 'Perfect Week', hint: '10K steps every day, Sunday to Saturday' }
   ];
 
   /* ---------- drawing ---------- */
@@ -115,7 +115,7 @@
       for (const b of BADGES) if (b.group === 'streak' && run >= b.need) hit(b.id, e.entry_date);
       km += steps * STEP_M / 1000;
       for (const b of BADGES) if (b.group === 'journey' && km >= b.need) hit(b.id, e.entry_date);
-      const d = parse(e.entry_date), monday = new Date(d); monday.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+      const d = parse(e.entry_date), monday = new Date(d); monday.setDate(d.getDate() - d.getDay()); // weeks run Sunday to Saturday
       const wk = key(monday);
       if (steps >= 10000) week.set(wk, (week.get(wk) || 0) + 1);
       if (week.get(wk) === 7) hit('perfect', e.entry_date);

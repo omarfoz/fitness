@@ -498,3 +498,10 @@ phone. `page-loading.js` registers it on every page after load.
 Measured on a local copy with slow 4G: first visit paints at ~1.5 s, later
 pages at 0.1-0.2 s; pages open offline; a simulated deploy was picked up and
 the old CSS copy removed. Change `CACHE` in the worker to wipe all copies.
+
+### 27 Nov 2026: Weeks start on Sunday
+
+Owner's call (Saudi work week, Sun-Thu). Switched everywhere a week is used:
+calendar grid and its header, Today's This week bars (S M T W T F S), the
+story card calendar, the weekly recap's week ranges ("Last week" = previous
+Sunday-Saturday) and the Perfect Week badge (Sunday to Saturday).

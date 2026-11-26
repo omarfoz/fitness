@@ -624,7 +624,7 @@
     $('prevMonth').disabled=monthKey<=oldestMonth;
     $('nextMonth').disabled=monthKey>=latestMonth;
     const y = displayedMonth.getFullYear(), m = displayedMonth.getMonth();
-    const blank = (new Date(y, m, 1).getDay() + 6) % 7; // Monday first
+    const blank = new Date(y, m, 1).getDay(); // Sunday first (Saudi work week)
     const days = new Date(y, m + 1, 0).getDate();
     for (let i = 0; i < blank; i++) {
       const el = document.createElement('span'); el.className = 'calendar-day empty'; grid.append(el);

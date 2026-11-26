@@ -1,5 +1,5 @@
 /* Today, Ember layout: the big steps ring, greeting + streak pill title,
- * this week's bars (Mon–Sun, dashed 10K line) and the challenge strip.
+ * this week's bars (Sun–Sat, dashed 10K line) and the challenge strip.
  * Reads the same entries app.js already loaded; writes nothing.
  * Text for calories, fasting and the streak numbers is still set by app.js
  * (same element ids as before); this file owns the visuals around them.
@@ -34,13 +34,13 @@
   function renderWeek(entries, selected) {
     const chart = $('weekChart');
     if (!chart) return;
-    const d = parse(selected), monday = new Date(d);
-    monday.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    const d = parse(selected), monday = new Date(d); // week starts Sunday (Saudi work week)
+    monday.setDate(d.getDate() - d.getDay());
     const days = [];
     for (let i = 0; i < 7; i++) {
       const x = new Date(monday); x.setDate(monday.getDate() + i);
       const k = key(x), s = entries.get(k)?.steps;
-      days.push({ k, label: 'MTWTFSS'[i], steps: s == null ? null : Number(s), future: k > key(new Date()) });
+      days.push({ k, label: 'SMTWTFS'[i], steps: s == null ? null : Number(s), future: k > key(new Date()) });
     }
     const max = Math.max(GOAL * 1.3, ...days.map((x) => x.steps || 0));
     const line = Math.round((1 - GOAL / max) * 100);

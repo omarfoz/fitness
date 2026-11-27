@@ -505,3 +505,22 @@ Owner's call (Saudi work week, Sun-Thu). Switched everywhere a week is used:
 calendar grid and its header, Today's This week bars (S M T W T F S), the
 story card calendar, the weekly recap's week ranges ("Last week" = previous
 Sunday-Saturday) and the Perfect Week badge (Sunday to Saturday).
+
+### 27 Nov 2026: Wear it (camera medal filter)
+
+A Snapchat-style lens that hangs your medal or badge around your neck.
+- Entry: "Wear it" in the badge window, and "Try on your medals" on
+  Challenges (hidden in view-only mode). The strip shows earned challenge
+  medals first, then earned badges by tier; with nothing earned yet, this
+  month's bronze medal is offered to try on.
+- `wear-medal.js`: front camera (portrait), MediaPipe Face Detection
+  (short range) self-hosted in `/vendor/mp-face` (Apache-2.0, ~1.7 MB gzipped
+  wasm + 229 KB model) and loaded only when the filter opens; everything runs
+  on the phone, no video is uploaded. Eyes + mouth give position, size and
+  tilt; the medal hangs below the chin with light smoothing and a small
+  pendulum swing when you move (off with Reduce Motion). Challenge medals
+  use their own Sadu ribbon; badges get a drawn ribbon in the tier colours.
+- Photo: crops to exactly what is on screen, adds a small "Fitness · <name>"
+  tag, then Retake / Save / Share (iOS share sheet).
+- The service worker caches the wasm/model after first use.
+Tested in Chrome with a fake camera; needs a check on a real iPhone.

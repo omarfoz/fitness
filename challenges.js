@@ -148,6 +148,7 @@
     if (!root || !ctx) return;
     const { userId, readonly, entries } = ctx();
     if (!userId) return;
+    if ($('wearOpenBtn')) $('wearOpenBtn').hidden = !!readonly;
     const now = new Date(), monthKey = key(now).slice(0, 7);
     document.querySelectorAll('[data-ch-tab]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.chTab === tab)));
     if (tab === 'badges') { root.innerHTML = badgeGrid(entries); if (!readonly) celebrate(entries); return; }
@@ -259,6 +260,8 @@
     $('badgeClose')?.addEventListener('click', () => $('badgeDialog').close());
     $('badgeKeep')?.addEventListener('click', () => $('badgeDialog').close());
     $('badgeShare')?.addEventListener('click', () => shareBadge().catch(() => {}));
+    $('badgeWear')?.addEventListener('click', () => openWear($('badgeDialog').dataset.badge));
+    $('wearOpenBtn')?.addEventListener('click', () => openWear());
   }
   async function refresh() {
     if (!ctx?.()?.userId) return;
@@ -269,5 +272,37 @@
     }
     render();
   }
+  /* ---------- Wear it: camera filter items (earned badges + medals) ---------- */
+  function wearItems(entries) {
+    const B = window.FitnessBadges, M = window.FitnessChallengeMedals;
+    const items = [];
+    const monthKey = key(new Date()).slice(0, 7);
+    for (const c of CHALLENGES.filter((x) => x.id <= monthKey).reverse()) {
+      const p = progress(c, entries);
+      if (p.level) {
+        const tier = TIERS[p.level - 1];
+        items.push({ id: `${c.id}-${tier}`, kind: 'medal', title: `${c.title} · ${tier[0].toUpperCase() + tier.slice(1)}`, svg: M.svg(medalOf(c), tier, { size: 300 }) });
+      }
+    }
+    const order = ['legend', 'ember', 'gold', 'silver', 'bronze'];
+    const earned = B.evaluate(entries).filter((b) => b.earnedOn).sort((a, b) => order.indexOf(a.tier) - order.indexOf(b.tier));
+    for (const b of earned) {
+      const t = B.TIERS[b.tier];
+      items.push({ id: b.id, kind: 'badge', title: b.title, svg: B.svg(b, { size: 300, flat: true }), ribbon: [t.rim, t.a] });
+    }
+    if (!items.length) {           // nothing earned yet: let them try this month's medal on
+      const c = CHALLENGES.find((x) => x.id === monthKey) || CHALLENGES[0];
+      items.push({ id: `${c.id}-preview`, kind: 'medal', title: `${c.title} · try it on`, svg: M.svg(medalOf(c), 'bronze', { size: 300 }) });
+    }
+    return items;
+  }
+  function openWear(startId) {
+    if (!window.FitnessWear || !ctx) return;
+    const items = wearItems(ctx().entries);
+    const i = Math.max(0, items.findIndex((x) => x.id === startId));
+    $('badgeDialog')?.open && $('badgeDialog').close();
+    window.FitnessWear.open(items, i);
+  }
+
   window.FitnessChallenges = Object.freeze({ mount, refresh, render, CHALLENGES, progress, celebrate: () => ctx && celebrate(ctx().entries) });
 })();

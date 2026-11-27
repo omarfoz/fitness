@@ -19,7 +19,7 @@ const NEVER = new Set(['/version.json', '/fitness-push-sw.js']);
 
 const pageKey = (url) => (url.pathname === '/index.html' ? '/' : url.pathname);
 const isPage = (req, url) => req.mode === 'navigate' || PAGES.includes(url.pathname) || url.pathname === '/index.html';
-const isAsset = (url) => /\.(css|js|svg|png|webp|jpg|jpeg|ico|webmanifest|woff2?)$/i.test(url.pathname);
+const isAsset = (url) => /\.(css|js|svg|png|webp|jpg|jpeg|ico|webmanifest|woff2?|wasm|tflite|binarypb|data)$/i.test(url.pathname);
 
 // Local files a page links to (stylesheets, scripts, icons, manifest).
 function assetsIn(html) {

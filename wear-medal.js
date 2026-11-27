@@ -128,9 +128,8 @@
       stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
         // Ask for the camera in the same orientation as the screen, so nothing is cropped away.
-        video: innerHeight >= innerWidth
-          ? { facingMode: facing, width: { ideal: 720 }, height: { ideal: 1280 }, aspectRatio: { ideal: 9 / 16 } }
-          : { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } }
+        // Natural 3:4 frame from the sensor; nothing is cropped or zoomed on screen.
+        video: { facingMode: facing, width: { ideal: 1440 }, height: { ideal: 1440 } }
       });
       video.srcObject = stream;
       await video.play().catch(() => {});
@@ -195,6 +194,18 @@
       g.lineWidth = size * 0.03; g.strokeStyle = '#E8C77A'; g.stroke();
     }
 
+    // The whole camera frame is shown (object-fit: contain, no zoom or crop).
+    // Lowest point (canvas px) the medal may reach: the frame's bottom, or the
+    // top of the controls if they overlap the frame on a short screen.
+    function maxBottom() {
+      const cw = canvas.clientWidth || canvas.width, chh = canvas.clientHeight || canvas.height;
+      const sc = Math.min(cw / canvas.width, chh / canvas.height);
+      const top = (chh - canvas.height * sc) / 2;
+      const controlsTop = chh - (el.querySelector('.wf-bottom')?.offsetHeight || 160) - 8;
+      const limitCss = Math.min(top + canvas.height * sc, controlsTop);
+      return Math.min(canvas.height, (limitCss - top) / sc) - 6;
+    }
+
     function draw() {
       if (!running) return;
       raf = requestAnimationFrame(draw);
@@ -233,15 +244,28 @@
         g.save();
         g.globalAlpha = Math.min(1, alpha);
         g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = fw * 0.08; g.shadowOffsetY = fw * 0.03;
+        const limit = maxBottom();
         if (it.kind === 'medal') {
           // The challenge medal carries its own ribbon: hang its top from the neck.
-          const wImg = fw * 1.05, hImg = wImg * (art.height / art.width || 1.25);
+          // Close-up selfies: shrink it so it stays above the controls.
+          const ratio = art.height / art.width || 1.25;
+          let wImg = fw * 1.05;
+          const room = limit - neck.y;
+          if (wImg * ratio * 0.94 > room) wImg = Math.max(fw * 0.5, room / (ratio * 0.94));
+          const hImg = wImg * ratio;
           g.translate(neck.x, neck.y); g.rotate(ang);
           g.drawImage(art, -wImg / 2, -hImg * 0.06, wImg, hImg);
         } else {
-          const size = fw * 0.72;
-          const strapTop = { x: neck.x + d.x * fw * 0.12, y: neck.y + d.y * fw * 0.12 };  // collarbones, below the chin
-          const cx = strapTop.x + dd.x * fw * 0.78, cy = strapTop.y + dd.y * fw * 0.78;
+          // Strap tops sit at the collarbones; the coin hangs below. If that would
+          // fall behind the controls (face close to the camera), pull it up and shrink it.
+          let drop = 0.12, hang = 0.78, size = fw * 0.72;
+          const need = (drop + hang) * fw + size * 0.55, room = limit - neck.y;
+          if (need > room) {
+            const f = Math.max(0.45, room / need);
+            drop *= f; hang *= f; size *= Math.max(0.6, f);
+          }
+          const strapTop = { x: neck.x + d.x * fw * drop, y: neck.y + d.y * fw * drop };
+          const cx = strapTop.x + dd.x * fw * hang, cy = strapTop.y + dd.y * fw * hang;
           g.shadowColor = 'transparent';
           drawRibbonAndCoin(cx, cy, size, it, strapTop, dd, ang);
           g.shadowColor = 'rgba(0,0,0,.45)';
@@ -267,11 +291,8 @@
     // capture
     q('shot').addEventListener('click', async () => {
       if (!canvas.width) return;
-      // Save exactly what is on screen: the canvas is shown with object-fit: cover.
-      const cw = canvas.clientWidth || canvas.width, chh = canvas.clientHeight || canvas.height;
-      const sc = Math.max(cw / canvas.width, chh / canvas.height);
-      const vwid = Math.round(cw / sc), vhei = Math.round(chh / sc);
-      const sx = Math.round((canvas.width - vwid) / 2), sy = Math.round((canvas.height - vhei) / 2);
+      // The whole frame is on screen, so the photo is the whole frame.
+      const vwid = canvas.width, vhei = canvas.height, sx = 0, sy = 0;
       const out = document.createElement('canvas');
       out.width = vwid; out.height = vhei;
       const o = out.getContext('2d');
@@ -280,7 +301,7 @@
       const label = `Fitness  ·  ${items[index].title}`;
       o.font = `700 ${Math.round(24 * s)}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
       const tw = o.measureText(label).width, bh = 50 * s, bw = tw + 40 * s;
-      const bx = (out.width - bw) / 2, by = out.height - bh - pad;
+      const bx = pad, by = pad;   // top-left, clear of the medal on the chest
       o.fillStyle = 'rgba(14,15,18,.72)';
       o.beginPath(); o.roundRect ? o.roundRect(bx, by, bw, bh, bh / 2) : o.rect(bx, by, bw, bh); o.fill();
       o.fillStyle = '#FFB27A'; o.textBaseline = 'middle'; o.fillText(label, bx + 20 * s, by + bh / 2 + 1);

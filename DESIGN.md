@@ -524,3 +524,10 @@ A Snapchat-style lens that hangs your medal or badge around your neck.
   tag, then Retake / Save / Share (iOS share sheet).
 - The service worker caches the wasm/model after first use.
 Tested in Chrome with a fake camera; needs a check on a real iPhone.
+- 27 Nov, after the first iPhone test: the view no longer zooms. It showed
+  the camera with object-fit: cover, which cropped the iPhone's 3:4 frame
+  hard on a tall screen. Now the whole frame is shown (contain, like the
+  Camera app) with the controls below it, the camera is asked for its natural
+  frame, the medal never hangs below the frame or behind the controls (it
+  moves up and shrinks on close-ups), and the photo is the whole frame with
+  the Fitness tag in the top-left corner.

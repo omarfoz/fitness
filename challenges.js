@@ -206,35 +206,105 @@
   }
 
   /* ---------- share a badge ---------- */
+  /* Share a badge as an animated GIF: the coin spins one full turn (edge,
+   * back and front, light sweeping across), then rests facing you. Story size
+   * (540 x 960), same layout as before. Frames after the first store only the
+   * pixels that changed, so the file stays small. */
   async function shareBadge() {
     const b = window.FitnessBadges.BADGES.find((x) => x.id === $('badgeDialog').dataset.badge);
     if (!b) return;
-    const W = 1080, H = 1920, S = 2, c = document.createElement('canvas');
-    c.width = W * S; c.height = H * S;
-    const g = c.getContext('2d', { alpha: false });
-    g.scale(S, S);
-    const bg = g.createRadialGradient(540, 760, 60, 540, 760, 1100);
-    bg.addColorStop(0, '#4A2010'); bg.addColorStop(1, '#0E0F12');
-    g.fillStyle = bg; g.fillRect(0, 0, W, H);
-    const img = new Image();
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(window.FitnessBadges.svg(b, { size: 720 }));
-    await img.decode();
-    g.drawImage(img, 180, 380, 720, 780);
-    const font = '-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif';
-    g.textAlign = 'center';
-    g.fillStyle = '#FFB27A'; g.font = `800 40px ${font}`; g.fillText('NEW BADGE UNLOCKED', W / 2, 260);
-    g.fillStyle = '#F5F2EE'; g.font = `800 96px ${font}`; g.fillText(b.title, W / 2, 1300);
-    g.fillStyle = '#D9D1CA'; g.font = `500 44px ${font}`; g.fillText(b.hint, W / 2, 1390, 960);
-    g.fillStyle = '#B9B1AA'; g.font = `500 30px ${font}`; g.fillText('fitness.oalfawzan.sa', W / 2, H - 80);
-    const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
-    const file = new File([blob], 'fitness-badge-' + b.id + '.png', { type: 'image/png' });
-    if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
-      try { await navigator.share({ files: [file] }); } catch (e) { if (e.name !== 'AbortError') throw e; }
-      return;
+    const btn = $('badgeShare'), label = btn?.textContent;
+    if (btn) { btn.disabled = true; btn.textContent = 'Making GIF…'; }
+    try {
+      const earned = window.FitnessBadges.evaluate(ctx().entries).find((x) => x.id === b.id) || b;
+      const { GIFEncoder, quantize, applyPalette } = await import('/vendor/gifenc-1.0.3.esm.js');
+      const W = 540, H = 960, SIZE = 360, FRAMES = 30;
+      const tier = window.FitnessBadges.TIERS[b.tier];
+      const load = (svg) => new Promise((res, rej) => {
+        const i = new Image(); i.onload = () => res(i); i.onerror = rej;
+        i.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.includes('xmlns=') ? svg : svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"'));
+      });
+      const front = await load(window.FitnessBadges.svg(earned, { size: 720, flat: true }));
+      const back = await load(window.FitnessBadge3D?.backSvg?.(earned, 720) || window.FitnessBadges.svg(earned, { size: 720, flat: true }));
+      const c = document.createElement('canvas'); c.width = W; c.height = H;
+      const g = c.getContext('2d', { willReadFrequently: true });
+      const font = '-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif';
+      const cx = W / 2, top = 190, ih = SIZE * 260 / 240;          // badge image box
+      const dcx = cx, dcy = top + SIZE * 116 / 240, R = SIZE * 106 / 240, T = SIZE * 0.07;
+      const shade = (hex, f) => '#' + [1, 3, 5].map((i) => Math.max(0, Math.min(255, Math.round(parseInt(hex.slice(i, i + 2), 16) * f))).toString(16).padStart(2, '0')).join('');
+      function frame(theta, shine) {
+        // a gentle glow: fewer shades means no visible rings in a 256-colour GIF
+        const bg = g.createRadialGradient(cx, 380, 30, cx, 380, 520);
+        bg.addColorStop(0, '#2E1710'); bg.addColorStop(1, '#0E0F12');
+        g.fillStyle = bg; g.fillRect(0, 0, W, H);
+        g.textAlign = 'center';
+        g.fillStyle = '#FFB27A'; g.font = `800 20px ${font}`; g.fillText('NEW BADGE UNLOCKED', cx, 130);
+        g.fillStyle = '#F5F2EE'; g.font = `800 48px ${font}`; g.fillText(b.title, cx, 650);
+        g.fillStyle = '#D9D1CA'; g.font = `500 22px ${font}`; g.fillText(b.hint, cx, 695, 480);
+        g.fillStyle = '#B9B1AA'; g.font = `500 15px ${font}`; g.fillText('fitness.oalfawzan.sa', cx, H - 40);
+        const s = Math.cos(theta), sn = Math.sin(theta), k = Math.abs(s);
+        // floor shadow narrows side-on
+        g.fillStyle = 'rgba(0,0,0,.35)';
+        g.beginPath(); g.ellipse(cx, top + ih + 18, SIZE * 0.36 * (0.25 + 0.75 * k), 9, 0, 0, Math.PI * 2); g.fill();
+        // edge: stacked discs between the faces
+        const N = 10;
+        for (let i = 0; i < N; i++) {
+          const off = sn * T * (i / (N - 1) - 0.5);
+          g.fillStyle = i % 3 === 1 ? shade(tier.rim, 1.3) : shade(tier.rim, 0.75);
+          g.beginPath(); g.ellipse(dcx + off, dcy, Math.max(0.5, R * k), R, 0, 0, Math.PI * 2); g.fill();
+        }
+        // the visible face, squeezed by the turn
+        const img = s >= 0 ? front : back, faceOff = sn * T * 0.5 * (s >= 0 ? 1 : -1);
+        g.save();
+        g.translate(dcx + faceOff, 0); g.scale(Math.max(0.01, k), 1);
+        g.drawImage(img, -SIZE / 2, top, SIZE, ih);
+        if (shine >= 0 && shine <= 1) {
+          g.beginPath(); g.arc(0, dcy, R * 0.98, 0, Math.PI * 2); g.clip();
+          const x = -R * 1.6 + shine * R * 3.2;
+          const gr = g.createLinearGradient(x - R * 0.35, 0, x + R * 0.35, 0);
+          gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.5, 'rgba(255,255,255,.5)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+          g.globalCompositeOperation = 'lighter'; g.fillStyle = gr; g.fillRect(-R, dcy - R, R * 2, R * 2);
+        }
+        g.restore();
+        return g.getImageData(0, 0, W, H).data;
+      }
+      const ease = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+      const frames = [];
+      for (let i = 0; i < FRAMES; i++) {
+        const p = i / FRAMES;
+        frames.push(frame(ease(p) * Math.PI * 2, p > 0.6 ? (p - 0.6) / 0.4 * 1.3 - 0.15 : -1));
+        if (i % 8 === 7) await new Promise((r) => setTimeout(r));
+      }
+      const mid = frames[Math.round(FRAMES * 0.85)], sample = new Uint8Array(frames[0].length + mid.length);
+      sample.set(frames[0]); sample.set(mid, frames[0].length);
+      const palette = quantize(sample, 255), TI = palette.length;
+      const gif = GIFEncoder();
+      let prev = null;
+      for (let i = 0; i < frames.length; i++) {
+        const idx = applyPalette(frames[i], palette);
+        const delay = i === 0 ? 1200 : 45;               // rest facing you, then spin
+        if (!prev) gif.writeFrame(idx, W, H, { palette: palette.concat([[0, 0, 0]]), delay, repeat: 0, dispose: 1 });
+        else {
+          const out = new Uint8Array(idx.length);
+          for (let k = 0; k < idx.length; k++) out[k] = idx[k] === prev[k] ? TI : idx[k];
+          gif.writeFrame(out, W, H, { delay, transparent: true, transparentIndex: TI, dispose: 1 });
+        }
+        prev = idx;
+        if (i % 8 === 7) await new Promise((r) => setTimeout(r));
+      }
+      gif.finish();
+      const blob = new Blob([gif.bytes()], { type: 'image/gif' });
+      const file = new File([blob], 'fitness-badge-' + b.id + '.gif', { type: 'image/gif' });
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        try { await navigator.share({ files: [file] }); } catch (e) { if (e.name !== 'AbortError') throw e; }
+        return;
+      }
+      const url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = file.name; document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 30000);
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = label; }
     }
-    const url = URL.createObjectURL(blob), a = document.createElement('a');
-    a.href = url; a.download = file.name; document.body.append(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 30000);
   }
 
   function mount(getContext) {

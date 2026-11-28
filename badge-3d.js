@@ -187,5 +187,5 @@
     };
   }
 
-  window.FitnessBadge3D = Object.freeze({ mount });
+  window.FitnessBadge3D = Object.freeze({ mount, backSvg: (badge, size) => backSvg(badge, window.FitnessBadges.TIERS[badge.tier], size) });
 })();

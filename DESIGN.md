@@ -548,3 +548,11 @@ and save a GIF.
   the first store only the pixels that changed, so a typical GIF is ~250 KB
   instead of ~1.9 MB.
 - The MediaPipe face tracking and `/vendor/mp-face` were removed.
+
+### 28 Nov 2026: Badge Share is a GIF
+
+"Share" in the badge window now makes a 540 x 960 story GIF: the badge rests
+facing you (1.2 s), then spins one full turn (edge, back face with name and
+date, front again) with a light sweep at the end, looping. Same layout as the
+old PNG. Uses gifenc with the changed-pixels trick (~0.6 MB, < 1 s to build).
+`FitnessBadge3D.backSvg` is exported for it.

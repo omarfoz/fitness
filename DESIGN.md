@@ -531,3 +531,20 @@ Tested in Chrome with a fake camera; needs a check on a real iPhone.
   frame, the medal never hangs below the frame or behind the controls (it
   moves up and shrinks on close-ups), and the photo is the whole frame with
   the Fitness tag in the top-left corner.
+
+### 28 Nov 2026: Wear it is now a photo editor + GIF (no live camera)
+
+Owner didn't like the live camera filter; he wants to place the medal himself
+and save a GIF.
+- Flow: "Take a photo" (file input, `capture="user"`) or "Choose from Photos"
+  → the photo with the medal on it → drag with one finger, pinch with two to
+  resize and rotate (Size slider and mouse wheel too) → "Save GIF" or "Photo"
+  → preview → Save or share (iOS share sheet).
+- The medal swings gently and a light streak sweeps across it, live in the
+  editor and in the GIF (24 frames, 70 ms, loops, 480 px wide). Reduce Motion
+  stops the live animation.
+- GIF: `vendor/gifenc-1.0.3.esm.js` (MIT, 9 KB), imported only on Save GIF.
+  One 255-colour palette for all frames plus a transparent slot; frames after
+  the first store only the pixels that changed, so a typical GIF is ~250 KB
+  instead of ~1.9 MB.
+- The MediaPipe face tracking and `/vendor/mp-face` were removed.
